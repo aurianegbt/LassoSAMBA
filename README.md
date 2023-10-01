@@ -1,0 +1,39 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# LassoSAMBA
+
+*Auriane Gabaut, Mélanie Prague*
+
+<div style="text-align: justify;">
+
+  Building non-linear mixed-effects models (NLMEM) is a crucial step to
+enhance our understanding of biological processes. In particular, it
+allows us to take into account the variability existing between
+individual by defining the model parameters as individual. These are
+defined as a combination of fixed effects -representing population-level
+relationships with covariates- and random effects -capturing individual
+variability around these relationships. Therefore, selecting the
+covariates defining the individual parameters play a crucial role in
+model building procedure. The selecting step is based on estimation of
+the different effect and it’s made possible using SAEM, Stochastic
+Approximation Expectation-Maximmization (Dempster, 1977) algorithm, a
+statistical optimization method, but is a time-consuming procedure.
+
+  To achieve the construction of a nonlinear mixed-effects model,
+conventional approaches such as SCM (Jonsson, 1998) or COSSAC (Ayral,
+2021) algorithms can be employed, or, alternatively, a more
+time-efficient algorithm like SAMBA (Prague and Lavielle, 2022). In a
+low-dimensional framework, these procedures are all efficient to build a
+model based on datasets, by minimizing an information criterion.
+However, in a high-dimensional framework, such as with transcriptomic
+data, the task is made challenging and need to be improved. In fact,
+initially SAMBA uses a stepAIC algorithm to select the covariates
+defining the NLMEM individual parameters. However, integrating a
+multivariate lasso approach instead enables us to better account for the
+correlations among model parameters and improve the model-building
+process in high dimensions. The method proposed used a whitening step
+(Perrot-Dockès, 2018) and a stability selection process (Meinshausen and
+Bühlmann, 2010).
+
+</div>
