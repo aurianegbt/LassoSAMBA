@@ -15,7 +15,7 @@ gatherResults <- function(covariateSize=c(100,200),
       cleanFile(covariateSize,covariateType,completePrint,buildMethod,print,buildOptions,Rv)
     }
   }
-  
+
   for(Rv in Rsmlx){
     for(opt in buildOptions){
       printProj = TRUE
@@ -24,46 +24,46 @@ gatherResults <- function(covariateSize=c(100,200),
           for(meth in buildMethod){
             printBuildInfo = TRUE
             if(dir.exists(paste0("Results/Results",Rv)) && dir.exists(paste0("Results/Results",Rv,"/Results_",meth))){
-              
-              # Folder and paths 
+
+              # Folder and paths
               Folder =paste0("Results/Results",Rv,"/")
               resultsFolder = paste0(Folder,"Results_",meth,"/",cov,type)
               pathToSave=paste0(Folder,"Results_",meth,"/finalResults/")
               if(!dir.exists(pathToSave)){dir.create(pathToSave)}
-              
+
               if(is.null(nameToSave)){
                 nameToGiveComp=paste0(cov,type,"comp.RData")
                 nameToGive=paste0(cov,type,".RData")
               }else{
-                nameToGiveComp=paste0(nameToGive,"comp.RData") 
+                nameToGiveComp=paste0(nameToGive,"comp.RData")
                 nameToGive =paste0(nameToGive,".RData")
               }
-              
-              # Get Results 
+
+              # Get Results
               Models = list()
               computationTime = numeric(0)
-              iterationCount = numeric(0) 
+              iterationCount = numeric(0)
               missingFile = numeric(0)
-              
+
               for(i in 1:numFiles){
                 if(file.exists(paste0(resultsFolder,"/buildResults_",i,".RData"))){
                   load(paste0(resultsFolder,"/buildResults_",i,".RData"))
                   load(paste0(resultsFolder,"/compResults_",i,".RData"))
-                  
+
                   name = paste0("estim_",i)
                   Models <- append(Models,list(model))
                   computationTime <- c(computationTime,time[[1]])
                   iterationCount <- c(iterationCount,iter)
-                  
+
                   names(Models)[length(Models)] <-  names(computationTime)[length(computationTime)] <- names(iterationCount)[length(iterationCount)] <- name
                 }else{missingFile = c(missingFile,i)}
               }
-              
+
               # Print information and save data
               if(length(missingFile)!=numFiles){
                 save(Models,file=paste0(pathToSave,nameToGive))
                 save(computationTime,iterationCount,file=paste0(pathToSave,"/",nameToGiveComp))
-                
+
                 if(print){
                   if( (length(missingFile)==0 && completePrint) || length(missingFile)!=0){
                     if(printProj){
@@ -90,10 +90,7 @@ gatherResults <- function(covariateSize=c(100,200),
                       }else if(meth=="lassoSSCl"){
                         cat("lasso with stability selection\nand preliminary clusterisation step")
                       }
-                      if(Rv=="2"){
-                        cat(" (and global IC test)")
-                      }else if(Rv=="Step"){
-                        cat(" (and local IC test)")}
+                      cat(paste0(" ",Rv))
                       cat(" :\n")
                       printBuildInfo = FALSE
                     }

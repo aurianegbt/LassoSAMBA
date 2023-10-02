@@ -1,5 +1,5 @@
-getResults <- function(buildMethod=c("reg","lassoSS","lassoSSCl"),
-                       covariateSize=c(100,200),
+getResults <- function(buildMethod=c("reg","lassoSS"),
+                       covariateSize=200,
                        covariateType=c("cov","corcov"),
                        files="all.computed",
                        buildOptions="standard",
@@ -161,6 +161,7 @@ getResults.data <- function(buildMethod=c("reg","lassoSS","lassoSSCl"),
                 H1 = list(phi_S="cAGE",phi_L="RACE",delta_AB="SEX")
                 H0 = lapply(H1,FUN = function(x){setdiff(orderList[[stringr::str_remove(type,"2")]][1:as.numeric(sim)],x)})
 
+                selection = list(ph_S=selectionS,phi_L=selectionL,delta_AB=selectionD)
                 aux = lapply(list("phi_S","phi_L","delta_AB"),FUN = function(x){data.frame(Model = num,
                                                               ProjectNumber=paste0(sim," covariates"),
                                                               TypeOfSim = type,
