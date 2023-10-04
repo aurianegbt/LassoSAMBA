@@ -2,9 +2,18 @@ graphsGenerate <- function(covariateSize=200,
                            buildMethod=c("regression","lassoSS"),
                            buildOption="standard",
                            Rsmlx="",
-                           JPEG=FALSE){
+                           JPEG = FALSE,
+                           PNG = TRUE){
+  if(file.exists(paste0("Results/Results",Rsmlx))){
+    compTime <- as.logical(readLines(paste0("Results/Results",Rsmlx,"/compTime.txt")))
+  }else{
+    compTime = FALSE
+  }
+
   library(ggplot2,quietly=TRUE)
   library(ggpubr,quietly=TRUE)
+  library(webshot2)
+  suppressMessages(library(flextable))
   library(grid)
   library(gtable)
   library(gridExtra)
@@ -13,16 +22,16 @@ graphsGenerate <- function(covariateSize=200,
   source("Fun/graphs.R")
 
 
-  generalsubtitle = paste0("Among 100 simulated datasets, with 100 individuals, ",covariateSize," covariates.\n")
+  generalsubtitle = paste0("Among 100 simulated datasets of simulated humoral immune response to a Ebola Vaccine (Ad26/MVA) for 100 individuals, with ",covariateSize," covariates.\n")
   Titlelist = list(regression = list(Mstar = "Model built with SAMBA.\nThe Model is initialized with the true one.",
                                      noCov0="Model built with SAMBA.\nThe Model is build whithout excluding covariates.",
                                      standard ="Model built with SAMBA."),
-                   lassoSS = list(Mstar = "Model built with SAMBA using lasso approaches.\nThe Model is initialized with the true one.",
-                                  noCov0="Model built with SAMBA using lasso approaches.\nThe Model is build whithout excluding covariates.",
-                                  standard ="Model built with SAMBA using lasso approaches."),
-                   lassoSSCl = list(Mstar = "Model built with SAMBA using lasso approaches, and preliminary clustering step.\nThe Model is initialized with the true one.",
-                                    noCov0="Model built with SAMBA using lasso approaches, and preliminary clustering step.\nThe Model is build whithout excluding covariates.",
-                                    standard ="Model built with SAMBA using lasso approaches, and preliminary clustering step."))
+                   lassoSS = list(Mstar = "Model built with a lasso approach within SAMBA.\nThe Model is initialized with the true one.",
+                                  noCov0="Model built with a lasso approach within SAMBA.\nThe Model is build whithout excluding covariates.",
+                                  standard ="Model built with a lasso approach within SAMBA."),
+                   lassoSSCl = list(Mstar = "Model built with a lasso approach within SAMBA, and a clustering step.\nThe Model is initialized with the true one.",
+                                    noCov0="Model built with a lasso approach within SAMBA, and a clustering step.\nThe Model is build whithout excluding covariates.",
+                                    standard ="Model built with a lasso approach within SAMBA, and a clustering step."))
 
 
   initFolder=paste0("~/Travail/Présentation/Plot/Results")
@@ -44,9 +53,9 @@ graphsGenerate <- function(covariateSize=200,
       if(!dir.exists(Folder)){dir.create(Folder)}
       subtitle = paste0(generalsubtitle,Titlelist[[meth]][[opt]])
       for(sim in covariateSize){
-        graphsTotalNB(Folder,subtitle,sim,meth,opt,Rsmlx,JPEG)
-        graphsParNB(Folder,subtitle,sim,meth,opt,Rsmlx,JPEG)
-        tableStats(Folder,subtitle,sim,meth,opt,Rsmlx,JPEG)
+        graphsTotalNB(Folder,subtitle,sim,meth,opt,Rsmlx,JPEG,PNG)
+        graphsParNB(Folder,subtitle,sim,meth,opt,Rsmlx,JPEG,PNG)
+        tableStats(Folder,subtitle,sim,meth,opt,Rsmlx,JPEG,PNG)
       }
     }
   }
@@ -57,16 +66,16 @@ graphsGenerate <- function(covariateSize=200,
       for(sim in covariateSize){
         Folder=initFolder
         subtitle = generalsubtitle
-        graphsCompMethod(Folder,subtitle,sim,buildMethod,opt,Rsmlx,JPEG)
-        graphsCompMethod2(Folder,subtitle,sim,buildMethod,opt,Rsmlx,JPEG)
-        tableStatsComp(Folder,subtitle,sim,meth,opt,Rsmlx,JPEG)
+        graphsCompMethod(Folder,subtitle,sim,buildMethod,opt,Rsmlx,JPEG,compTime,PNG)
+        graphsCompMethod2(Folder,subtitle,sim,buildMethod,opt,Rsmlx,JPEG,PNG)
+        tableStatsComp(Folder,subtitle,sim,buildMethod,opt,Rsmlx,JPEG,PNG)
       }
     }
   }
 }
 
 ###############################################################################
-tableStats <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="standard",Rsmlx,JPEG){
+tableStats <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="standard",Rsmlx,JPEG,PNG){
   load(paste0("Save/BuildResults_",Rsmlx,".RData"))
 
   resultModelCov <- resultModel[resultModel$ProjectNumber == paste(covariateSize,"covariates") & resultModel$Method==buildMethod, ]
@@ -75,203 +84,214 @@ tableStats <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="st
 
   # Data
 
-  df = data.frame(TypeOfSim=c("With uncorrelated covariates","With correlated covariates"),
+  df = data.frame(TypeOfSim=c("cov","corcov"),
                   FDR_mean = c(mean(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"]),
                                mean(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"])),
+                  FDR_median = c(median(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"]),
+                               median(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"])),
                   FDR_sd = c(sd(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"]),
                              sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"])),
+                  FDR_q95 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],0.95),
+                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],0.95)),
+                  FDR_q5 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],0.05),
+                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],0.05)),
                   FNR_mean = c(mean(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"]),
                                mean(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])),
+                  FNR_median = c(median(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"]),
+                               median(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])),
                   FNR_sd = c(sd(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"]),
-                             sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])))
+                             sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])),
+                  FNR_q95 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],0.95),
+                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],0.95)),
+                  FNR_q5 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],0.05),
+                             quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],0.05)),
+                  FN_mean = c(mean(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"]),
+                               mean(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"])),
+                  FN_median = c(median(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"]),
+                                 median(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"])),
+                  FN_sd = c(sd(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"]),
+                             sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"])),
+                  FN_q95 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"],0.95),
+                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"],0.95)),
+                  FN_q5 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"],0.05),
+                             quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"],0.05)))
+
+  percent <- function(x, digits = 1, format = "f", ...) {
+    paste0(formatC(x * 100, format = format, digits = digits, ...), "%")
+  }
+
   CB <- function(df,char){
-    moy = df[,paste0(char,"_mean")]
-    sd = df[,paste0(char,"_sd")]
-    return(paste0("[",sapply(round(moy-1.96*sd,digits=3),FUN=function(x){max(0,x)}),
-                  ";",sapply(round(moy+1.96*sd,digits=3),FUN=function(x){min(1,x)}),"]"))}
+    lb = df[,paste0(char,"_q5")]
+    ub = df[,paste0(char,"_q95")]
+    return(paste0("[",sapply(lb,FUN=function(x){percent(max(0,x))}),
+                  ";",sapply(ub,FUN=function(x){percent(min(1,x))}),"]"))}
 
-  df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"))
+  df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"),FN_CB=CB(df,"FN"))
 
-  # Display Table
+  tableCov = data.frame(c("With uncorrelated covariates :", "False Discovery Rate","False Negative Rate",
+                          paste0("\t • Final Final model without any False Negatives : ",percent(resultModelCov[resultModelCov$TypeOfSim=="cov","NoFNModel"],digits=0)),
+                          paste0("\t • Final model is the true one : ",percent(resultModelCov[resultModelCov$TypeOfSim=="cov","TrueModel"],digits=0))),
+                        median=c("",percent((as.numeric(format(c(df[df$TypeOfSim=="cov","FDR_median"],df[df$TypeOfSim=="cov","FNR_median"])), scientific=TRUE, digits=2))),"",""),
+                        CB=c("",df[df$TypeOfSim=="cov","FDR_CB"],df[df$TypeOfSim=="cov","FNR_CB"],"",""))
+  colnames(tableCov) <- c("Rate","Median","Confidence Interval\n(quantiles 5%-95%)")
 
-  tt3 <- ttheme_minimal(
-    core=list(bg_params = list(fill = c("white","#f1f1f1"), col=NA)),
-    core = list(fg_params = list(hjust = 0,
-                                 x = 0.1,
-                                 fontsize = 9)),
-    colhead=list(fg_params=list(col="#ef6262")),
-    rowhead=list(fg_params=list(col="#468b97")))
+  tableCorcov =data.frame(c("With correlated covariates :","False Discovery Rate","False Negative Rate",
+                            paste0("\t • Final Final model without any False Negatives : ",percent(resultModelCov[resultModelCov$TypeOfSim=="corcov","NoFNModel"],digits=0)),
+                            paste0("\t • Final model is the true one : ",percent(resultModelCov[resultModelCov$TypeOfSim=="corcov","TrueModel"],digits=0))),
+                          median=c("",percent(as.numeric(format(c(df[df$TypeOfSim=="corcov","FDR_median"],df[df$TypeOfSim=="corcov","FNR_median"]), scientific=TRUE, digits=2))),"",""),
+                          CB=c("",df[df$TypeOfSim=="corcov","FDR_CB"],df[df$TypeOfSim=="corcov","FNR_CB"],"",""))
+  colnames(tableCorcov) <- c("Rate","Median","Confidence Interval\n(quantiles 5%-95%)")
 
-  grid.newpage()
-
+  table <-  tibble::as_tibble(rbind(tableCov,tableCorcov))
 
 
-  # With uncorrelated variable
-  tableCov = data.frame(c("False Discovery Rate","False Negative Rate"),mean=as.character(as.numeric(format(c(df$FDR_mean[1],df$FNR_mean[1]), scientific=TRUE, digits=2))),CB=c(df$FDR_CB[1],df$FNR_CB[1]))
-  colnames(tableCov) <- c("","Mean","Confidence Interval\n(95%)")
 
-  grid.newpage()
-  gridCov <-tableGrob(tableCov, theme = tt3,rows=NULL)
-  gridCov$widths <- unit(rep(1/(ncol(gridCov)+1), ncol(gridCov)), "npc")
-  gridCov$heights <- unit(rep(0.1,nrow(gridCov)),"npc")
 
-  separators <- replicate(ncol(gridCov) - 1,
-                          segmentsGrob(x1 = unit(0, "npc"), gp=gpar(lty=2)),
-                          simplify=FALSE)
+  ft <- flextable(table) %>%
+    merge_at(i=1,j=1:3) %>%
+    merge_at(i=4,j=1:3) %>%
+    merge_at(i=5,j=1:3) %>%
+    merge_at(i=6,j=1:3) %>%
+    merge_at(i=9,j=1:3) %>%
+    merge_at(i=10,j=1:3) %>%
+    color(i=c(1,6),color="indianred") %>%
+    bold(i=c(1,6)) %>%
+    set_table_properties(layout="autofit",width=1) %>%
+    bg(i=c(4:5,9:10),j=1:3,bg="#e4e6eb",part="body") %>%
+    hline(i = 5, part = "body", border = fp_border_default(color = "grey1", width = 1) ) %>%
+    hline(i = 1, part = "body", border = fp_border_default(color = "grey", width = 0.7) ) %>%
+    hline(i = 6, part = "body", border = fp_border_default(color = "grey", width = 0.7) ) %>%
+    vline(j=c(2,1),i=c(2,3,7,8),part="body", border = fp_border_default(color = "grey", width = 1)) %>%
+    add_header_lines("Error Rate Comparison Table") %>%
+    bold(part="header") %>%
+    fontsize(size=22,part="header",i=1)%>%
+    fontsize(size=20,part="header",i=2)%>%
+    fontsize(size=18,part="body") %>%
+    fontsize(size=20,i=c(1,6),part="body") %>%
+    align(align = "center", part = "header",i=1) %>%
+    fontsize(size=16,i=c(4,5,9,10),part="body") %>%
+    add_footer_lines(subtitle) %>%
+    fontsize(size=16,part="footer") %>%
+    align(align="right",part="footer")
 
-  gridCov <- gtable::gtable_add_grob(gridCov, grobs = separators,
-                                        t = 2, b = nrow(gridCov), l = seq_len(ncol(gridCov)-1)+1)
-
-  title <- textGrob("With uncorrelated covariates", gp = gpar(fontsize = 20,col="#862B0D"))
-  stitle <- textGrob(subtitle, gp = gpar(fontsize = 11))
-  padding <- unit(0.5,"line")
-  gridCov <- gtable_add_grob(gtable_add_rows(
-    gridCov, heights = grobHeight(stitle) + padding, pos = 0), list(stitle),
-    t = 1, l = 1 , r = ncol(gridCov))
-  gridCov <- gtable_add_grob(gtable_add_rows(
-    gridCov, heights = grobHeight(title) + padding, pos = 0), list(title),
-    t = 1, l = 1, r = ncol(gridCov))
-  grid.draw(gridCov)
-
-  # With correlated variable
-  tableCorcov =data.frame(c("False Discovery Rate","False Negative Rate"),mean=as.character(as.numeric(format(c(df$FDR_mean[2],df$FNR_mean[2]), scientific=TRUE, digits=2))),CB=c(df$FDR_CB[2],df$FNR_CB[2]))
-  colnames(tableCorcov) <- c("","Mean","Confidence Interval\n(95%)")
-
-  grid.newpage()
-  gridCorcov <-tableGrob(tableCorcov, theme = tt3,rows=NULL)
-  gridCorcov$widths <- unit(rep(1/(ncol(gridCorcov)+1), ncol(gridCorcov)), "npc")
-  gridCorcov$heights <- unit(rep(0.1,nrow(gridCorcov)),"npc")
-
-  separators <- replicate(ncol(gridCorcov) - 1,
-                          segmentsGrob(x1 = unit(0, "npc"), gp=gpar(lty=2)),
-                          simplify=FALSE)
-
-  gridCorcov <- gtable::gtable_add_grob(gridCorcov, grobs = separators,
-                                        t = 2, b = nrow(gridCorcov), l = seq_len(ncol(gridCorcov)-1)+1)
-
-  title <- textGrob("With correlated covariates", gp = gpar(fontsize = 20,col="#862B0D"))
-  stitle <- textGrob(subtitle, gp = gpar(fontsize = 11))
-  padding <- unit(0.5,"line")
-  gridCorcov <- gtable_add_grob(gtable_add_rows(
-    gridCorcov, heights = grobHeight(stitle) + padding, pos = 0), list(stitle),
-    t = 1, l = 1 , r = ncol(gridCorcov))
-  gridCorcov <- gtable_add_grob(gtable_add_rows(
-    gridCorcov, heights = grobHeight(title) + padding, pos = 0), list(title),
-    t = 1, l = 1, r = ncol(gridCorcov))
-  grid.draw(gridCorcov)
-
-  ggsave(file=paste0(Folder,"/ErrorTable",covariateSize,"cov.png"), gridCov,
-         height = 1500,width=3000,units = "px")
-  ggsave(file=paste0(Folder,"/ErrorTable",covariateSize,"corcov.png"), gridCorcov,
-         height = 1500,width=3000,units = "px")
+  save_as_html(ft, path = paste0(Folder,"/ErrorTable",covariateSize,".html"),expand=10)
+  if(PNG){
+    webshot(paste0(Folder,"/ErrorTable",covariateSize,".html"), paste0(Folder,"/ErrorTable",covariateSize,".png"))
+  }
+  if(JPEG){
+    webshot(paste0(Folder,"/ErrorTable",covariateSize,".html"), paste0(Folder,"/ErrorTable",covariateSize,".jpeg"))
+  }
+  unlink(paste0(Folder,"/ErrorTable",covariateSize,".html"))
 }
 
 #########################################################################################
 
-tableStatsComp <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="standard",Rsmlx,JPEG){
+tableStatsComp <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="standard",Rsmlx,JPEG,PNG){
   load(paste0("Save/BuildResults_",Rsmlx,".RData"))
 
   resultModelCov <- resultModel[resultModel$ProjectNumber == paste(covariateSize,"covariates") & resultModel$Method %in% buildMethod, ]
 
   errorStatsCov <- errorStats[errorStats$ProjectNumber == paste(covariateSize,"covariates") & errorStats$Method %in% buildMethod,]
 
-# Data,KNKEtgabzytrbi
-  nMeth = length(buildMethod)
-
-  df = data.frame(TypeOfSim=rep(c("With uncorrelated covariates","With correlated covariates"),each=length(buildMethod)),
+# Data
+  df = data.frame(TypeOfSim=rep(c("cov","corcov"),each=length(buildMethod)),
                   Method = rep(buildMethod,2),
-                  FDR_mean = c(mean(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"]),
-                               mean(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"])),
-                  FDR_sd = c(sd(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"]),
-                             sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"])),
-                  FNR_mean = c(mean(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"]),
-                               mean(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])),
-                  FNR_sd = c(sd(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"]),
-                             sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])))
+                  FDR_mean = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = mean)[buildMethod],
+                               sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = mean)[buildMethod]),
+                  FDR_median = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = median)[buildMethod],
+                                 sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
+                  FDR_sd = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
+                             sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
+                  FDR_q95 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){return(quantile(x,0.95))})[paste0(buildMethod,".95%")],
+                              sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.95)})[paste0(buildMethod,".95%")]),
+                  FDR_q5 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".5%")],
+                             sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".5%")]),
+                  FNR_mean = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = mean)[buildMethod],
+                               sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = mean)[buildMethod]),
+                  FNR_median = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = median)[buildMethod],
+                                 sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
+                  FNR_sd = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
+                             sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
+                  FNR_q95 =  c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.95)})[paste0(buildMethod,".95%")],
+                               sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.95)})[paste0(buildMethod,".95%")]),
+                  FNR_q5 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".5%")],
+                           sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".5%")]))
+
+  percent <- function(x, digits = 1, format = "f", ...) {      # Create user-defined function
+    paste0(formatC(x * 100, format = format, digits = digits, ...), "%")
+  }
+
   CB <- function(df,char){
-    moy = df[,paste0(char,"_mean")]
-    sd = df[,paste0(char,"_sd")]
-    return(paste0("[",sapply(round(moy-1.96*sd,digits=3),FUN=function(x){max(0,x)}),
-                  ";",sapply(round(moy+1.96*sd,digits=3),FUN=function(x){min(1,x)}),"]"))}
+    lb = df[,paste0(char,"_q5")]
+    ub = df[,paste0(char,"_q95")]
+    return(paste0("[",sapply(lb,FUN=function(x){percent(max(0,x))}),
+                  ";",sapply(ub,FUN=function(x){percent(min(1,x))}),"]"))}
 
   df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"))
+  methname=c(lassoSS="Lasso",regression="stepAIC")
 
-  # Display Table
+  tableCov = data.frame(Rate = c("With uncorrelated covariates :",
+                                 paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
+                                 paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
+                                 paste0(" • Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelCov[resultModelCov$TypeOfSim=="cov","NoFNModel"],resultModelCov[resultModelCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
+                                 paste0("  • Final model is the true one :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelCov[resultModelCov$TypeOfSim=="cov","TrueModel"],resultModelCov[resultModelCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
+                        Median = c("",paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("FDR_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),
+                                   paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("FNR_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
+                        CB = c("",paste0("\n",paste0(split(df[df$TypeOfSim=="cov","FDR_CB"],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],collapse="\n")),
+                               paste0("\n",paste0(split(df[df$TypeOfSim=="cov","FNR_CB"],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],collapse="\n")),"",""))
+  colnames(tableCov) <- c("Rate","Median","Confidence Interval\n(quantiles 5%-95%)")
 
-  tt3 <- ttheme_minimal(
-    core=list(bg_params = list(fill = c("white","#f1f1f1"), col=NA)),
-    core = list(fg_params = list(hjust = 0,
-                                 x = 0.1,
-                                 fontsize = 9)),
-    colhead=list(fg_params=list(col="#ef6262")),
-    rowhead=list(fg_params=list(col="#468b97")))
+  tableCorcov = data.frame(Rate = c("With correlated covariates :",
+                                    paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
+                                    paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
+                                    paste0("• Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelCov[resultModelCov$TypeOfSim=="corcov","NoFNModel"],resultModelCov[resultModelCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
+                                    paste0("• Final model is the true one :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelCov[resultModelCov$TypeOfSim=="corcov","TrueModel"],resultModelCov[resultModelCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
+                           Median = c("",paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("FDR_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),
+                                      paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("FNR_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
+                           CB = c("",paste0("\n",paste0(split(df[df$TypeOfSim=="corcov","FDR_CB"],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],collapse="\n")),
+                                  paste0("\n",paste0(split(df[df$TypeOfSim=="corcov","FNR_CB"],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],collapse="\n")),"",""))
+  colnames(tableCorcov) <- c("Rate","Median","Confidence Interval\n(quantiles 5%-95%)")
 
-  grid.newpage()
+
+  table <-  tibble::as_tibble(rbind(tableCov,tableCorcov))
 
 
 
-  # With uncorrelated variable
-  tableCov = data.frame(c("False Discovery Rate","False Negative Rate"),mean=as.character(as.numeric(format(c(df$FDR_mean[1],df$FNR_mean[1]), scientific=TRUE, digits=2))),CB=c(df$FDR_CB[1],df$FNR_CB[1]))
-  colnames(tableCov) <- c("","Mean","Confidence Interval\n(95%)")
 
-  grid.newpage()
-  gridCov <-tableGrob(tableCov, theme = tt3,rows=NULL)
-  gridCov$widths <- unit(rep(1/(ncol(gridCov)+1), ncol(gridCov)), "npc")
-  gridCov$heights <- unit(rep(0.1,nrow(gridCov)),"npc")
+  ft <- flextable(table) %>%
+    merge_at(i=1,j=1:3) %>%
+    merge_at(i=4,j=1:3) %>%
+    merge_at(i=5,j=1:3) %>%
+    merge_at(i=6,j=1:3) %>%
+    merge_at(i=9,j=1:3) %>%
+    merge_at(i=10,j=1:3) %>%
+    color(i=c(1,6),color="indianred") %>%
+    bold(i=c(1,6)) %>%
+    set_table_properties(layout="autofit",width=1) %>%
+    bg(i=c(4:5,9:10),j=1:3,bg="#e4e6eb",part="body") %>%
+    hline(i = 5, part = "body", border = fp_border_default(color = "grey1", width = 1) ) %>%
+    hline(i = 1, part = "body", border = fp_border_default(color = "grey", width = 0.7) ) %>%
+    hline(i = 6, part = "body", border = fp_border_default(color = "grey", width = 0.7) ) %>%
+    vline(j=c(2,1),i=c(2,3,7,8),part="body", border = fp_border_default(color = "grey", width = 1)) %>%
+    add_header_lines("Error Rate Comparison Table") %>%
+    bold(part="header") %>%
+    fontsize(size=22,part="header",i=1)%>%
+    fontsize(size=20,part="header",i=2)%>%
+    fontsize(size=18,part="body") %>%
+    fontsize(size=20,i=c(1,6),part="body") %>%
+    align(align = "center", part = "header",i=1) %>%
+    fontsize(size=16,i=c(4,5,9,10),part="body") %>%
+    add_footer_lines(subtitle) %>%
+    fontsize(size=16,part="footer") %>%
+    align(align="right",part="footer")
 
-  separators <- replicate(ncol(gridCov) - 1,
-                          segmentsGrob(x1 = unit(0, "npc"), gp=gpar(lty=2)),
-                          simplify=FALSE)
-
-  gridCov <- gtable::gtable_add_grob(gridCov, grobs = separators,
-                                     t = 2, b = nrow(gridCov), l = seq_len(ncol(gridCov)-1)+1)
-
-  title <- textGrob("With uncorrelated covariates", gp = gpar(fontsize = 20,col="#862B0D"))
-  stitle <- textGrob(subtitle, gp = gpar(fontsize = 11))
-  padding <- unit(0.5,"line")
-  gridCov <- gtable_add_grob(gtable_add_rows(
-    gridCov, heights = grobHeight(stitle) + padding, pos = 0), list(stitle),
-    t = 1, l = 1 , r = ncol(gridCov))
-  gridCov <- gtable_add_grob(gtable_add_rows(
-    gridCov, heights = grobHeight(title) + padding, pos = 0), list(title),
-    t = 1, l = 1, r = ncol(gridCov))
-  grid.draw(gridCov)
-
-  # With correlated variable
-  tableCorcov =data.frame(c("False Discovery Rate","False Negative Rate"),mean=as.character(as.numeric(format(c(df$FDR_mean[2],df$FNR_mean[2]), scientific=TRUE, digits=2))),CB=c(df$FDR_CB[2],df$FNR_CB[2]))
-  colnames(tableCorcov) <- c("","Mean","Confidence Interval\n(95%)")
-
-  grid.newpage()
-  gridCorcov <-tableGrob(tableCorcov, theme = tt3,rows=NULL)
-  gridCorcov$widths <- unit(rep(1/(ncol(gridCorcov)+1), ncol(gridCorcov)), "npc")
-  gridCorcov$heights <- unit(rep(0.1,nrow(gridCorcov)),"npc")
-
-  separators <- replicate(ncol(gridCorcov) - 1,
-                          segmentsGrob(x1 = unit(0, "npc"), gp=gpar(lty=2)),
-                          simplify=FALSE)
-
-  gridCorcov <- gtable::gtable_add_grob(gridCorcov, grobs = separators,
-                                        t = 2, b = nrow(gridCorcov), l = seq_len(ncol(gridCorcov)-1)+1)
-
-  title <- textGrob("With correlated covariates", gp = gpar(fontsize = 20,col="#862B0D"))
-  stitle <- textGrob(subtitle, gp = gpar(fontsize = 11))
-  padding <- unit(0.5,"line")
-  gridCorcov <- gtable_add_grob(gtable_add_rows(
-    gridCorcov, heights = grobHeight(stitle) + padding, pos = 0), list(stitle),
-    t = 1, l = 1 , r = ncol(gridCorcov))
-  gridCorcov <- gtable_add_grob(gtable_add_rows(
-    gridCorcov, heights = grobHeight(title) + padding, pos = 0), list(title),
-    t = 1, l = 1, r = ncol(gridCorcov))
-  grid.draw(gridCorcov)
-
-  ggsave(file=paste0(Folder,"/ErrorTable",covariateSize,"cov.png"), gridCov,
-         height = 1500,width=3000,units = "px")
-  ggsave(file=paste0(Folder,"/ErrorTable",covariateSize,"corcov.png"), gridCorcov,
-         height = 1500,width=3000,units = "px")
+  save_as_html(ft, path = paste0(Folder,"/ErrorTable",covariateSize,".html"),expand=10)
+  webshot(paste0(Folder,"/ErrorTable",covariateSize,".html"), paste0(Folder,"/ErrorTable",covariateSize,".png"))
+  unlink(paste0(Folder,"/ErrorTable",covariateSize,".html"))
 }
 
 
-graphsTotalNB <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="standard",Rsmlx,JPEG){
+graphsTotalNB <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="standard",Rsmlx,JPEG,PNG){
   load(paste0("Save/BuildResults_",Rsmlx,".RData"))
 
   fill.vec = c(c("#468b97","#ef6262", "#74C385"),rep("#888888",300))
@@ -325,7 +345,8 @@ graphsTotalNB <- function(Folder,subtitle,covariateSize,buildMethod,buildOption=
     xlab("Covariate")+
     ylab("Frequency")+
     ggtitle("With uncorrelated covariates, ",
-            subtitle= paste0("Model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim==covType,"NoFNModel"]*100,"%"))+
+            subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim==covType,"NoFNModel"]*100,"%","\n",
+                             "   • Final model is the true one  : ",resultModelCov[resultModelCov$TypeOfSim==covType,"TrueModel"]*100,"%"))+
     geom_segment(x=3.5,y=0,xend=3.5,yend=1,color="#862B0D",linewidth=1,linetype="twodash")+
     scale_fill_manual(values=cbPalette)+
     theme(axis.text.x = element_text(size = 6, angle = 90))+
@@ -357,7 +378,8 @@ graphsTotalNB <- function(Folder,subtitle,covariateSize,buildMethod,buildOption=
     xlab("Covariate")+
     ylab("Frequency")+
     ggtitle("With correlated covariate, ",
-            subtitle= paste0("Model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim==corcovType,"NoFNModel"]*100,"%"))+
+            subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim==corcovType,"NoFNModel"]*100,"%","\n",
+                             "   • Final model is the true one  : ",resultModelCov[resultModelCov$TypeOfSim==corcovType,"TrueModel"]*100,"%"))+
     geom_segment(x=3.5,y=0,xend=3.5,yend=1,color="#862B0D",linewidth=1,linetype="twodash")+
     scale_fill_manual(values=cbPalette)+
     theme(axis.text.x = element_text(size = 6, angle = 90))+
@@ -389,8 +411,10 @@ graphsTotalNB <- function(Folder,subtitle,covariateSize,buildMethod,buildOption=
                   face="bold",size=20,color="#862B0D")
   )
 
-  ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,".png"),
-         height = 2500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,".png"),
+           height = 2500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,".jpeg"),
            height = 2500, width = 5500+covariateSize, units = "px",device=grDevices::jpeg)
@@ -404,9 +428,10 @@ graphsTotalNB <- function(Folder,subtitle,covariateSize,buildMethod,buildOption=
     top=text_grob("Covariate Selection Frequency",
                   face="bold",size=20,color="#862B0D")
   )
-
-  ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"Cov.png"),
-         height = 1500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"Cov.png"),
+           height = 1500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"Cov.jpeg"),
            height = 1500, width = 5500+covariateSize, units = "px",device=grDevices::jpeg)
@@ -419,9 +444,10 @@ graphsTotalNB <- function(Folder,subtitle,covariateSize,buildMethod,buildOption=
     top=text_grob("Covariate Selection Frequency",
                   face="bold",size=20,color="#862B0D")
   )
-
-  ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"Corcov.png"),
-         height = 1500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"Corcov.png"),
+           height = 1500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"Corcov.jpeg"),
            height = 1500, width = 5500+covariateSize, units = "px",device=grDevices::jpeg)
@@ -431,7 +457,7 @@ graphsTotalNB <- function(Folder,subtitle,covariateSize,buildMethod,buildOption=
 
 ###########################################################################################################################################
 
-graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,Rsmlx,JPEG){
+graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,Rsmlx,JPEG,PNG){
   load(paste0("Save/BuildParResults_",Rsmlx,".RData"))
 
   fill.vec = c(c("#468b97","#ef6262", "#74C385"),rep("#888888",200))
@@ -593,7 +619,8 @@ graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,R
     xlab("Covariate")+
     ylab("Count")+
     ggtitle("With uncorrelated covariates, ",
-            subtitle= paste0("Model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim=="cov","NoFNModel"]*100,"%"))+
+            subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim==covType,"NoFNModel"]*100,"%","\n",
+                             "   • Final model is the true one  : ",resultModelCov[resultModelCov$TypeOfSim==covType,"TrueModel"]*100,"%"))+
     geom_segment(x=3.5,y=0,xend=3.5,yend=1,color="#862B0D",linewidth=1,linetype="twodash")+
     scale_fill_manual(values=cbPalette)+
     theme(axis.text.x = element_text(size = 6, angle = 90))+
@@ -643,7 +670,8 @@ graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,R
       xlab("Covariate")+
       ylab("Count")+
       ggtitle("With correlated covariates, ",
-              subtitle= paste0("Model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim=="corcov","NoFNModel"]*100,"%"))+
+              subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim==corcovType,"NoFNModel"]*100,"%","\n",
+                               "   • Final model is the true one  : ",resultModelCov[resultModelCov$TypeOfSim==corcovType,"TrueModel"]*100,"%"))+
       geom_segment(x=3.5,y=0,xend=3.5,yend=1,color="#862B0D",linewidth=1,linetype="twodash")+
       scale_fill_manual(values=cbPalette)+
       theme(axis.text.x = element_text(size = 6, angle = 90))+
@@ -668,10 +696,10 @@ graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,R
                   face="bold",size=20,color="#862B0D")
   )
 
-
-  ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,".png"),
-         height = 2500, width = 5500, units = "px", bg='transparent',device=grDevices::png)
-
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,".png"),
+           height = 2500, width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,".jpeg"),
            height = 2500, width = 5500, units = "px",device=grDevices::jpeg)
@@ -684,9 +712,10 @@ graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,R
     top=text_grob("Covariate Selection Frequency",
                   face="bold",size=20,color="#862B0D")
   )
-
-  ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"Cov.png"),
-         height = 1500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"Cov.png"),
+           height = 1500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"Cov.jpeg"),
            height = 1500, width = 5500+covariateSize, units = "px",device=grDevices::jpeg)
@@ -699,9 +728,10 @@ graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,R
     top=text_grob("Covariate Selection Frequency",
                   face="bold",size=20,color="#862B0D")
   )
-
-  ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"Corcov.png"),
-         height = 1500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"Corcov.png"),
+           height = 1500, width = 5500+covariateSize, units = "px", bg='transparent',device=grDevices::png)
+  }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"Corcov.jpeg"),
            height = 1500, width = 5500+covariateSize, units = "px",device=grDevices::jpeg)
@@ -710,7 +740,7 @@ graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,R
 
 }
 #############################################################################################################
-graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOption,Rsmlx,JPEG){
+graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOption,Rsmlx,JPEG,compTime=TRUE){
   library(ggplot2,quietly=TRUE)
   source("~/Travail/00_Theme.R")
 
@@ -859,9 +889,10 @@ graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOpti
   )
 
 
-  ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
-         height = 4500, width = 5500, units = "px", bg='transparent',device=grDevices::png)
-
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
+                 height = 4500, width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  }
   if(JPEG){
 
     ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
@@ -876,9 +907,10 @@ graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOpti
                   face="bold",size=20,color="#862B0D")
   )
 
-
-  ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
-         height = 2500, width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
+           height = 2500, width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  }
 
   if(JPEG){
 
@@ -895,8 +927,10 @@ graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOpti
   )
 
 
-  ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
-         height = 2500, width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberOfSelection",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
+           height = 2500, width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  }
 
   if(JPEG){
 
@@ -904,215 +938,230 @@ graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOpti
            height = 2500, width = 5500, units = "px",device=grDevices::jpeg)
   }
 
-
-  ## Computation Stats
-  colFonce = colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(buildMethod)]
+  colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(buildMethod)]
   col = c("#a6c46a","#8e6aa0","#ee6c4d","#007194","#9D8F80","#FFD447")[1:length(buildMethod)]
   colpas = c("#e0e6c6","#d0c1d7","#f8c2b4","#99e7ff","#cac2ba","#ffe591")[1:length(buildMethod)]
 
-  valueDisplayTime = data.frame()
-  for(t in c(covType,corcovType)){
-    for(meth in buildMethod){
-      aux = computationStatsCov[computationStatsCov$TypeOfSim==t & computationStatsCov$Method==meth,]
-      valueDisplayTime = rbind(valueDisplayTime,data.frame(Method=meth,
-                                                           TypeOfSim = t,
-                                                           Mean = median(aux$time),
-                                                           textMean = paste0(round(median(aux$time)), " s"),
-                                                           textStandardDeviation = paste0("sd = ", round(sd(aux$time),digits=2)),
-                                                           StandardDeviation = sd(aux$time)))
+  if(compTime){
+    ## Computation Stats
+    valueDisplayTime = data.frame()
+    for(t in c(covType,corcovType)){
+      for(meth in buildMethod){
+        aux = computationStatsCov[computationStatsCov$TypeOfSim==t & computationStatsCov$Method==meth,]
+        valueDisplayTime = rbind(valueDisplayTime,data.frame(Method=meth,
+                                                             TypeOfSim = t,
+                                                             Mean = median(aux$time),
+                                                             textMean = paste0(round(median(aux$time)), " s"),
+                                                             textStandardDeviation = paste0("sd = ", round(sd(aux$time),digits=2)),
+                                                             StandardDeviation = sd(aux$time)))
+      }
+    }
+    valueDisplayTime <- cbind(valueDisplayTime,coor=1:length(buildMethod))
+
+    ggplot(computationStatsCov[computationStatsCov$TypeOfSim %in% c(covType,corcovType),],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=time))+
+      geom_boxplot(lwd=0.5,alpha=0.6,
+                   color=rep(col,2),
+                   fill=rep(colpas,2))+
+      geom_text(data=valueDisplayTime, mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6,color=rep(colFonce,2))+
+      facet_grid(.~TypeOfSim,labeller = as_labeller(c(cov="With uncorrelated covariates",corcov="With correlated covariates",cov2="With uncorrelated covariates",corcov2="With correlated covariates")))+
+      #stat_boxplot(geom = "errorbar") +
+      xlab("Method used")+
+      ylab("Computation time (s)")+
+      ggtitle("Computation Time Comparison",
+              subtitle=subtitle)+
+      scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
+      # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
+      scale_fill_manual(values=cbPalette)+
+      theme(axis.text.x = element_text(size = 10))+
+      theme(axis.text.y = element_text(size = 8))+
+      theme(axis.title = element_text(size=12))+
+      theme(strip.text = element_text(size = 12))+
+      theme(plot.subtitle = element_text(size=12))+
+      theme(plot.title = element_text(size=16,color="#ee6c4d"))
+
+    if(PNG){
+      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
+             height = 2800, width = 2500, units = "px", bg='transparent',device=grDevices::png)
+    }
+
+    if(JPEG){
+      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
+             height = 2800, width = 2500, units = "px",device=grDevices::jpeg)
+    }
+
+
+    ggplot(computationStatsCov[computationStatsCov$TypeOfSim ==covType,],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=time))+
+      geom_boxplot(lwd=0.5,alpha=0.6,
+                   color=col,
+                   fill=colpas)+
+      geom_text(data=valueDisplayTime[valueDisplayTime$TypeOfSim==covType,], mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6,color=colFonce)+
+      #stat_boxplot(geom = "errorbar") +
+      xlab("Method used")+
+      ylab("Computation time (s)")+
+      ggtitle("Computation Time Comparison",
+              subtitle=paste0(subtitle,"With uncorrelated covariates,"))+
+      scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
+      # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
+      scale_fill_manual(values=cbPalette)+
+      theme(axis.text.x = element_text(size = 10))+
+      theme(axis.text.y = element_text(size = 8))+
+      theme(axis.title = element_text(size=12))+
+      theme(strip.text = element_text(size = 12))+
+      theme(plot.subtitle = element_text(size=12))+
+      theme(plot.title = element_text(size=16,color="#ee6c4d"))
+
+    if(PNG){
+      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
+             height = 2000, width = 2000, units = "px", bg='transparent',device=grDevices::png)
+    }
+
+    if(JPEG){
+      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.jpeg"),
+             height = 2000, width = 2000, units = "px",device=grDevices::jpeg)
+    }
+
+    ggplot(computationStatsCov[computationStatsCov$TypeOfSim ==corcovType,],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=time))+
+      geom_boxplot(lwd=0.5,alpha=0.6,
+                   color=col,
+                   fill=colpas)+
+      geom_text(data=valueDisplayTime[valueDisplayTime$TypeOfSim==corcovType,], mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6,color=colFonce)+
+      #stat_boxplot(geom = "errorbar") +
+      xlab("Method used")+
+      ylab("Computation time (s)")+
+      ggtitle("Computation Time Comparison",
+              subtitle=paste0(subtitle,"With correlated covariates,"))+
+      scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
+      # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
+      scale_fill_manual(values=cbPalette)+
+      theme(axis.text.x = element_text(size = 10))+
+      theme(axis.text.y = element_text(size = 8))+
+      theme(axis.title = element_text(size=12))+
+      theme(strip.text = element_text(size = 12))+
+      theme(plot.subtitle = element_text(size=12))+
+      theme(plot.title = element_text(size=16,color="#ee6c4d"))
+
+    if(PNG){
+      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
+                   height = 2000, width = 2000, units = "px", bg='transparent',device=grDevices::png)
+      }
+
+    if(JPEG){
+      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.jpeg"),
+             height = 2000, width = 2000, units = "px",device=grDevices::jpeg)
+    }
+
+
+
+
+
+    ## Iteration time
+    valueDisplayTime = data.frame()
+    for(t in c(covType,corcovType)){
+      for(meth in buildMethod){
+        aux = computationStatsCov[computationStatsCov$TypeOfSim==t & computationStatsCov$Method==meth,]
+        valueDisplayTime = rbind(valueDisplayTime,data.frame(Method=meth,
+                                                             TypeOfSim = t,
+                                                             Mean = median(aux$iteration),
+                                                             textMean = paste0(median(aux$iteration)),
+                                                             textStandardDeviation = paste0("sd = ", round(sd(aux$iteration),digits=2)),
+                                                             StandardDeviation = sd(aux$iteration)))
+      }
+    }
+
+    valueDisplayTime <- cbind(valueDisplayTime,coor=1:length(buildMethod))
+
+    ggplot(computationStatsCov[computationStatsCov$TypeOfSim %in% c(covType,corcovType),],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=iteration))+
+      geom_boxplot(lwd=0.5,alpha=0.6,
+                   color=rep(col,2),
+                   fill=rep(colpas,2))+
+      facet_grid(.~TypeOfSim,labeller = as_labeller(c(cov="With uncorrelated covariates",corcov="With correlated covariates",cov2="With uncorrelated covariates",corcov2="With correlated covariates")))+
+      xlab("Method used")+
+      ylab("Iteration Count")+
+      ggtitle("Number of Iterations Comparison",
+              subtitle=subtitle)+
+      scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
+      scale_fill_manual(values=cbPalette)+
+      theme(axis.text.x = element_text(size = 10))+
+      theme(axis.text.y = element_text(size = 8))+
+      theme(axis.title = element_text(size=12))+
+      theme(strip.text = element_text(size = 12))+
+      theme(plot.subtitle = element_text(size=12))+
+      theme(plot.title = element_text(size=16,color="#ee6c4d"))
+
+
+    if(PNG){
+      ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
+             height = 2800, width = 2500, units = "px", bg='transparent',device=grDevices::png)
+    }
+
+
+    if(JPEG){
+      ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
+             height = 2800, width = 2500, units = "px",device=grDevices::jpeg)
+    }
+
+    ggplot(computationStatsCov[computationStatsCov$TypeOfSim == covType,],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=iteration))+
+      geom_boxplot(lwd=0.5,alpha=0.6,
+                   color=col,
+                   fill=colpas)+
+      xlab("Method used")+
+      ylab("Iteration Count")+
+      ggtitle("Number of Iterations Comparison",
+              subtitle=paste0(subtitle,"With uncorrelated covariates,"))+
+      scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
+      scale_fill_manual(values=cbPalette)+
+      theme(axis.text.x = element_text(size = 10))+
+      theme(axis.text.y = element_text(size = 8))+
+      theme(axis.title = element_text(size=12))+
+      theme(strip.text = element_text(size = 12))+
+      theme(plot.subtitle = element_text(size=12))+
+      theme(plot.title = element_text(size=16,color="#ee6c4d"))
+
+
+    if(PNG){
+      ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
+             height = 2000, width = 2000, units = "px", bg='transparent',device=grDevices::png)
+    }
+
+
+    if(JPEG){
+      ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.jpeg"),
+             height = 2000, width = 2000, units = "px",device=grDevices::jpeg)
+    }
+
+    ggplot(computationStatsCov[computationStatsCov$TypeOfSim == corcovType,],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=iteration))+
+      geom_boxplot(lwd=0.5,alpha=0.6,
+                   color=col,
+                   fill=colpas)+
+      xlab("Method used")+
+      ylab("Iteration Count")+
+      ggtitle("Number of Iterations Comparison",
+              subtitle=paste0(subtitle,"With correlated covariates,"))+
+      scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
+      scale_fill_manual(values=cbPalette)+
+      theme(axis.text.x = element_text(size = 10))+
+      theme(axis.text.y = element_text(size = 8))+
+      theme(axis.title = element_text(size=12))+
+      theme(strip.text = element_text(size = 12))+
+      theme(plot.subtitle = element_text(size=12))+
+      theme(plot.title = element_text(size=16,color="#ee6c4d"))
+
+
+    if(PNG){
+      ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
+             height = 2000, width = 2000, units = "px", bg='transparent',device=grDevices::png)
+    }
+
+    if(JPEG){
+      ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.jpeg"),
+             height = 2000, width = 2000, units = "px",device=grDevices::jpeg)
     }
   }
-  valueDisplayTime <- cbind(valueDisplayTime,coor=1:length(buildMethod))
-
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim %in% c(covType,corcovType),],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=time))+
-    geom_boxplot(lwd=0.5,alpha=0.6,
-                 color=rep(col,2),
-                 fill=rep(colpas,2))+
-    geom_text(data=valueDisplayTime, mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6,color=rep(colFonce,2))+
-    facet_grid(.~TypeOfSim,labeller = as_labeller(c(cov="With uncorrelated covariates",corcov="With correlated covariates",cov2="With uncorrelated covariates",corcov2="With correlated covariates")))+
-    #stat_boxplot(geom = "errorbar") +
-    xlab("Method used")+
-    ylab("Computation time (s)")+
-    ggtitle("Computation Time Comparison",
-            subtitle=subtitle)+
-    scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
-    # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
-    scale_fill_manual(values=cbPalette)+
-    theme(axis.text.x = element_text(size = 10))+
-    theme(axis.text.y = element_text(size = 8))+
-    theme(axis.title = element_text(size=12))+
-    theme(strip.text = element_text(size = 12))+
-    theme(plot.subtitle = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))
-
-  ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
-         height = 2800, width = 2500, units = "px", bg='transparent',device=grDevices::png)
-
-  if(JPEG){
-    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
-           height = 2800, width = 2500, units = "px",device=grDevices::jpeg)
-  }
 
 
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim ==covType,],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=time))+
-    geom_boxplot(lwd=0.5,alpha=0.6,
-                 color=col,
-                 fill=colpas)+
-    geom_text(data=valueDisplayTime[valueDisplayTime$TypeOfSim==covType,], mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6,color=colFonce)+
-    #stat_boxplot(geom = "errorbar") +
-    xlab("Method used")+
-    ylab("Computation time (s)")+
-    ggtitle("Computation Time Comparison",
-            subtitle=paste0(subtitle,"With uncorrelated covariates,"))+
-    scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
-    # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
-    scale_fill_manual(values=cbPalette)+
-    theme(axis.text.x = element_text(size = 10))+
-    theme(axis.text.y = element_text(size = 8))+
-    theme(axis.title = element_text(size=12))+
-    theme(strip.text = element_text(size = 12))+
-    theme(plot.subtitle = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))
-
-  ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
-         height = 2000, width = 2000, units = "px", bg='transparent',device=grDevices::png)
-
-  if(JPEG){
-    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.jpeg"),
-           height = 2000, width = 2000, units = "px",device=grDevices::jpeg)
-  }
-
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim ==corcovType,],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=time))+
-    geom_boxplot(lwd=0.5,alpha=0.6,
-                 color=col,
-                 fill=colpas)+
-    geom_text(data=valueDisplayTime[valueDisplayTime$TypeOfSim==corcovType,], mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6,color=colFonce)+
-    #stat_boxplot(geom = "errorbar") +
-    xlab("Method used")+
-    ylab("Computation time (s)")+
-    ggtitle("Computation Time Comparison",
-            subtitle=paste0(subtitle,"With correlated covariates,"))+
-    scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
-    # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
-    scale_fill_manual(values=cbPalette)+
-    theme(axis.text.x = element_text(size = 10))+
-    theme(axis.text.y = element_text(size = 8))+
-    theme(axis.title = element_text(size=12))+
-    theme(strip.text = element_text(size = 12))+
-    theme(plot.subtitle = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))
-
-  ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
-         height = 2000, width = 2000, units = "px", bg='transparent',device=grDevices::png)
-
-  if(JPEG){
-    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.jpeg"),
-           height = 2000, width = 2000, units = "px",device=grDevices::jpeg)
-  }
-
-
-
-
-
-  ## Iteration time
-  valueDisplayTime = data.frame()
-  for(t in c(covType,corcovType)){
-    for(meth in buildMethod){
-      aux = computationStatsCov[computationStatsCov$TypeOfSim==t & computationStatsCov$Method==meth,]
-      valueDisplayTime = rbind(valueDisplayTime,data.frame(Method=meth,
-                                                           TypeOfSim = t,
-                                                           Mean = median(aux$iteration),
-                                                           textMean = paste0(median(aux$iteration)),
-                                                           textStandardDeviation = paste0("sd = ", round(sd(aux$iteration),digits=2)),
-                                                           StandardDeviation = sd(aux$iteration)))
-    }
-  }
-
-  valueDisplayTime <- cbind(valueDisplayTime,coor=1:length(buildMethod))
-
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim %in% c(covType,corcovType),],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=iteration))+
-    geom_boxplot(lwd=0.5,alpha=0.6,
-                 color=rep(col,2),
-                 fill=rep(colpas,2))+
-    facet_grid(.~TypeOfSim,labeller = as_labeller(c(cov="With uncorrelated covariates",corcov="With correlated covariates",cov2="With uncorrelated covariates",corcov2="With correlated covariates")))+
-    xlab("Method used")+
-    ylab("Iteration Count")+
-    ggtitle("Number of Iterations Comparison",
-            subtitle=subtitle)+
-    scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
-    scale_fill_manual(values=cbPalette)+
-    theme(axis.text.x = element_text(size = 10))+
-    theme(axis.text.y = element_text(size = 8))+
-    theme(axis.title = element_text(size=12))+
-    theme(strip.text = element_text(size = 12))+
-    theme(plot.subtitle = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))
-
-
-  ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
-         height = 2800, width = 2500, units = "px", bg='transparent',device=grDevices::png)
-
-
-  if(JPEG){
-    ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
-           height = 2800, width = 2500, units = "px",device=grDevices::jpeg)
-  }
-
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim == covType,],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=iteration))+
-    geom_boxplot(lwd=0.5,alpha=0.6,
-                 color=col,
-                 fill=colpas)+
-    xlab("Method used")+
-    ylab("Iteration Count")+
-    ggtitle("Number of Iterations Comparison",
-            subtitle=paste0(subtitle,"With uncorrelated covariates,"))+
-    scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
-    scale_fill_manual(values=cbPalette)+
-    theme(axis.text.x = element_text(size = 10))+
-    theme(axis.text.y = element_text(size = 8))+
-    theme(axis.title = element_text(size=12))+
-    theme(strip.text = element_text(size = 12))+
-    theme(plot.subtitle = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))
-
-
-  ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
-         height = 2000, width = 2000, units = "px", bg='transparent',device=grDevices::png)
-
-
-  if(JPEG){
-    ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.jpeg"),
-           height = 2000, width = 2000, units = "px",device=grDevices::jpeg)
-  }
-
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim == corcovType,],aes(x=factor(Method,levels=c("regression","lassoSS","lassoSSCl")),y=iteration))+
-    geom_boxplot(lwd=0.5,alpha=0.6,
-                 color=col,
-                 fill=colpas)+
-    xlab("Method used")+
-    ylab("Iteration Count")+
-    ggtitle("Number of Iterations Comparison",
-            subtitle=paste0(subtitle,"With correlated covariates,"))+
-    scale_x_discrete(labels=c(regression="stepAIC",lassoSSCl="Lasso with\nclustering step",lassoSS="Lasso",ClustOfVar="ClustOfVar"))+
-    scale_fill_manual(values=cbPalette)+
-    theme(axis.text.x = element_text(size = 10))+
-    theme(axis.text.y = element_text(size = 8))+
-    theme(axis.title = element_text(size=12))+
-    theme(strip.text = element_text(size = 12))+
-    theme(plot.subtitle = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))
-
-
-  ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
-         height = 2000, width = 2000, units = "px", bg='transparent',device=grDevices::png)
-
-
-  if(JPEG){
-    ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.jpeg"),
-           height = 2000, width = 2000, units = "px",device=grDevices::jpeg)
-  }
-
-  ## FDR
+  colFonce = colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(buildMethod)]
+  col = c("#a6c46a","#8e6aa0","#ee6c4d","#007194","#9D8F80","#FFD447")[1:length(buildMethod)]
+  colpas = c("#e0e6c6","#d0c1d7","#f8c2b4","#99e7ff","#cac2ba","#ffe591")[1:length(buildMethod)]## FDR
 
   valueDisplayFDR = data.frame()
   for(t in c(covType,corcovType)){
@@ -1153,8 +1202,10 @@ graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOpti
 
 
 
-  ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
-         height = 1700, width = 1700, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
+           height = 1700, width = 1700, units = "px", bg='transparent',device=grDevices::png)
+  }
 
   if(JPEG){
     ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
@@ -1179,8 +1230,10 @@ graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOpti
     theme(plot.subtitle = element_text(size=12))+
     theme(plot.title = element_text(size=16,color="#ee6c4d"))
 
-  ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
-         height = 1700, width = 1700, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
+           height = 1700, width = 1700, units = "px", bg='transparent',device=grDevices::png)
+  }
 
   if(JPEG){
     ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.jpeg"),
@@ -1205,8 +1258,10 @@ graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOpti
     theme(plot.subtitle = element_text(size=12))+
     theme(plot.title = element_text(size=16,color="#ee6c4d"))
 
-  ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
-         height = 1700, width = 1700, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
+           height = 1700, width = 1700, units = "px", bg='transparent',device=grDevices::png)
+  }
 
   if(JPEG){
     ggsave(paste0(Folder,"/ErrorControl",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.jpeg"),
@@ -1216,7 +1271,7 @@ graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOpti
 }
 
 #############################################################################################################
-graphsCompMethod2 <- function(Folder,subtitle,covariateSize,buildMethod,buildOption,Rsmlx,JPEG){
+graphsCompMethod2 <- function(Folder,subtitle,covariateSize,buildMethod,buildOption,Rsmlx,JPEG,PNG){
   load(paste0("Save/BuildParResults_",Rsmlx,".RData"))
 
   fill.vec = c(c("#468b97","#ef6262", "#74C385"),rep("#888888",200))
@@ -1430,13 +1485,13 @@ graphsCompMethod2 <- function(Folder,subtitle,covariateSize,buildMethod,buildOpt
     cmdA <- append(cmdA,list(auxA))
     names(cmdA)[length(cmdA)] = t
   }
-
+  library(ggh4x)
 
   cmdCov = paste0(unlist(cmd$cov),collapse=",")
   eval(parse(text=paste0("fillScale=c(",cmdCov,")")))
   cmdACov = paste0(unlist(cmdA$cov),collapse=",")
   eval(parse(text=paste0("alphaScale=c(",cmdACov,")")))
-  library(ggh4x)
+
 
 
   cov = ggplot(CovariateModelSelectionCov[CovariateModelSelectionCov$TypeOfSim==covType,],aes(x=factor(Covariate,levels=orderList$cov)))+
@@ -1458,7 +1513,8 @@ graphsCompMethod2 <- function(Folder,subtitle,covariateSize,buildMethod,buildOpt
     theme(plot.title = element_text(size=16,color="#ee6c4d"))+
     theme(plot.subtitle = element_text(size=12))+
     geom_text(data=valueDisplay[valueDisplay$type==covType & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=70,hjust=0),color=rep(c("#468b97","#ef6262", "#74C385"),length(buildMethod)),size=5.3)+
-    geom_text(data=valueDisplay[valueDisplay$type==covType & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$cov,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5.3)+ geom_text(data=valueModel[valueModel$TypeOfSim==covType,],x=lim$cov,y=100,hjust=1,size=5,vjust=1,mapping=aes(label=text))+
+    geom_text(data=valueDisplay[valueDisplay$type==covType & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$cov,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5.3)+
+    geom_text(data=valueModel[valueModel$TypeOfSim==covType,],x=lim$cov,y=100,hjust=1,size=5,vjust=1,mapping=aes(label=text))+
     coord_cartesian(ylim=c(0,100),clip="off")
 
 
@@ -1487,7 +1543,8 @@ graphsCompMethod2 <- function(Folder,subtitle,covariateSize,buildMethod,buildOpt
     theme(plot.title = element_text(size=16,color="#ee6c4d"))+
     theme(plot.subtitle = element_text(size=12))+
     geom_text(data=valueDisplay[valueDisplay$type==corcovType & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=70,hjust=0),color=rep(c("#468b97","#ef6262", "#74C385"),length(buildMethod)),size=5.3)+
-    geom_text(data=valueDisplay[valueDisplay$type==corcovType & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$cov,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5.3)+ geom_text(data=valueModel[valueModel$TypeOfSim==covType,],x=lim$cov,y=100,hjust=1,size=5,vjust=1,mapping=aes(label=text))+
+    geom_text(data=valueDisplay[valueDisplay$type==corcovType & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$cov,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5.3)+
+    geom_text(data=valueModel[valueModel$TypeOfSim==corcovType,],x=lim$corcov,y=100,hjust=1,size=5,vjust=1,mapping=aes(label=text))+
     coord_cartesian(ylim=c(0,100),clip="off")
 
   annotate_figure(
@@ -1499,8 +1556,10 @@ graphsCompMethod2 <- function(Folder,subtitle,covariateSize,buildMethod,buildOpt
   )
 
 
-  ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
-         height = 3000 + 1000*(length(buildMethod)-1), width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
+           height = 3000 + 1000*(length(buildMethod)-1), width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  }
 
 
   if(JPEG){
@@ -1517,8 +1576,10 @@ graphsCompMethod2 <- function(Folder,subtitle,covariateSize,buildMethod,buildOpt
   )
 
 
-  ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
-         height = 3000 + 1000*(length(buildMethod)-1), width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
+           height = 3000 + 1000*(length(buildMethod)-1), width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  }
 
 
   if(JPEG){
@@ -1535,8 +1596,10 @@ graphsCompMethod2 <- function(Folder,subtitle,covariateSize,buildMethod,buildOpt
   )
 
 
-  ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
-         height = 3000 + 1000*(length(buildMethod)-1), width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  if(PNG){
+    ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
+           height = 3000 + 1000*(length(buildMethod)-1), width = 5500, units = "px", bg='transparent',device=grDevices::png)
+  }
 
 
   if(JPEG){

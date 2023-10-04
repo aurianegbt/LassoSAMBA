@@ -468,7 +468,7 @@ getResults.pardata <- function(buildMethod=c("reg","lassoSS","lassoSSCl"),
                   NoFNModel = NoFNModel +1
                 }
               }
-              aux = CovariateModelSelection[CovariateModelSelection$ProjectNumber==paste0(sim," covariates") & CovariateModelSelection$TypeOfSim==type & CovariateModelSelection$Method==meth,]
+              aux = CovariateModelSelection[CovariateModelSelection$ProjectNumber==latex2exp::TeX(paste0(sim," covariates"),output="character") & CovariateModelSelection$TypeOfSim==type & CovariateModelSelection$Method==meth,]
 
               TrueModel = 0
               for(model in unique(aux$Model)){
@@ -476,6 +476,8 @@ getResults.pardata <- function(buildMethod=c("reg","lassoSS","lassoSSCl"),
                   TrueModel = TrueModel + 1
                 }
               }
+
+
               resultModel <- rbind(resultModel,data.frame(ProjectNumber = latex2exp::TeX(paste0(sim," covariates"),output="character"),
                                                           TypeOfSim = type,
                                                           Method = meth,
