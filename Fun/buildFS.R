@@ -37,6 +37,8 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
 
     headerTypes = c("id","time","observation",rep("contcov",cl))
 
+
+    pathToSimOriginal = pathToSim
     pathToSim = paste0(temporaryDirectory,"/simulation.txt")
     write.csv(newSim,file=pathToSim,quote = FALSE,row.names = FALSE)
   }else{
@@ -83,20 +85,90 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
 
   if(cluster){
     covariateModel = Model$covariateModel
+    cat("\nCurrent clustered model : \n")
+    print(covariateModel)
+    cat("Selection whithin each cluster...")
+
+
+    pos = c(1:length(nCovariate))
+    names(pos) <- nCovariate
+
+    cov0.list = list()
+
+
+    Rsmlx:::mlx.runConditionalDistributionSampling()
+    sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
+    nrep <- max(sp.df$rep)
+    ind.dist <- Rsmlx:::mlx.getIndividualParameterModel()$distribution
+    param.names <- names(ind.dist)
+    n.param <- length(param.names)
+    cov.info <- Rsmlx:::mlx.getCovariateInformation()
+    cov.names <- cov.info$name
+    cov.types <- cov.info$type
+    tcov.names <- NULL
+    covariates <- cov.info$covariate
+    cov.cat <- cov.names[cov.types == "categorical"]
+    covariates[cov.cat] <- lapply(covariates[cov.cat], as.factor)
+    indvar <- Rsmlx:::mlx.getIndividualParameterModel()$variability$id
+    cov.model <- Rsmlx:::mlx.getIndividualParameterModel()$covariateModel
+    r <- res <- r.cov0 <- list()
+    eps <- 1e-15
+
+    # Y transformation
+    Y=sp.df[,c("rep","id",names(indvar)[which(indvar==TRUE)])]
+    for(j in 1:n.param){
+      dj <- ind.dist[j]
+      nj <- names(dj)
+      if (indvar[j]) {
+        if (tolower(dj) == "lognormal") {
+          Y[,nj] <- log(Y[,nj] + eps)
+          colnames(Y)[which(colnames(Y)==nj)] <- paste0("log.", nj)
+        }else if (tolower(dj) == "logitnormal") {
+          Y[,nj] <- log((Y[,nj] + eps)/(1 - Y[,nj] + eps))
+          colnames(Y)[which(colnames(Y)==nj)] <- paste0("logit.", nj)
+        }else if (tolower(dj) == "probitnormal") {
+          Y[,nj] <- qnorm(Y[,nj])
+          colnames(Y)[which(colnames(Y)==nj)]  <- paste0("probit.", nj)
+        }
+      }
+    }
+    # param.names for order in r :
+
+    Sigma=Rsmlx::getEstimatedCovarianceMatrix()$cov.matrix
+    rownames(Sigma) <- colnames(Sigma) <- rownames(Rsmlx::getEstimatedCovarianceMatrix()$cor.matrix)
+
+
+    for(par in names(indvar)[which(indvar==TRUE)]){
+      clSelected = stringr::str_remove(names(which(covariateModel[[par]])),"cluster")
+      covSelected = names(variableCluster[which(variableCluster %in% clSelected)])
+
+      cov0.list <- append(cov0.list,list(setdiff(nCovariate,covSelected)))
+      names(cov0.list)[length(cov0.list)] <- par
+    }
+
+    N = length(unique(Y$id))
+    Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
+    covariates = read.csv(pathToSimOriginal) %>% filter(time==0)
+    covariates <- covariates[,nCovariate]
+    X.mat  = covariates
+
+    selection = lassoSelection(Y.mat,X.mat,Sigma,cov0.list=cov0.list)
 
     empty = rep(FALSE,length(nCovariate))
     names(empty) <- nCovariate
-    for(par in 1:length(covariateModel)){
+    for(par in names(indvar)[which(indvar==TRUE)]){
       toSet = empty
-
-      clSelected = stringr::str_remove(names(which(covariateModel[[par]])),"cluster")
-      covSelected = names(variableCluster[which(variableCluster %in% clSelected)])
+      covSelected = colnames(selection)[which(as.logical(selection[par,]))]
       toSet[covSelected] <- TRUE
 
       covariateModel[[par]] <- toSet
     }
 
     Model$covariateModel <- covariateModel
+
+    cat("\nFinal Covariate model:\n")
+    print(covariateModel)
+
   }
   return(list(Model=Model,time=res$time,iter=res$iter))
 }
