@@ -740,7 +740,7 @@ graphsParNB <- function(Folder,subtitle,covariateSize, buildMethod,buildOption,R
 
 }
 #############################################################################################################
-graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOption,Rsmlx,JPEG,compTime=TRUE){
+graphsCompMethod <- function(Folder,subtitle,covariateSize,buildMethod,buildOption,Rsmlx,JPEG,compTime=TRUE,PNG){
   library(ggplot2,quietly=TRUE)
   source("~/Travail/00_Theme.R")
 
