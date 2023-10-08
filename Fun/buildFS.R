@@ -84,9 +84,14 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
   Model <- Rsmlx:::mlx.getIndividualParameterModel()
 
   if(cluster){
-    covariateModel = Model$covariateModel
+    newcovariateModel = Model$covariateModel
+    covariateModel = t(data.frame(lapply(Model$covariateModel,FUN=function(x){sapply(x,FUN=as.numeric)})))
     cat("\nCurrent clustered model : \n")
     print(covariateModel)
+    cat("Cluster Description :\n")
+    for(cl in 1:ncol(covariateModel)){
+      cat(paste0("\t - Cluster n°",cl," :",paste0(names(variableCluster[which(variableCluster==cl)]),collapse=", "),"\n"))
+    }
     cat("Selection whithin each cluster...")
 
 
@@ -139,7 +144,7 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
 
 
     for(par in names(indvar)[which(indvar==TRUE)]){
-      clSelected = stringr::str_remove(names(which(covariateModel[[par]])),"cluster")
+      clSelected = stringr::str_remove(names(which(sapply(covariateModel[par,],FUN=as.logical))),"cluster")
       covSelected = names(variableCluster[which(variableCluster %in% clSelected)])
 
       cov0.list <- append(cov0.list,list(setdiff(nCovariate,covSelected)))
@@ -153,21 +158,23 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
     X.mat  = covariates
 
     selection = lassoSelection(Y.mat,X.mat,Sigma,cov0.list=cov0.list)
-
+    rownames(selection) <- names(cov0.list)
     empty = rep(FALSE,length(nCovariate))
     names(empty) <- nCovariate
-    for(par in names(indvar)[which(indvar==TRUE)]){
+    for(par in names(newcovariateModel)){
       toSet = empty
-      covSelected = colnames(selection)[which(as.logical(selection[par,]))]
-      toSet[covSelected] <- TRUE
+      if(par %in% names(indvar)[which(indvar==TRUE)]){
+        covSelected = colnames(selection)[which(as.logical(selection[par,]))]
+        toSet[covSelected] <- TRUE
+      }
 
-      covariateModel[[par]] <- toSet
+      newcovariateModel[[par]] <- toSet
     }
 
-    Model$covariateModel <- covariateModel
-
+    Model$covariateModel <- newcovariateModel
+    cat("__________________________________________________\n")
     cat("\nFinal Covariate model:\n")
-    print(covariateModel)
+    print(t(data.frame(lapply(newcovariateModel,FUN=function(x){sapply(x,FUN=as.numeric)}))))
 
   }
   return(list(Model=Model,time=res$time,iter=res$iter))
