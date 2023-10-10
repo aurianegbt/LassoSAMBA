@@ -7,7 +7,7 @@ buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, 
                      p.max=0.1, p.min=c(0.075, 0.05, 0.1),
                      print=TRUE, nb.model=1,
                      nfolds=5,alpha=1,parallel=FALSE,ncores=1,
-                     stabilitySelection=TRUE,nSS=1000,thresholdsSS=0.90,
+                     stabilitySelection=TRUE,nSS=1000,thresholdsSS=0.80,
                      buildMethod="lasso",critMV = "BIC")
 {
   ptm <- proc.time()
