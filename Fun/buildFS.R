@@ -155,7 +155,8 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
     Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
     covariates = read.csv(pathToSimOriginal) %>% filter(time==0)
     covariates <- covariates[,nCovariate]
-    X.mat  = covariates
+    sd0 = which(apply(X,2,FUN=sd)==0)
+    X.mat  = covariates %>% select(-one_of(names(sd0)))
 
     selection = lassoSelection(Y.mat,X.mat,Sigma,cov0.list=cov0.list)
     rownames(selection) <- names(cov0.list)

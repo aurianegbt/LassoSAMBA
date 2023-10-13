@@ -91,38 +91,38 @@ tableStats <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="st
                                median(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"])),
                   FDR_sd = c(sd(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"]),
                              sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"])),
-                  FDR_q95 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],0.95),
-                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],0.95)),
-                  FDR_q5 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],0.05),
-                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],0.05)),
+                  FDR_q975 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],0.975),
+                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],0.975)),
+                  FDR_q25 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],0.025),
+                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],0.025)),
                   FNR_mean = c(mean(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"]),
                                mean(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])),
                   FNR_median = c(median(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"]),
                                median(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])),
                   FNR_sd = c(sd(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"]),
                              sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"])),
-                  FNR_q95 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],0.95),
-                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],0.95)),
-                  FNR_q5 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],0.05),
-                             quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],0.05)),
+                  FNR_q975 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],0.975),
+                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],0.975)),
+                  FNR_q25 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],0.025),
+                             quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],0.025)),
                   FN_mean = c(mean(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"]),
                                mean(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"])),
                   FN_median = c(median(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"]),
                                  median(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"])),
                   FN_sd = c(sd(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"]),
                              sd(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"])),
-                  FN_q95 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"],0.95),
-                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"],0.95)),
-                  FN_q5 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"],0.05),
-                             quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"],0.05)))
+                  FN_q975 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"],0.975),
+                              quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"],0.975)),
+                  FN_q25 = c(quantile(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FN"],0.025),
+                             quantile(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FN"],0.025)))
 
   percent <- function(x, digits = 1, format = "f", ...) {
     paste0(formatC(x * 100, format = format, digits = digits, ...), "%")
   }
 
   CB <- function(df,char){
-    lb = df[,paste0(char,"_q5")]
-    ub = df[,paste0(char,"_q95")]
+    lb = df[,paste0(char,"_q25")]
+    ub = df[,paste0(char,"_q975")]
     return(paste0("[",sapply(lb,FUN=function(x){percent(max(0,x))}),
                   ";",sapply(ub,FUN=function(x){percent(min(1,x))}),"]"))}
 
@@ -133,14 +133,14 @@ tableStats <- function(Folder,subtitle,covariateSize,buildMethod,buildOption="st
                           paste0("\t • Final model is the true one : ",percent(resultModelCov[resultModelCov$TypeOfSim=="cov","TrueModel"],digits=0))),
                         median=c("",percent((as.numeric(format(c(df[df$TypeOfSim=="cov","FDR_median"],df[df$TypeOfSim=="cov","FNR_median"])), scientific=TRUE, digits=2))),"",""),
                         CB=c("",df[df$TypeOfSim=="cov","FDR_CB"],df[df$TypeOfSim=="cov","FNR_CB"],"",""))
-  colnames(tableCov) <- c("Rate","Median","Confidence Interval\n(quantiles 5%-95%)")
+  colnames(tableCov) <- c("Rate","Median","Confidence Interval\n(quantiles 95%)")
 
   tableCorcov =data.frame(c("With correlated covariates :","False Discovery Rate","False Negative Rate",
                             paste0("\t • Final Final model without any False Negatives : ",percent(resultModelCov[resultModelCov$TypeOfSim=="corcov","NoFNModel"],digits=0)),
                             paste0("\t • Final model is the true one : ",percent(resultModelCov[resultModelCov$TypeOfSim=="corcov","TrueModel"],digits=0))),
                           median=c("",percent(as.numeric(format(c(df[df$TypeOfSim=="corcov","FDR_median"],df[df$TypeOfSim=="corcov","FNR_median"]), scientific=TRUE, digits=2))),"",""),
                           CB=c("",df[df$TypeOfSim=="corcov","FDR_CB"],df[df$TypeOfSim=="corcov","FNR_CB"],"",""))
-  colnames(tableCorcov) <- c("Rate","Median","Confidence Interval\n(quantiles 5%-95%)")
+  colnames(tableCorcov) <- c("Rate","Median","Confidence Interval\n(quantiles 95%)")
 
   table <-  tibble::as_tibble(rbind(tableCov,tableCorcov))
 
@@ -202,28 +202,28 @@ tableStatsComp <- function(Folder,subtitle,covariateSize,buildMethod,buildOption
                                  sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
                   FDR_sd = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
                              sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
-                  FDR_q95 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){return(quantile(x,0.95))})[paste0(buildMethod,".95%")],
-                              sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.95)})[paste0(buildMethod,".95%")]),
-                  FDR_q5 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".5%")],
-                             sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".5%")]),
+                  FDR_q975 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){return(quantile(x,0.975))})[paste0(buildMethod,".97.5%")],
+                              sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.975)})[paste0(buildMethod,".97.5%")]),
+                  FDR_q25 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")],
+                             sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")]),
                   FNR_mean = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = mean)[buildMethod],
                                sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = mean)[buildMethod]),
                   FNR_median = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = median)[buildMethod],
                                  sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
                   FNR_sd = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
                              sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
-                  FNR_q95 =  c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.95)})[paste0(buildMethod,".95%")],
-                               sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.95)})[paste0(buildMethod,".95%")]),
-                  FNR_q5 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".5%")],
-                           sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".5%")]))
+                  FNR_q975 =  c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.975)})[paste0(buildMethod,".97.5%")],
+                               sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.975)})[paste0(buildMethod,".97.5%")]),
+                  FNR_q25 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".2.5%")],
+                           sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = function(x){quantile(x,0.05)})[paste0(buildMethod,".2.5%")]))
 
   percent <- function(x, digits = 1, format = "f", ...) {      # Create user-defined function
     paste0(formatC(x * 100, format = format, digits = digits, ...), "%")
   }
 
   CB <- function(df,char){
-    lb = df[,paste0(char,"_q5")]
-    ub = df[,paste0(char,"_q95")]
+    lb = df[,paste0(char,"_q25")]
+    ub = df[,paste0(char,"_q975")]
     return(paste0("[",sapply(lb,FUN=function(x){percent(max(0,x))}),
                   ";",sapply(ub,FUN=function(x){percent(min(1,x))}),"]"))}
 
@@ -239,7 +239,7 @@ tableStatsComp <- function(Folder,subtitle,covariateSize,buildMethod,buildOption
                                    paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("FNR_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
                         CB = c("",paste0("\n",paste0(split(df[df$TypeOfSim=="cov","FDR_CB"],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],collapse="\n")),
                                paste0("\n",paste0(split(df[df$TypeOfSim=="cov","FNR_CB"],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],collapse="\n")),"",""))
-  colnames(tableCov) <- c("Rate","Median","Confidence Interval\n(quantiles 5%-95%)")
+  colnames(tableCov) <- c("Rate","Median","Confidence Interval\n(quantiles 95%)")
 
   tableCorcov = data.frame(Rate = c("With correlated covariates :",
                                     paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
@@ -250,7 +250,7 @@ tableStatsComp <- function(Folder,subtitle,covariateSize,buildMethod,buildOption
                                       paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("FNR_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
                            CB = c("",paste0("\n",paste0(split(df[df$TypeOfSim=="corcov","FDR_CB"],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],collapse="\n")),
                                   paste0("\n",paste0(split(df[df$TypeOfSim=="corcov","FNR_CB"],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],collapse="\n")),"",""))
-  colnames(tableCorcov) <- c("Rate","Median","Confidence Interval\n(quantiles 5%-95%)")
+  colnames(tableCorcov) <- c("Rate","Median","Confidence Interval\n(quantiles 95%)")
 
 
   table <-  tibble::as_tibble(rbind(tableCov,tableCorcov))
