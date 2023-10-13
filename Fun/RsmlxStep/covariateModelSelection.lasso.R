@@ -10,8 +10,10 @@ covariateModelSelection.lasso <- function(nfolds = 5,
                                           eta=NULL,
                                           p.max=1,
                                           sp0=NULL,
+                                          ncrit=20,
                                           covariate.model=NULL,
-                                          critMV = "BIC"){
+                                          critMV = "BIC",
+                                          printFrequencySS=FALSE){
   # Simulate Individual Parameters and setup parameters
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
   if (is.null(sp.df$rep))
@@ -96,7 +98,7 @@ covariateModelSelection.lasso <- function(nfolds = 5,
 
   r.var <- applyMethodLasso(Y.mat,X.mat,Sigma,alpha,cov0.list,
                             stabilitySelection,nfolds,nSS,thresholdsSS,
-                            critMV=critMV,covariate.model=covariate.model)  # contient le résultat de seulement les paramètres variables donc pas dans l'ordre et pas entier
+                            critMV=critMV,ncrit=ncrit,covariate.model=covariate.model,printFrequencySS)  # contient le résultat de seulement les paramètres variables donc pas dans l'ordre et pas entier
   r <- res <- r.cov0 <- list()
   for(j in 1:n.param){
     nj=param.names[j]

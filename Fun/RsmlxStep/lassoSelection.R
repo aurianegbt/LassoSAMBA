@@ -74,10 +74,6 @@ lassoSelection <- function(Y,X,Sigma=NULL,alpha=1,cov0.list=NULL, # cov0.list da
       selection <- resSelection
     }
   }
-
-  if(printFrequencySS){
-    cat("\nCovariate selection results :\n")
-  }
   selection <- matrix(selection,nrow=ncol(Y),byrow=TRUE)
   colnames(selection) <- cov.names
   rownames(selection)<- colnames(Y)

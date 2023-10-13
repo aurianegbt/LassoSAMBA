@@ -9,7 +9,8 @@ buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, 
                      nfolds=5,alpha=1,
                      stabilitySelection=TRUE,nSS=1000,thresholdsSS=0.95,
                      thresholdsRep = 0.75,
-                     buildMethod="lasso",critMV = "BIC")
+                     buildMethod="lasso",critMV = "BIC",ncrit=20,
+                     printFrequencySS = FALSE )
 {
   ptm <- proc.time()
   dashed.line <- "--------------------------------------------------\n"
@@ -255,9 +256,11 @@ buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, 
                                                steps=steps,
                                                sp0=sp0,
                                                iter=iter,
+                                               ncrit=ncrit,
                                                correlation.model=correlation.model,
                                                covariate.model=covariate.model,
-                                               critMV = critMV)
+                                               critMV = critMV,
+                                               printFrequencySS = printFrequencySS)
 
       res.covariate$res <- Rsmlx:::sortCov(res.covariate$res, cov.ini)
       if (iter>explor.iter) sp0 <- res.covariate$sp

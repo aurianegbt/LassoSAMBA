@@ -1,6 +1,6 @@
 applyMethodLasso <- function(Y,X,Sigma=NULL,alpha=1,cov0.list=NULL,
                               stabilitySelection=FALSE,nfolds=5,nSS=1000,thresholdsSS=0.90,
-                              ncrit=20,covariate.model=NULL,critMV="BIC"){
+                              ncrit=20,covariate.model=NULL,critMV="BIC",printFrequencySS = FALSE){
   # X et Y on juste la bonne "forme" mais pas scale encore (ça c'est fait dans la sélection en elle même !!!! )
   # Le but de cette fonction est de construit le modèle linéaire pour chaque paramètre
   param.names = names(cov0.list)
@@ -27,22 +27,22 @@ applyMethodLasso <- function(Y,X,Sigma=NULL,alpha=1,cov0.list=NULL,
 
 
   oldCriterion = mvIC(fitList = fit.list,criterion = critMV)
-  print(paste0("old Criterion ",critMV," : ",round(oldCriterion,digits=2)))
+  cat(paste0("\nold Criterion ",critMV," : ",round(oldCriterion,digits=2)))
 
-  selection = lassoSelection(Y,X,Sigma,alpha,cov0.list,stabilitySelection,nfolds,nSS,thresholdsSS)
+  selection = lassoSelection(Y,X,Sigma,alpha,cov0.list,stabilitySelection,nfolds,nSS,thresholdsSS,printFrequencySS)
   model.list = modelFromLassoSelection(Y,X,selection=selection,Sigma = Sigma,alpha = alpha,cov0.list = cov0.list,stabilitySelection = stabilitySelection,nfolds = nfolds,nSS = nSS,thresholdsSS = thresholdsSS)
 
   newCriterion = mvIC(model.list,criterion="BIC")
   tested = 1
-  print(paste0("new Criterion ",tested, " : ",round(newCriterion,digits=2)))
+  cat(paste0("\nnew Criterion ",tested, " : ",round(newCriterion,digits=2)))
   flag = newCriterion < oldCriterion
 
   while(tested < ncrit & !flag){
-    selection = lassoSelection(Y,X,Sigma,alpha,cov0.list,stabilitySelection,nfolds,nSS,thresholdsSS)
+    selection = lassoSelection(Y,X,Sigma,alpha,cov0.list,stabilitySelection,nfolds,nSS,thresholdsSS,printFrequencySS)
     model.list = modelFromLassoSelection(Y,X,selection=selection,Sigma = Sigma,alpha = alpha,cov0.list = cov0.list,stabilitySelection = stabilitySelection,nfolds = nfolds,nSS = nSS,thresholdsSS = thresholdsSS)
     tested = tested + 1
     newCriterion = mvIC(model.list,criterion="BIC")
-    print(paste0("new Criterion ",tested, " : ",round(newCriterion,digits=2)))
+    cat(paste0("\nnew Criterion ",tested, " : ",round(newCriterion,digits=2)))
     flag = newCriterion < oldCriterion
   }
 

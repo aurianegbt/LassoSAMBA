@@ -16,13 +16,15 @@ covariateModelSelection <- function(buildMethod,
                                     steps=1000,
                                     sp0=NULL,
                                     iter=1,
+                                    ncrit=20,
                                     correlation.model=NULL,
                                     covariate.model=NULL,
-                                    critMV = "BIC"){
+                                    critMV = "BIC",
+                                    printFrequencySS=FALSE){
   if(buildMethod=="reg"){
     covariateModelSelection.reg(covFix,pen.coef,weight,n.full,nb.model,direction,paramToUse,eta,p.max,steps,sp0,iter,correlation.model)
   }else if(buildMethod=="lasso"){
-    covariateModelSelection.lasso(nfolds,alpha,stabilitySelection,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,critMV)
+    covariateModelSelection.lasso(nfolds,alpha,stabilitySelection,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,ncrit,covariate.model,critMV,printFrequencySS)
   }
 }
 
