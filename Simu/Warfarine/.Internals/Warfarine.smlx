@@ -1,0 +1,144 @@
+
+<MODEL>
+file = '../../Warfarine.txt'
+
+<SIMULX>
+
+[SETTINGS]
+GLOBAL:
+exportpath='../'
+
+[DEFINITION]
+POPULATION:
+parameters={Cl_pop, omega_Cl, Q_pop, omega_Q, V1_pop, omega_V1, V2_pop, omega_V2, ka_pop, omega_ka, beta_Cl_tage, beta_Cl_wt, beta_V1_wt, corr_V1_Cl, corr_V2_Cl, corr_V2_V1, a, b}
+'PopParameters' = {{{values={0.046, 0.24, 0.086, 0.15, 2.46, 0.12, 1.64, 0.21, 0.39, 0.32, 0.24, 0.72, 0.96, 0.5, 0.6, 0.7, 0.35, 0.068}}}}
+
+OUTPUT:
+'regularY1' = {output=y1, {{start=0, interval=1, final=100}}}
+'regularCc' = {output=Cc, {{start=0, interval=1, final=100}}}
+'yCc' = {output=y1, {{times={0.5, 2, 3, 6, 12, 24, 36, 48, 72, 96, 120}}}}
+
+INDIVIDUAL:
+parameters={Cl, Q, V1, V2, ka}
+'PopParameters_indiv1' = {{{values={0.046, 0.086, 2.46, 1.64, 0.39}}}}
+
+COVARIATE:
+continuousCovariates={AGE, WT}
+'Covariates' = {{{values={1, 1}}}}
+'covDistrib1' = {{distribution=logNormal, typical=29, sd=0.3}, {distribution=logNormal, typical=69, sd=0.2}}
+'covTable1' = {file='../../../tmpfile.txt'}
+'covTable2' = {file='../../../tmpfile.txt'}
+'covTable3' = {file='../../../tmpfile.txt'}
+'covTable4' = {file='../../../tmpfile.txt'}
+'covTable5' = {file='../../../tmpfile.txt'}
+'covTable6' = {file='../../../tmpfile.txt'}
+'covTable7' = {file='../../../tmpfile.txt'}
+'covTable8' = {file='../../../tmpfile.txt'}
+'covTable9' = {file='../../../tmpfile.txt'}
+'covTable10' = {file='../../../tmpfile.txt'}
+'covTable11' = {file='../../../tmpfile.txt'}
+'covTable12' = {file='../../../tmpfile.txt'}
+'covTable13' = {file='../../../tmpfile.txt'}
+'covTable14' = {file='../../../tmpfile.txt'}
+'covTable15' = {file='../../../tmpfile.txt'}
+'covTable16' = {file='../../../tmpfile.txt'}
+'covTable17' = {file='../../../tmpfile.txt'}
+'covTable18' = {file='../../../tmpfile.txt'}
+'covTable19' = {file='../../../tmpfile.txt'}
+'covTable20' = {file='../../../tmpfile.txt'}
+'covTable21' = {file='../../../tmpfile.txt'}
+'covTable22' = {file='../../../tmpfile.txt'}
+'covTable23' = {file='../../../tmpfile.txt'}
+'covTable24' = {file='../../../tmpfile.txt'}
+'covTable25' = {file='../../../tmpfile.txt'}
+'covTable26' = {file='../../../tmpfile.txt'}
+'covTable27' = {file='../../../tmpfile.txt'}
+'covTable28' = {file='../../../tmpfile.txt'}
+'covTable29' = {file='../../../tmpfile.txt'}
+'covTable30' = {file='../../../tmpfile.txt'}
+'covTable31' = {file='../../../tmpfile.txt'}
+'covTable32' = {file='../../../tmpfile.txt'}
+'covTable33' = {file='../../../tmpfile.txt'}
+'covTable34' = {file='../../../tmpfile.txt'}
+'covTable35' = {file='../../../tmpfile.txt'}
+'covTable36' = {file='../../../tmpfile.txt'}
+'covTable37' = {file='../../../tmpfile.txt'}
+'covTable38' = {file='../../../tmpfile.txt'}
+'covTable39' = {file='../../../tmpfile.txt'}
+'covTable40' = {file='../../../tmpfile.txt'}
+'covTable41' = {file='../../../tmpfile.txt'}
+'covTable42' = {file='../../../tmpfile.txt'}
+'covTable43' = {file='../../../tmpfile.txt'}
+'covTable44' = {file='../../../tmpfile.txt'}
+'covTable45' = {file='../../../tmpfile.txt'}
+'covTable46' = {file='../../../tmpfile.txt'}
+'covTable47' = {file='../../../tmpfile.txt'}
+'covTable48' = {file='../../../tmpfile.txt'}
+'covTable49' = {file='../../../tmpfile.txt'}
+'covTable50' = {file='../../../tmpfile.txt'}
+'covTable51' = {file='../../../tmpfile.txt'}
+'covTable52' = {file='../../../tmpfile.txt'}
+'covTable53' = {file='../../../tmpfile.txt'}
+'covTable54' = {file='../../../tmpfile.txt'}
+'covTable55' = {file='../../../tmpfile.txt'}
+'covTable56' = {file='../../../tmpfile.txt'}
+'covTable57' = {file='../../../tmpfile.txt'}
+'covTable58' = {file='../../../tmpfile.txt'}
+'covTable59' = {file='../../../tmpfile.txt'}
+'covTable60' = {file='../../../tmpfile.txt'}
+'covTable61' = {file='../../../tmpfile.txt'}
+'covTable62' = {file='../../../tmpfile.txt'}
+'covTable63' = {file='../../../tmpfile.txt'}
+'covTable64' = {file='../../../tmpfile.txt'}
+'covTable65' = {file='../../../tmpfile.txt'}
+'covTable66' = {file='../../../tmpfile.txt'}
+'covTable67' = {file='../../../tmpfile.txt'}
+'covTable68' = {file='../../../tmpfile.txt'}
+'covTable69' = {file='../../../tmpfile.txt'}
+'covTable70' = {file='../../../tmpfile.txt'}
+'covTable71' = {file='../../../tmpfile.txt'}
+'covTable72' = {file='../../../tmpfile.txt'}
+'covTable73' = {file='../../../tmpfile.txt'}
+'covTable74' = {file='../../../tmpfile.txt'}
+'covTable75' = {file='../../../tmpfile.txt'}
+'covTable76' = {file='../../../tmpfile.txt'}
+'covTable77' = {file='../../../tmpfile.txt'}
+'covTable78' = {file='../../../tmpfile.txt'}
+'covTable79' = {file='../../../tmpfile.txt'}
+'covTable80' = {file='../../../tmpfile.txt'}
+'covTable81' = {file='../../../tmpfile.txt'}
+'covTable82' = {file='../../../tmpfile.txt'}
+'covTable83' = {file='../../../tmpfile.txt'}
+'covTable84' = {file='../../../tmpfile.txt'}
+'covTable85' = {file='../../../tmpfile.txt'}
+'covTable86' = {file='../../../tmpfile.txt'}
+'covTable87' = {file='../../../tmpfile.txt'}
+'covTable88' = {file='../../../tmpfile.txt'}
+'covTable89' = {file='../../../tmpfile.txt'}
+'covTable90' = {file='../../../tmpfile.txt'}
+'covTable91' = {file='../../../tmpfile.txt'}
+'covTable92' = {file='../../../tmpfile.txt'}
+'covTable93' = {file='../../../tmpfile.txt'}
+'covTable94' = {file='../../../tmpfile.txt'}
+'covTable95' = {file='../../../tmpfile.txt'}
+'covTable96' = {file='../../../tmpfile.txt'}
+'covTable97' = {file='../../../tmpfile.txt'}
+'covTable98' = {file='../../../tmpfile.txt'}
+'covTable99' = {file='../../../tmpfile.txt'}
+'covTable100' = {file='../../../tmpfile.txt'}
+
+TREATMENT:
+'mlx_Adm' = {{{times={0}, amounts={100}}}, adm=1}
+
+[SIMULATION]
+GROUPS:
+'simulationGroup1'={size=100, parameter='PopParameters', remaining={a=1, b=1}, covariate='covTable100', outputs={'yCc'}, treatment={'mlx_Adm'}}
+
+[EXPLORATION]
+GROUPS:
+'explorationGroup1'={remaining={a=1, b=1}, parameter='PopParameters_indiv1', outputs={'regularCc'}, treatment={'mlx_Adm'}}
+
+[TASKS]
+simulation()
+endpoint(run=false)
+

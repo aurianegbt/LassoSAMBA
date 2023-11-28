@@ -1,0 +1,47 @@
+
+<MODEL>
+file = 'Warfarine.txt'
+
+<SIMULX>
+
+[SETTINGS]
+GLOBAL:
+exportpath='Warfarine'
+
+[DEFINITION]
+POPULATION:
+parameters={Cl_pop, omega_Cl, Q_pop, omega_Q, V1_pop, omega_V1, V2_pop, omega_V2, ka_pop, omega_ka, beta_Cl_tage, beta_Cl_wt, beta_V1_wt, corr_V1_Cl, corr_V2_Cl, corr_V2_V1, a, b}
+'PopParameters' = {{{values={0.046, 0.24, 0.086, 0.15, 2.46, 0.12, 1.64, 0.21, 0.39, 0.32, 0.24, 0.72, 0.96, 0.5, 0.6, 0.7, 0.35, 0.068}}}}
+
+OUTPUT:
+'regularY1' = {output=y1, {{start=0, interval=1, final=100}}}
+'regularCc' = {output=Cc, {{start=0, interval=1, final=100}}}
+'yCc' = {output=y1, {{times={0.5, 2, 3, 6, 12, 24, 36, 48, 72, 96, 120}}}}
+
+INDIVIDUAL:
+parameters={Cl, Q, V1, V2, ka}
+'PopParameters_indiv1' = {{{values={0.046, 0.086, 2.46, 1.64, 0.39}}}}
+
+COVARIATE:
+continuousCovariates={AGE, WT}
+'Covariates' = {{{values={1, 1}}}}
+'covDistrib1' = {{distribution=logNormal, typical=29, sd=0.3}, {distribution=logNormal, typical=69, sd=0.2}}
+
+TREATMENT:
+'mlx_Adm' = {{{times={0}, amounts={100}}}, adm=1}
+
+[SIMULATION]
+GROUPS:
+'simulationGroup1'={size=100, parameter='PopParameters', remaining={a=1, b=1}, covariate='covDistrib1', outputs={'yCc'}, treatment={'mlx_Adm'}}
+
+SETTINGS:
+nbReplicates=100
+
+[EXPLORATION]
+GROUPS:
+'explorationGroup1'={remaining={a=1, b=1}, parameter='PopParameters_indiv1', outputs={'regularCc'}, treatment={'mlx_Adm'}}
+
+[TASKS]
+simulation()
+endpoint(run=false)
+
