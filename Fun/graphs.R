@@ -31,7 +31,7 @@ graphsGenerate <- function(project="Pasin",
                      lassoSSCrit = "Model built with a lasso approach within SAMBA, and multiple thresholds.",
                      elasticnetSSCrit ="Model built with an elastic net approach within SAMBA, and multiple thresholds")
     
-    initFolder=paste0("~/Travail/Presentation/Plot",project)
+    initFolder=paste0("~/Travail/Presentation/Plot/LassoSAMBA/Plot",project)
     if(!dir.exists(initFolder)){dir.create(initFolder)}
     initFolder=paste0(initFolder,"/Results",sim)
     if(!dir.exists(initFolder)){dir.create(initFolder)}
