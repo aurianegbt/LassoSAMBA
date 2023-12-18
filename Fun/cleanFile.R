@@ -1,15 +1,14 @@
 cleanFile <- function(project=c("Pasin","Warfarine"),
                       covariateSize=c(10,50,200,500),
-                      covariateType=c("cov","corcov"),
                       buildMethod=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit"),
                       completePrint=FALSE,
                       print=FALSE){
   for(proj in project){
     for(cov in covariateSize){
-      for(type in covariateType){
+      for(type in c("cov","corcov")){
         for(meth in buildMethod){
           
-          resultsFolder = paste0("Results",proj,"/Results_",meth,"/",cov,type)
+          resultsFolder = paste0("Results/Results",proj,"/Results_",meth,"/",cov,type)
           
           deletedFiles <- numeric()
           for(i in 1:100){
@@ -29,7 +28,7 @@ cleanFile <- function(project=c("Pasin","Warfarine"),
             }
           }
           if(print && length(deletedFiles)!=0){
-            cat(paste0("▶ For project with ",cov))
+            cat(paste0("▶ For ",proj," project with ",cov))
             if(type=="corcov"){cat(" correlated covariates, ")}else{cat(" covariates,")}
             cat(" built with ")
             if(meth == "reg"){
@@ -43,13 +42,13 @@ cleanFile <- function(project=c("Pasin","Warfarine"),
             }else if(meth=="elasticnetSSCrit"){
               cat("elastic net with multiple thresholds and stability selection")
             }
-            cat(" :")
+            cat(" :\n")
             first = FALSE
             dFlen = length(deletedFiles)
             if(dFlen==1){
-              cat(paste0("   • File n°",deletedFiles[1]," has been deleted.\n"))
+              cat(paste0("   • File n°",deletedFiles[1]," has been deleted.\n\n"))
             }else{
-              cat(paste0("   • File n°",paste0(paste0(deletedFiles[-dFlen],collapse=", ")," and ",deletedFiles[dFlen])," have been deleted.\n"))
+              cat(paste0("   • File n°",paste0(paste0(deletedFiles[-dFlen],collapse=", ")," and ",deletedFiles[dFlen])," have been deleted.\n\n"))
             }
           }
         }
@@ -65,7 +64,7 @@ fileTEST <- function(link){
       load(link)
       bool <- TRUE
     }, error = function(e) {
-      print(e)
+      #print(e)
       bool <- FALSE
     })
     return(bool)
