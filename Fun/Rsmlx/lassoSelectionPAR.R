@@ -9,6 +9,7 @@ lassoSelection <- function(Y,X,
                            criterion="BIC",
                            printFrequencySS = FALSE,
                            MSE=FALSE){
+  # depends on for each 
   if(criterion %in% c("BIC","BICc")){
     critFUN <- BIC
   }else if(criterion=="AIC"){
@@ -61,12 +62,12 @@ lassoSelection <- function(Y,X,
       res = glmnet::glmnet(Xwh, Ywh, alpha=alpha, lambda=lambda, exclude=exclude)
       selection = tabulate(Matrix:::which(res$beta != 0),ncol(Xwh))
     }else{
-      selection = data.frame()
-      for(i in 1:nSS){
+      selection =
+        foreach(i = 1:nSS,.combine = "rbind") %dopar% {
         indSampled = sample(1:length(Ywh), floor(length(Ywh)/2))
         res = glmnet::glmnet(Xwh[indSampled,], Ywh[indSampled], alpha=alpha, lambda=lambda, exclude=exclude)
 
-        selection <- rbind(selection,tabulate(Matrix::which(res$beta != 0),ncol(Xwh)))
+       tabulate(Matrix::which(res$beta != 0),ncol(Xwh))
       }
       resSelection = colSums(selection)/nSS
 

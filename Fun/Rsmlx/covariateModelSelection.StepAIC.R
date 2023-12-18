@@ -1,23 +1,16 @@
-covariateModelSelection.lasso <- function(nfolds = 5,
-                                          alpha = 1,
-                                          stabilitySelection = TRUE,
-                                          nSS=1000,
-                                          thresholdsSS=0.80,
-                                          thresholdsRep=0.75,
-                                          covFix = NULL,
-                                          pen.coef=NULL,
+covariateModelSelection.StepAIC <- function(covFix = NULL, 
+                                          pen.coef=NULL, 
                                           weight=1,
+                                          n.full = 10,
+                                          nb.model = 1,
+                                          direction="both",
                                           paramToUse="all",
                                           eta=NULL,
                                           p.max=1,
+                                          steps=1000,
                                           sp0=NULL,
-                                          covariate.model=NULL,
-                                          criterion="BIC",
-                                          ncrit=20,
-                                          printFrequencySS = FALSE,
-                                          replicatesSS=FALSE){
+                                          iter=1){
   # Simulate Individual Parameters and setup parameters
-  
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
   if (is.null(sp.df$rep))
     sp.df$rep <- 1
@@ -52,6 +45,7 @@ covariateModelSelection.lasso <- function(nfolds = 5,
   # Update eta cov0 and pweight
   eta.list =list()
   cov0.list = list()
+  cov1.list = list()
   pweight.list = list()
   for(j in 1:n.param){
     dj <- ind.dist[j]
@@ -73,9 +67,11 @@ covariateModelSelection.lasso <- function(nfolds = 5,
       names(eta.list)[length(eta.list)] <- nj
       if (length(covFix) > 0){
         cmj <- cov.model[[nj]][covFix]
+        cov1.list <- append(cov1.list,list(names(which(cmj))))
         cov0.list <- append(cov0.list,list(names(which(!cmj))))
       }else {
         cov0.list <-  append(cov0.list,list(NULL))
+        cov1.list <-  append(cov1.list,list(NULL))
       }
       names(cov0.list)[length(cov0.list)] <- nj
       pweight.list <- append(pweight.list,list(weight[nj, ]))
@@ -90,41 +86,15 @@ covariateModelSelection.lasso <- function(nfolds = 5,
   rownames(Sigma) <- rownames(Rsmlx::getEstimatedCovarianceMatrix()$cor.matrix)
   # # param.names for order in r :
   N = length(unique(Y$id))
-  Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
+  Y.mat = Y[,-c(1,2)]
   X.mat  = covariates[,setdiff(colnames(covariates),"id")]
 
-  if(replicatesSS){
-    
-    runREP = lapply(1:nrep,FUN=function(k){
-      Yk.mat = as.matrix(Y[Y$rep==k,-c(1,2)])
-      sapply(param.names[which(indvar)],FUN=function(x){
-        applyMethodLasso(Yk.mat[,stringr::str_detect(colnames(Yk.mat),x),drop=F],
-                              X.mat,Sigma[x,x],alpha,cov0.list[[x]],
-                              stabilitySelection,nfolds,nSS,thresholdsSS,
-                              criterion,ncrit,covariate.model[[x]],
-                              printFrequencySS,p.name=x,rep=k)$res})})
-    # cov0 compute prior 
-    
-    r.AUX = Reduce("+",runREP)
-    
-    ### COMMENT ???????
-    sel = t(apply(r.AUX/nrep>=thresholdsRep,MARGIN=2,FUN=as.numeric))
-    colnames(sel) <- rownames(r.AUX)
-    
-    r.var = lapply(param.names[which(indvar)],
-                   FUN=function(x){
-                     mod = modelFromSelection(Y.mat[,stringr::str_detect(colnames(Y.mat),x),drop=F],X.mat,setNames(sel[x,],colnames(sel)))
-                     list(model=mod,res=setNames(as.logical(sel[x,]),colnames(sel)),cov0=cov0.list[[x]],p.name=x)})
-    
-  }else{
+  
     r.var <- lapply(param.names[which(indvar)],FUN=function(x){
-      applyMethodLasso(Y.mat[,stringr::str_detect(colnames(Y.mat),x),drop=F],
-                            X.mat,Sigma[x,x],alpha,cov0.list[[x]],
-                            stabilitySelection,nfolds,nSS,thresholdsSS,
-                            criterion,ncrit,covariate.model[[x]],
-                            printFrequencySS,p.name=x)})  # contient le résultat de seulement les paramètres variables donc pas dans l'ordre et pas entier
-  }
-  print(r.var)
+      applyMethodStepAIC(Y.mat[,stringr::str_detect(colnames(Y.mat),x),drop=F],
+                            X.mat,Sigma[x,x],cov0.list[[x]],cov1.list[[x]],
+                            covariate.model[[x]],n.full,direction,steps,nb.model,pweight=pweight.list[[x]],pen.coef,p.name=x)})
+   # contient le résultat de seulement les paramètres variables donc pas dans l'ordre et pas entier
   r <- res <- r.cov0 <- list()
   for(j in 1:n.param){
     nj=param.names[j]
@@ -144,7 +114,6 @@ covariateModelSelection.lasso <- function(nfolds = 5,
       r[[j]]$p.name <- nj
     }
   }
-  print(lapply(r.cov0,length))
   
   e <- as.data.frame(lapply(r[indvar], function(x) {
     x$model$residuals

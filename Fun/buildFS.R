@@ -4,9 +4,10 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
                     buildMethod = "reg",
                     stabilitySelection = TRUE,
                     thresholdsSS = 0.90,
+                    thresholdsRep= 0.75,
                     cluster=FALSE,
                     weight=NULL,
-                    ncrit=20){
+                    ncrit=20,replicatesSS=FALSE){
 
   load(paste0("Files/Files",project,"/",covariateSize,covariateType,"/headerTypes.RData"))
 
@@ -34,7 +35,7 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
   setScenario(scenario)
 
   saveProject(projectFile=paste0(temporaryDirectory,"/Build.mlxtran"))
-
+  
   # Model Building
   res = buildmlx(project =paste0(temporaryDirectory,"/Build.mlxtran"),
                  buildMethod = buildMethod,
@@ -42,7 +43,9 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
                  model=model,
                  test=FALSE,
                  thresholdsSS=thresholdsSS,
-                 ncrit=ncrit)
+                 thresholdsRep=thresholdsRep,
+                 ncrit=ncrit,
+                 replicatesSS=replicatesSS)
 
   Model <- Rsmlx:::mlx.getIndividualParameterModel()
   return(list(Model=Model,time=res$time,iter=res$iter))

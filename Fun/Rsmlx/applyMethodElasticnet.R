@@ -1,6 +1,7 @@
 applyMethodElasticnet <- function(Y,X,omega,cov0,
                              stabilitySelection=FALSE,nfolds=5,nSS=1000,thresholdsSS=0.9,
-                             criterion="BIC",ncrit=20,covariate.model=NULL,printFrequencySS = TRUE,p.name=NULL){
+                             criterion="BIC",ncrit=20,covariate.model=NULL,
+                             printFrequencySS = TRUE,p.name=NULL,rep=NULL){
   # X et Y on juste la bonne "forme" mais pas scale encore (ça c'est fait dans la sélection en elle même !!!! )
   # Le but de cette fonction est de construit le modèle linéaire pour chaque paramètr
   if(criterion %in% c("BIC","BICc")){
@@ -35,7 +36,7 @@ applyMethodElasticnet <- function(Y,X,omega,cov0,
       Xkeep = Xwh[,prevSelection]
       oldCriterion =critFUN(lm(Ywh ~ Xkeep))
     }
-    cat("\nSearch of a elastic net selection improving the ",criterion," criterion (max ",ncrit," searchs) for ",p.name," :\n ")
+    cat("\nSearch of a elastic net selection improving the ",criterion," criterion (max ",ncrit," searchs) for ",p.name,if(!is.null(rep)){paste0(", replicates n°",rep)}," :\n ")
     cat(paste0("  ▶ old Criterion ",criterion," : ",round(oldCriterion,digits=2)))
   }
 
@@ -49,8 +50,12 @@ applyMethodElasticnet <- function(Y,X,omega,cov0,
   }
   if(!stop & !is.null(covariate.model)){
     tested = 1
-    cat(paste0("\n    - new Criterion ",tested, " : ",round(newCriterion,digits=2)))
-    cat(paste0("\n           > parameter values : ",paste0(names(resSelection$param),"=",sapply(resSelection$param,function(x){10**floor(log10(x))*round(x/(10**floor(log10(x))),digits=2)}),collapse=",")))
+    cat("\n    - new Criterion ",tested, " : ",round(newCriterion,digits=2))
+    cat("\n           > parameter values : ",
+        paste0(names(resSelection$param),"=",
+               sapply(resSelection$param,function(x){
+                 10**floor(log10(x))*round(x/(10**floor(log10(x))),digits=2)
+                 }),collapse=","))
     flag = newCriterion < oldCriterion
     while(tested < ncrit & !flag){
       resSelection = elasticnetSelection(Y,X,omega,cov0,stabilitySelection,nfolds,nSS,thresholdsSS,criterion,printFrequencySS = printFrequencySS)
@@ -58,8 +63,12 @@ applyMethodElasticnet <- function(Y,X,omega,cov0,
       newCriterion = resSelection$criterion
 
       tested = tested + 1
-      cat(paste0("\n    - new Criterion ",tested, " : ",round(newCriterion,digits=2)))
-      cat(paste0("\n           > parameter values : ",paste0(names(resSelection$param),"=",sapply(resSelection$param,function(x){10**floor(log10(x))*round(x/(10**floor(log10(x))),digits=2)}),collapse=",")))
+      cat("\n    - new Criterion ",tested, " : ",round(newCriterion,digits=2))
+      cat("\n           > parameter values : ",
+          paste0(names(resSelection$param),"=",
+                 sapply(resSelection$param,function(x){
+                   10**floor(log10(x))*round(x/(10**floor(log10(x))),digits=2)
+                   }),collapse=","))
       flag = newCriterion < oldCriterion
     }
 
