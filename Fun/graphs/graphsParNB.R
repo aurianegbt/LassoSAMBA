@@ -2,7 +2,7 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
 
   # Load data
   load(paste0("Save/BuildResults_",project,".RData"))
-  source(paste0("Files",project,"/H1.all.R"))
+  source(paste0("Files/Files",project,"/H1.all.R"))
 
   # Color & covariates
   gr = "#888888"
@@ -131,7 +131,7 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
   cov = ggplot(CovariateModelSelectionCov[CovariateModelSelectionCov$TypeOfSim=="cov",],aes(x=factor(Covariate,levels=orderList$cov)))+
     geom_bar(position=position_dodge(preserve = "single"), alpha=alphaScale,color=colorScale, fill =colorScale)+
     facet_grid(Parameter~.,labeller=label_parsed)+
-    xlab("Covariate")+
+    xlab("Covariates")+
     ylab("Count")+
     ggtitle("With uncorrelated covariates, ",
             subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim=="cov","NoFNModel"]*100,"%","\n",
@@ -149,7 +149,7 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
     theme(plot.subtitle = element_text(size=12))+
     geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$cov,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5)+
     coord_cartesian(ylim=c(0,unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])),clip="off")+
-    geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2),hjust=0),color=rev(colDisplay),size=5)
+    geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2)-2,hjust=0),color=rev(colDisplay),size=5)
 
   # Color and fill arguments / corcov Graphs
   precious = c("#468b97","#ef6262", "#74C385","#8e6aa0","#ee6c4d","#007194")[1:length(unlist(H1.all,use.names = F))]
@@ -186,7 +186,7 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
   corcov = ggplot(CovariateModelSelectionCov[CovariateModelSelectionCov$TypeOfSim=="corcov",],aes(x=factor(Covariate,levels=orderList$corcov)))+
     geom_bar(position=position_dodge(preserve = "single"), alpha=alphaScale,color=colorScale, fill =colorScale)+
     facet_grid(Parameter~.,labeller=label_parsed)+
-    xlab("Covariate")+
+    xlab("Covariates")+
     ylab("Count")+
     ggtitle("With correlated covariates, ",
             subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim=="corcov","NoFNModel"]*100,"%","\n",
@@ -204,16 +204,20 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
     theme(plot.subtitle = element_text(size=12))+
     geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$corcov,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5)+
     coord_cartesian(ylim=c(0,unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])),clip="off")+
-    geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2),hjust=0),color=rev(colDisplay),size=5)
+    geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2)-2,hjust=0),color=rev(colDisplay),size=5)
 
   # Save plot
-  annotate_figure(
-    annotate_figure(ggarrange(cov, corcov, nrow = 2),
-                    top=text_grob(stringr::str_wrap(subtitle,100)),
-    ),
-    top=text_grob("Covariate Selection Frequency",
-                  face="bold",size=20,color="#862B0D")
-  )
+  annotate_figure(ggarrange(cov, corcov, nrow = 2),
+                  top=text_grob(stringr::str_wrap(subtitle,100)),
+  ) %>%
+    annotate_figure(
+      top=text_grob("covariates presence in final model with parameters link",
+                    face="italic",size=12,color="#9c9c9c")
+    )%>%
+    annotate_figure(
+      top=text_grob("Covariate Selection Frequency",
+                    face="bold",size=18,color="#862B0D")
+    )
 
   if(PNG){
     ggsave(paste0(Folder,"/NumberSelectionParameter.png"),
@@ -224,13 +228,18 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
            height = 2000+400*length(t.param),width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units = "px",device=grDevices::jpeg)
   }
 
-  annotate_figure(
-    annotate_figure(cov,
-                    top=text_grob(stringr::str_wrap(subtitle,100)),
-    ),
-    top=text_grob("Covariate Selection Frequency",
-                  face="bold",size=20,color="#862B0D")
-  )
+  annotate_figure(cov,
+                  top=text_grob(stringr::str_wrap(subtitle,100)),
+  ) %>%
+    annotate_figure(
+      top=text_grob("covariates presence in final model with parameters link",
+                    face="italic",size=12,color="#9c9c9c")
+    )%>%
+    annotate_figure(
+      top=text_grob("Covariate Selection Frequency",
+                    face="bold",size=18,color="#862B0D")
+    )
+  
   if(PNG){
     ggsave(paste0(Folder,"/NumberSelectionParameterCov.png"),
            height = 1000+200*length(t.param),width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units = "px", bg='transparent',device=grDevices::png)
@@ -240,13 +249,19 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
            height = 1000+200*length(t.param),width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units = "px",device=grDevices::jpeg)
   }
 
+annotate_figure(corcov,
+                top=text_grob(stringr::str_wrap(subtitle,100)),
+) %>%
   annotate_figure(
-    annotate_figure(corcov,
-                    top=text_grob(stringr::str_wrap(subtitle,100)),
-    ),
+    top=text_grob("covariates presence in final model with parameters link",
+                  face="italic",size=12,color="#9c9c9c")
+  )%>%
+  annotate_figure(
     top=text_grob("Covariate Selection Frequency",
-                  face="bold",size=20,color="#862B0D")
+                  face="bold",size=18,color="#862B0D")
   )
+
+  
   if(PNG){
     ggsave(paste0(Folder,"/NumberSelectionParameterCorcov.png"),
            height =1000+200*length(t.param),width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units = "px", bg='transparent',device=grDevices::png)

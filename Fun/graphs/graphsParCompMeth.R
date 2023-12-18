@@ -2,7 +2,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
 
   # Load data
   load(paste0("Save/BuildResults_",project,".RData"))
-  source(paste0("Files",project,"/H1.all.R"))
+  source(paste0("Files/Files",project,"/H1.all.R"))
 
   # Color & covariates
   gr = "#888888"
@@ -88,6 +88,19 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
   resultModelCov[resultModelCov$Method=="elasticnet","Method"] <- "Elastic Net without\nstability selection"
   resultModelCov[resultModelCov$Method=="elasticnetSSCrit","Method"] <- "Elastic Net with\nmultiple thresholds"
   
+  resultModelParCov <- resultModelPar[resultModelPar$Method %in% buildMethod
+                                      & resultModelPar$ProjectNumber==covariateSizeCar,]
+  
+  resultModelParCov <- cbind(resultModelParCov,text=paste0("Model without False Negatives : ",resultModelParCov$NoFNModel*100,"%"))
+  
+  resultModelParCov[resultModelParCov$Method=="reg","Method"] <- "StepAIC"
+  resultModelParCov[resultModelParCov$Method=="lassoSS","Method"] <- "Lasso"
+  resultModelParCov[resultModelParCov$Method=="lasso","Method"] <- "Lasso without\nstability selection"
+  resultModelParCov[resultModelParCov$Method=="lassoSSCrit","Method"] <- "Lasso with\nmultiple thresholds" 
+  resultModelParCov[resultModelParCov$Method=="elasticnetSS","Method"] <- "Elastic Net"
+  resultModelParCov[resultModelParCov$Method=="elasticnet","Method"] <- "Elastic Net without\nstability selection"
+  resultModelParCov[resultModelParCov$Method=="elasticnetSSCrit","Method"] <- "Elastic Net with\nmultiple thresholds"
+  
 
   buildMethod <- newbuildMethod
 
@@ -167,7 +180,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
                                                     distext = distextAux))
     }
   }
-  valueModel = cbind(resultModelCov,Parameter=rev(t.param)[1])
+  valueModel = cbind(resultModelParCov,Parameter=rev(t.param)[1])
 
 
   # Cov graphs
@@ -210,22 +223,22 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
              color= colorScale,
              fill = colorScale)+
     facet_nested(factor(Method,levels=c("StepAIC","Lasso","Elastic Net","Lasso with\nclustering step","Lasso with\nmultiple thresholds","Elastic Net with\nclustering step","Elastic Net with\nmultiple thresholds"))+Parameter~.,labeller=labeller(Parameter=label_parsed))+
-    xlab("Covariate")+
+    xlab("Covariates")+
     ylab("Count")+
     ggtitle("With uncorrelated covariates, ")+
-    theme(axis.text.x = element_text(size = 6, angle = 90))+
-    theme(axis.text.y = element_text(size = 8))+
+    theme(axis.text.x = element_text(size = 10, angle = 90))+
+    theme(axis.text.y = element_text(size = 10))+
     ylim(c(0,max(resultCovariateCov[resultCovariateCov$TypeOfSim=="cov","NumberofModel"])))+
-    theme(axis.title = element_text(size=14))+
+    theme(axis.title = element_text(size=20))+
     theme(strip.text = element_text(size = 16))+
     theme(legend.key.size = unit(1, 'cm'))+
     theme(legend.text = element_text(size=14))+
     theme(legend.title = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))+
+    theme(plot.title = element_text(size=25,color="#ee6c4d"))+
     theme(plot.subtitle = element_text(size=12))+
-    geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2),hjust=0),color=rev(colDisplay),size=5.3)+
-    geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$cov+0.5,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5.3)+
-    geom_text(data=valueModel[valueModel$TypeOfSim=="cov",],x=lim$cov+0.5,y=max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"]),hjust=1,size=5,vjust=1,mapping=aes(label=text))+
+    geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2),hjust=0),color=rev(colDisplay),size=7)+
+    geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$cov+0.5,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=7)+
+    geom_text(data=valueModel[valueModel$TypeOfSim=="cov",],x=lim$cov+0.5,y=max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"]),hjust=1,size=7,vjust=1,mapping=aes(label=text))+
     coord_cartesian(ylim=c(0,max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])),clip="off")
 
 
@@ -266,76 +279,90 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
              color= colorScale,
              fill = colorScale)+
     facet_nested(factor(Method,levels=c("StepAIC","Lasso","Elastic Net","Lasso with\nclustering step","Lasso with\nmultiple thresholds","Elastic Net with\nclustering step","Elastic Net with\nmultiple thresholds"))+Parameter~.,labeller=labeller(Parameter=label_parsed))+
-    xlab("Covariate")+
+    xlab("Covariates")+
     ylab("Count")+
     ggtitle("With correlated covariates, ")+
-    theme(axis.text.x = element_text(size = 6, angle = 90))+
-    theme(axis.text.y = element_text(size = 8))+
+    theme(axis.text.x = element_text(size = 10, angle = 90))+
+    theme(axis.text.y = element_text(size = 10))+
     ylim(c(0,max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])))+
-    theme(axis.title = element_text(size=14))+
+    theme(axis.title = element_text(size=18))+
     theme(strip.text = element_text(size = 16))+
     theme(legend.key.size = unit(1, 'cm'))+
     theme(legend.text = element_text(size=14))+
     theme(legend.title = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))+
+    theme(plot.title = element_text(size=25,color="#ee6c4d"))+
     theme(plot.subtitle = element_text(size=12))+
-    geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2),hjust=0),color=rev(colDisplay),size=5.3)+
-    geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$corcov+0.5,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5.3)+
-    geom_text(data=valueModel[valueModel$TypeOfSim=="corcov",],x=lim$corcov+0.5,y=max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"]),hjust=1,size=5,vjust=1,mapping=aes(label=text))+
-    coord_cartesian(ylim=c(0,max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])),clip="off")
-
-  annotate_figure(
-    annotate_figure(ggarrange(cov, corcov, nrow = 2),
-                    top=text_grob(stringr::str_wrap(subtitle,100)),
-    ),
-    top=text_grob("Covariate Selection Frequency",
-                  face="bold",size=20,color="#862B0D")
-  )
-
-
+    geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2),hjust=0),color=rev(colDisplay),size=7)+
+    geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$corcov+0.5,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=7)+
+    geom_text(data=valueModel[valueModel$TypeOfSim=="corcov",],x=lim$corcov+0.5,y=max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"]),hjust=1,size=7,vjust=1,mapping=aes(label=text))+
+    coord_cartesian(ylim=c(0,max(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])),clip="off") 
+  
+  
   # Save plot
+  annotate_figure(ggarrange(cov, corcov, nrow = 2),
+                  top=text_grob(stringr::str_wrap(subtitle,80),size=25),
+  ) %>%
+    annotate_figure(
+      top=text_grob("covariates presence in final model with parameters link",
+                    face="italic",size=20,color="#9c9c9c")
+    )%>%
+    annotate_figure(
+      top=text_grob("Covariate Selection Frequency",
+                    face="bold",size=30,color="#862B0D")
+    )
+
+
+
   if(PNG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
-           height = length(buildMethod)*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE, bg='transparent',device=grDevices::png)
+           height = length(buildMethod)*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=4500,"50"=5000,"200"=6000,"500"=8000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE, bg='transparent',device=grDevices::png)
   }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
-            height = length(buildMethod)*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE,device=grDevices::jpeg)
+            height = length(buildMethod)*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=4500,"50"=5000,"200"=6000,"500"=8000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE,device=grDevices::jpeg)
   }
 
-  annotate_figure(
-    annotate_figure(cov,
-                    top=text_grob(stringr::str_wrap(subtitle,100)),
-    ),
-    top=text_grob("Covariate Selection Frequency",
-                  face="bold",size=20,color="#862B0D")
-  )
+  annotate_figure(cov,
+                  top=text_grob(stringr::str_wrap(subtitle,80),size=25),
+  ) %>%
+    annotate_figure(
+      top=text_grob("covariates presence in final model with parameters link",
+                    face="italic",size=20,color="#9c9c9c")
+    )%>%
+    annotate_figure(
+      top=text_grob("Covariate Selection Frequency",
+                    face="bold",size=30,color="#862B0D")
+    )
 
 
   if(PNG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
-            height = length(buildMethod)/2*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE, bg='transparent',device=grDevices::png)
+            height = length(buildMethod)/2*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=4500,"50"=5000,"200"=6000,"500"=8000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE, bg='transparent',device=grDevices::png)
   }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.jpeg"),
-            height = length(buildMethod)/2*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE,device=grDevices::jpeg)
+            height = length(buildMethod)/2*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=4500,"50"=5000,"200"=6000,"500"=8000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE,device=grDevices::jpeg)
   }
 
-  annotate_figure(
-    annotate_figure(corcov,
-                    top=text_grob(stringr::str_wrap(subtitle,100)),
-    ),
-    top=text_grob("Covariate Selection Frequency",
-                  face="bold",size=20,color="#862B0D")
-  )
+  annotate_figure(corcov,
+                  top=text_grob(stringr::str_wrap(subtitle,80),size=25),
+  ) %>%
+    annotate_figure(
+      top=text_grob("covariates presence in final model with parameters link",
+                    face="italic",size=20,color="#9c9c9c")
+    )%>%
+    annotate_figure(
+      top=text_grob("Covariate Selection Frequency",
+                    face="bold",size=30,color="#862B0D")
+    )
 
 
   if(PNG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
-            height = length(buildMethod)/2*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE, bg='transparent',device=grDevices::png)
+            height = length(buildMethod)/2*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=4500,"50"=5000,"200"=6000,"500"=8000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE, bg='transparent',device=grDevices::png)
   }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberSelectionParameter",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.jpeg"),
-            height = length(buildMethod)/2*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE,device=grDevices::jpeg)
+            height = length(buildMethod)/2*list("3"=2500,"4"=3000,"5"=3500)[[as.character(length(t.param))]], width = list("10"=4500,"50"=5000,"200"=6000,"500"=8000)[[as.character(covariateSize)]], units="px",limitsize =   FALSE,device=grDevices::jpeg)
   }
 }

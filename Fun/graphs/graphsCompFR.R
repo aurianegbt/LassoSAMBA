@@ -2,7 +2,7 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
 
   # Load data
   load(paste0("Save/BuildResults_",project,".RData"))
-  source(paste0("Files",project,"/H1.all.R"))
+  source(paste0("Files/Files",project,"/H1.all.R"))
 
   # Color
   colFonce = colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(buildMethod)]
@@ -11,6 +11,17 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
 
   # Data to use
   errorStatsCov <- errorStats[errorStats$Method %in% buildMethod,]
+  errorStatsParCov <-  suppressMessages(errorStatsPar %>%
+    group_by(Model,ProjectNumber,TypeOfSim,Method) %>%
+    summarise(
+      FP = sum(FP),
+      TP = sum(TP), 
+      FN = sum(FN),
+      TN = sum(TN)
+      ) %>% 
+    mutate(FDR = (FP/(FP+TP)),.after = "TP") %>%
+    mutate(FNR = (FN/(FN+TN)),.after="TN") %>%
+      as.data.frame())
 
 
   # FDR
@@ -18,7 +29,7 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
   valueDisplayFDR = data.frame()
   for(t in c("cov","corcov")){
     for(meth in buildMethod){
-      aux = errorStatsCov[errorStatsCov$TypeOfSim==t & errorStatsCov$Method==meth,]
+      aux = errorStatsParCov[errorStatsParCov$TypeOfSim==t & errorStatsParCov$Method==meth,]
       valueDisplayFDR = rbind(valueDisplayFDR,data.frame(Method=meth,
                                                          TypeOfSim = t,
                                                          Mean = mean(aux$FDR),
@@ -124,7 +135,7 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
   valueDisplayFNR = data.frame()
   for(t in c("cov","corcov")){
     for(meth in buildMethod){
-      aux = errorStatsCov[errorStatsCov$TypeOfSim==t & errorStatsCov$Method==meth,]
+      aux = errorStatsParCov[errorStatsParCov$TypeOfSim==t & errorStatsParCov$Method==meth,]
       valueDisplayFNR = rbind(valueDisplayFNR,data.frame(Method=meth,
                                                          TypeOfSim = t,
                                                          Mean = mean(aux$FNR),

@@ -2,7 +2,7 @@ tableStats <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,PN
 
   # Load data
   load(paste0("Save/BuildResults_",project,".RData"))
-  source(paste0("Files",project,"/H1.all.R"))
+  source(paste0("Files/Files",project,"/H1.all.R"))
 
   # Data.frame to use
   resultModelCov <- resultModel[resultModel$ProjectNumber == paste(covariateSize,"covariates") & resultModel$Method==buildMethod, ]
@@ -107,9 +107,14 @@ tableStats <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,PN
     fontsize(size=20,i=c(1,6),part="body") %>%
     align(align = "center", part = "header",i=1) %>%
     fontsize(size=16,i=c(4,5,9,10),part="body") %>%
+    add_footer_lines("Covariates presence in final model with parameters link")%>%
     add_footer_lines(subtitle) %>%
     fontsize(size=16,part="footer") %>%
-    align(align="right",part="footer")
+    italic(i=1,par="footer")%>%
+    fontsize(i=1,size=12,part="footer") %>%
+    align( i =1, align="right",part="footer") %>%
+    align( i =2, align="left",part="footer")
+    
 
   # Save plot
   save_as_html(ft, path = paste0(Folder,"/ErrorTable.html"),expand=10)

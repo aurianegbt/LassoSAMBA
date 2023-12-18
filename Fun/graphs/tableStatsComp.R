@@ -2,71 +2,83 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   # Load data
   load(paste0("Save/BuildResults_",project,".RData"))
-  source(paste0("Files",project,"/H1.all.R"))
+  source(paste0("Files/Files",project,"/H1.all.R"))
 
   # Data.frame to use
   resultModelCov <- resultModel[resultModel$ProjectNumber == paste(covariateSize,"covariates") & resultModel$Method %in% buildMethod, ]
+  resultModelParCov <- resultModelPar[resultModelPar$ProjectNumber == paste(covariateSize,"covariates") & resultModelPar$Method %in% buildMethod, ]
 
   errorStatsCov <- errorStats[errorStats$ProjectNumber == paste(covariateSize,"covariates") & errorStats$Method %in% buildMethod,]
+  errorStatsParCov <-  suppressMessages(errorStatsPar %>%
+    group_by(Model,ProjectNumber,TypeOfSim,Method) %>%
+    summarise(
+      FP = sum(FP),
+      TP = sum(TP), 
+      FN = sum(FN),
+      TN = sum(TN)
+    ) %>% 
+    mutate(FDR = (FP/max(FP+TP,1)),.after = "TP") %>%
+    mutate(FNR = (FN/max(FN+TN,1)),.after="TN") %>%
+    as.data.frame())
 
   df = data.frame(TypeOfSim=rep(c("cov","corcov"),each=length(buildMethod)),
                   Method = rep(buildMethod,2),
-                  FDR_mean = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],
-                                            errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = mean)[buildMethod],
-                               sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],
-                                            errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = mean)[buildMethod]),
+                  FDR_mean = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FDR"],
+                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN= mean)[buildMethod],
+                               sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FDR"],
+                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = mean)[buildMethod]),
 
-                  FDR_median = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],
-                                              errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = median)[buildMethod],
-                                 sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],
-                                              errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
+                  FDR_median = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FDR"],
+                                              errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN = median)[buildMethod],
+                                 sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FDR"],
+                                              errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
 
-                  FDR_sd = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],
-                                          errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
-                             sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],
-                                          errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
+                  FDR_sd = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FDR"],
+                                          errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
+                             sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FDR"],
+                                          errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
 
-                  FDR_q975 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],
-                                            errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),
+                  FDR_q975 = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FDR"],
+                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),
                                       FUN = function(x){return(quantile(x,0.975))})[paste0(buildMethod,".97.5%")],
-                               sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],
-                                            errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),
+                               sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FDR"],
+                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),
                                       FUN = function(x){quantile(x,0.975)})[paste0(buildMethod,".97.5%")]),
 
-                  FDR_q25 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FDR"],
-                                           errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),
+                  FDR_q25 = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FDR"],
+                                           errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),
                                      FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")],
-                              sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FDR"],
-                                           errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),
+                              sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FDR"],
+                                           errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),
                                      FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")]),
 
-                  FNR_mean = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],
-                                            errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = mean)[buildMethod],
-                               sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],
-                                            errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = mean)[buildMethod]),
+                  FNR_mean = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FNR"],
+                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN = mean)[buildMethod],
+                               sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FNR"],
+                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = mean)[buildMethod]),
 
-                  FNR_median = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],
-                                              errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = median)[buildMethod],
-                                 sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],
-                                              errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
+                  FNR_median = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FNR"],
+                                              errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN = median)[buildMethod],
+                                 sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FNR"],
+                                              errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
 
-                  FNR_sd = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],
-                                          errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
-                             sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],
-                                          errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
+                  FNR_sd = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FNR"],
+                                          errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
+                             sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FNR"],
+                                          errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
 
-                  FNR_q975 =  c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],
-                                             errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),
+                  FNR_q975 =  c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FNR"],
+                                             errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),
                                        FUN = function(x){quantile(x,0.975)})[paste0(buildMethod,".97.5%")],
-                                sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],
-                                             errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),
+                                sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FNR"],
+                                             errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),
                                        FUN = function(x){quantile(x,0.975)})[paste0(buildMethod,".97.5%")]),
 
-                  FNR_q25 = c(sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="cov","FNR"],
-                                           errorStatsCov[errorStatsCov$TypeOfSim=="cov","Method"]),
+                  FNR_q25 = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FNR"],
+                                           errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),
                                      FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")],
-                              sapply(split(errorStatsCov[errorStatsCov$TypeOfSim=="corcov","FNR"],
-                                           errorStatsCov[errorStatsCov$TypeOfSim=="corcov","Method"]),
+                              sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FNR"],
+                                           errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),
                                      FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")]))
 
   # Function
@@ -87,8 +99,8 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   tableCov = data.frame(Rate = c("With uncorrelated covariates :",
                                  paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
                                  paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
-                                 paste0(" • Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelCov[resultModelCov$TypeOfSim=="cov","NoFNModel"],resultModelCov[resultModelCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
-                                 paste0("  • Final model is the true one :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelCov[resultModelCov$TypeOfSim=="cov","TrueModel"],resultModelCov[resultModelCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
+                                 paste0(" • Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="cov","NoFNModel"],resultModelParCov[resultModelParCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
+                                 paste0("  • Final model is the true one :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="cov","TrueModel"],resultModelParCov[resultModelParCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
 
                         Median = c("",paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("FDR_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),
                                    paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("FNR_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
@@ -101,8 +113,8 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   tableCorcov = data.frame(Rate = c("With correlated covariates :",
                                     paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
                                     paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
-                                    paste0("• Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelCov[resultModelCov$TypeOfSim=="corcov","NoFNModel"],resultModelCov[resultModelCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
-                                    paste0("• Final model is the true one :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelCov[resultModelCov$TypeOfSim=="corcov","TrueModel"],resultModelCov[resultModelCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
+                                    paste0("• Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="corcov","NoFNModel"],resultModelParCov[resultModelParCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
+                                    paste0("• Final model is the true one :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="corcov","TrueModel"],resultModelParCov[resultModelParCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
 
                            Median = c("",paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("FDR_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),
                                       paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("FNR_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
@@ -138,18 +150,22 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     fontsize(size=18,part="body") %>%
     fontsize(size=20,i=c(1,6),part="body") %>%
     align(align = "center", part = "header",i=1) %>%
-    fontsize(size=16,i=c(4,5,9,10),part="body") %>%
+    fontsize(size=16,i=c(4,5,9,10),part="body")%>%
+    add_footer_lines("Covariates presence in final model with parameters link")%>%
     add_footer_lines(subtitle) %>%
     fontsize(size=16,part="footer") %>%
-    align(align="right",part="footer")
+    italic(i=1,par="footer")%>%
+    fontsize(i=1,size=12,part="footer") %>%
+    align( i =1, align="right",part="footer") %>%
+    align( i =2, align="left",part="footer")
 
   # Save plot
-  save_as_html(ft, path = paste0(Folder,"/ErrorTable",covariateSize,".html"),expand=10)
+  save_as_html(ft, path = paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"),expand=10)
   if(PNG){
-    webshot(paste0(Folder,"/ErrorTable",covariateSize,".html"), paste0(Folder,"/ErrorTable",covariateSize,".png"),quiet=TRUE)
+    webshot(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".png"),quiet=TRUE)
   }
   if(JPEG){
-    webshot(paste0(Folder,"/ErrorTable",covariateSize,".html"), paste0(Folder,"/ErrorTable",covariateSize,".jpeg"),quiet=TRUE)
+    webshot(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".jpeg"),quiet=TRUE)
   }
-  unlink(paste0(Folder,"/ErrorTable",covariateSize,".html"))
+  unlink(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"))
 }
