@@ -1,0 +1,94 @@
+<DATAFILE>
+
+[FILEINFO]
+file='../../../Files/FilesWarfarine/10cov/simulation/simulation_1.txt'
+delimiter = comma
+header={id, time, y1, amt, cAGE, WT, Gen1, Gen2, Gen3, Gen4, Gen5, Gen6, Gen7, Gen8}
+
+[CONTENT]
+id = {use=identifier}
+time = {use=time}
+y1 = {use=observation, type=continuous}
+amt = {use=amount}
+cAGE = {use=covariate, type=continuous}
+WT = {use=covariate, type=continuous}
+Gen1 = {use=covariate, type=continuous}
+Gen2 = {use=covariate, type=continuous}
+Gen3 = {use=covariate, type=continuous}
+Gen4 = {use=covariate, type=continuous}
+Gen5 = {use=covariate, type=continuous}
+Gen6 = {use=covariate, type=continuous}
+Gen7 = {use=covariate, type=continuous}
+Gen8 = {use=covariate, type=continuous}
+
+[SETTINGS]
+dataType = {'y1'=plasma}
+
+<MODEL>
+
+[COVARIATE]
+input = {Gen1, Gen2, Gen3, Gen4, Gen5, Gen6, Gen7, Gen8, WT, cAGE}
+
+[INDIVIDUAL]
+input = {Cl_pop, omega_Cl, Q_pop, omega_Q, V1_pop, omega_V1, V2_pop, omega_V2, ka_pop, omega_ka, WT, beta_Cl_WT, cAGE, beta_Cl_cAGE, beta_Q_WT, Gen4, beta_V1_Gen4, beta_V1_WT, Gen6, beta_ka_Gen6, corr_ka_V1, corr_ka_Cl, corr_V1_Cl}
+
+DEFINITION:
+Cl = {distribution=logNormal, typical=Cl_pop, covariate={WT, cAGE}, coefficient={beta_Cl_WT, beta_Cl_cAGE}, sd=omega_Cl}
+Q = {distribution=logNormal, typical=Q_pop, covariate=WT, coefficient=beta_Q_WT, sd=omega_Q}
+V1 = {distribution=logNormal, typical=V1_pop, covariate={Gen4, WT}, coefficient={beta_V1_Gen4, beta_V1_WT}, sd=omega_V1}
+V2 = {distribution=logNormal, typical=V2_pop, sd=omega_V2}
+ka = {distribution=logNormal, typical=ka_pop, covariate=Gen6, coefficient=beta_ka_Gen6, sd=omega_ka}
+correlation = {level=id, r(V1, Cl)=corr_V1_Cl, r(ka, Cl)=corr_ka_Cl, r(ka, V1)=corr_ka_V1}
+
+[LONGITUDINAL]
+input = {a, b}
+
+file = '../../../Warfarine.txt'
+
+DEFINITION:
+y1 = {distribution=normal, prediction=Cc, errorModel=combined1(a, b)}
+
+<FIT>
+data = 'y1'
+model = y1
+
+<PARAMETER>
+Cl_pop = {value=0.02669512, method=MLE}
+Q_pop = {value=0.05940637, method=MLE}
+V1_pop = {value=0.8484953, method=MLE}
+V2_pop = {value=1.49246, method=MLE}
+a = {value=1, method=MLE}
+b = {value=0.3, method=MLE}
+beta_Cl_WT = {value=0.0138829, method=MLE}
+beta_Cl_cAGE = {value=0.2435502, method=MLE}
+beta_Q_WT = {value=0.005937147, method=MLE}
+beta_V1_Gen4 = {value=-0.004356478, method=MLE}
+beta_V1_WT = {value=0.01483812, method=MLE}
+beta_ka_Gen6 = {value=-0.06439319, method=MLE}
+c = {value=1, method=FIXED}
+corr_V1_Cl = {value=0, method=MLE}
+corr_ka_Cl = {value=0, method=MLE}
+corr_ka_V1 = {value=0, method=MLE}
+ka_pop = {value=0.4360529, method=MLE}
+omega_Cl = {value=0.85177301547664, method=MLE}
+omega_Q = {value=0.395932680747623, method=MLE}
+omega_V1 = {value=0.362653377581338, method=MLE}
+omega_V2 = {value=0.739675126173662, method=MLE}
+omega_ka = {value=0.888925432672136, method=MLE}
+
+<MONOLIX>
+
+[TASKS]
+populationParameters()
+individualParameters(method = {conditionalMean, conditionalMode })
+fim(method = StochasticApproximation)
+logLikelihood(run = false,method = ImportanceSampling)
+plotResult(method = {indfits, parameterdistribution, covariancemodeldiagnosis, covariatemodeldiagnosis, obspred, vpc, residualsscatter, residualsdistribution, randomeffects, saemresults })
+
+[SETTINGS]
+GLOBAL:
+exportpath = 'iteration2'
+
+INDIVIDUAL:
+miniterations = 100
+
