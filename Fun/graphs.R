@@ -1,25 +1,24 @@
+suppressWarnings(suppressMessages(library(ggplot2,quietly=TRUE)))
+suppressWarnings(suppressMessages(library(ggpubr,quietly=TRUE)))
+suppressWarnings(suppressMessages(library(webshot2,quietly=TRUE)))
+suppressWarnings(suppressMessages(library(ggh4x,quietly=TRUE)))
+suppressWarnings(suppressMessages(library(flextable,quietly=TRUE)))
+suppressWarnings(suppressMessages(library(grid,quietly=TRUE)))
+suppressWarnings(suppressMessages(library(gtable,quietly=TRUE)))
+suppressWarnings(suppressMessages(library(gridExtra,quietly=TRUE)))
+suppressWarnings(suppressMessages(library(scales,quietly=TRUE)))
+
 graphsGenerate <- function(project="Pasin",
                            covariateSize=c(10,50,200,500),
                            buildMethod=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit"),
                            JPEG = FALSE,
                            PNG = TRUE){
-  eval(parse(text=readLines(paste0("Files",project,"/info.txt"))))
+  eval(parse(text=readLines(paste0("Files/Files",project,"/info.txt"))))
   
-  library(ggplot2,quietly=TRUE)
-  library(ggpubr,quietly=TRUE)
-  library(webshot2,quietly=TRUE)
-  library(ggh4x,quietly=TRUE)
-  suppressMessages(library(flextable,quietly=TRUE))
-  library(grid,quietly=TRUE)
-  library(gtable,quietly=TRUE)
-  library(gridExtra,quietly=TRUE)
-  library(scales,quietly=TRUE)
   source("~/Travail/00_Theme.R")
   
   # Load data
   sapply(paste0("Fun/graphs/",list.files("Fun/graphs")),source)
-  load(paste0("Save/BuildResults_",project,".RData"))
-  source(paste0("Files",project,"/H1.all.R"))
   
   for(sim in covariateSize){
 

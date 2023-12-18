@@ -1,10 +1,11 @@
+suppressWarnings(suppressMessages(library(dplyr)))
+
 getResults <- function(project=c("Pasin","Warfarine"),
                        buildMethod=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit"),
                        covariateSize=c(10,50,200,500),
-                       covariateType=c("cov","corcov"),
                        files="all.computed"){
   for(proj in project){
-    source(paste0("Files",proj,"/H1.all.R"))
+    source(paste0("Files/Files",proj,"/H1.all.R"))
     
     
     if(file.exists(paste0("Save/orderList",proj,".RData"))){
@@ -12,9 +13,9 @@ getResults <- function(project=c("Pasin","Warfarine"),
     }else{
       orderList = list()
       
-      for(type in covariateType){
+      for(type in c("cov","corcov")){
         sim = max(covariateSize)
-        covTable = read.csv(paste0("Files",proj,"/",sim,type,"/covTable/covTable_1.txt"))
+        covTable = read.csv(paste0("Files/Files",proj,"/",sim,type,"/covTable/covTable_1.txt"))
         covnames = colnames(covTable)[-1]
         
         orderList = append(orderList,list(covnames))
@@ -28,8 +29,8 @@ getResults <- function(project=c("Pasin","Warfarine"),
       files.list=list()
       for(meth in buildMethod){
         for(sim in covariateSize){
-          for(type in covariateType){
-            pathToRes =paste0("Results",proj,"/Results_",meth,"/finalResults/",sim,type,".RData")
+          for(type in c("cov","corcov")){
+            pathToRes =paste0("Results/Results",proj,"/Results_",meth,"/finalResults/",sim,type,".RData")
             
             if(file.exists(pathToRes)){
               load(pathToRes)
@@ -67,8 +68,8 @@ getResults <- function(project=c("Pasin","Warfarine"),
     
     for(meth in buildMethod){
       for(sim in covariateSize){
-        for(type in covariateType){
-          pathToRes =paste0("Results",proj,"/Results_",meth,"/finalResults/")
+        for(type in c("cov","corcov")){
+          pathToRes =paste0("Results/Results",proj,"/Results_",meth,"/finalResults/")
           pathToCompRes = paste0(pathToRes,sim,type,"comp.RData")
           pathToRes = paste0(pathToRes,sim,type,".RData")
           if(file.exists(pathToRes)){
@@ -147,10 +148,10 @@ getResults <- function(project=c("Pasin","Warfarine"),
         
     resultCovariate <- data.frame()
     resultCovariatePar <- data.frame()
+    resultModelPar <- data.frame()
     resultModel <- data.frame()
-    covLink=sapply(H1,FUN=function(y){unname(t.param[names(which(unlist(lapply(H1.all,function(x){y %in% x}))))])})
     
-    for(type in covariateType){
+    for(type in c("cov","corcov")){
       covnames = orderList[[type]]
       nbCov = length(covnames)
       
@@ -210,12 +211,42 @@ getResults <- function(project=c("Pasin","Warfarine"),
                                                         Method = meth,
                                                         TrueModel = TrueModel/TotalNumberofModel[[paste0(meth,sim,type)]],
                                                         NoFNModel = NoFNModel/TotalNumberofModel[[paste0(meth,sim,type)]]))
+            
+            errorStatsParTrans = suppressMessages(errorStatsPar %>%
+              group_by(Model,ProjectNumber,TypeOfSim,Method) %>%
+              summarise(
+                FP = sum(FP),
+                TP = sum(TP), 
+                FN = sum(FN),
+                TN = sum(TN)
+              ) %>% 
+              mutate(FDR = (FP/max(FP+TP,1)),.after = "TP") %>%
+              mutate(FNR = (FN/max(FN+TN,1)),.after="TN") %>%
+              as.data.frame())
+            
+            NoFNModel = length(unique(errorStatsParTrans[errorStatsParTrans$FN==0 &
+                                                   errorStatsParTrans$ProjectNumber==paste0(sim," covariates") &
+                                                   errorStatsParTrans$TypeOfSim==type &
+                                                   errorStatsParTrans$Method==meth,"Model"]))
+            TrueModel = length(unique(errorStatsParTrans[errorStatsParTrans$FN==0 &
+                                                   errorStatsParTrans$FP==0 &
+                                                   errorStatsParTrans$ProjectNumber==paste0(sim," covariates") &
+                                                   errorStatsParTrans$TypeOfSim==type &
+                                                   errorStatsParTrans$Method==meth,"Model"]))
+            
+            resultModelPar <- rbind(resultModelPar,data.frame(ProjectNumber = paste0(sim," covariates"),
+                                                        TypeOfSim = type,
+                                                        Method = meth,
+                                                        TrueModel = TrueModel/TotalNumberofModel[[paste0(meth,sim,type)]],
+                                                        NoFNModel = NoFNModel/TotalNumberofModel[[paste0(meth,sim,type)]]))
+            
+            
           }
         }
       }
     }
     
     
-    save(computationStats,errorStats,errorStatsPar,resultCovariate,orderList,CovariateModelSelection,resultCovariatePar,resultModel,file=paste0("Save/BuildResults_",proj,".RData"))
+    save(computationStats,errorStats,errorStatsPar,resultCovariate,orderList,CovariateModelSelection,resultCovariatePar,resultModel,resultModelPar,file=paste0("Save/BuildResults_",proj,".RData"))
   }
 } 

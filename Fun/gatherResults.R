@@ -1,39 +1,35 @@
 gatherResults <- function(project=c("Pasin","Warfarine"),
                           covariateSize=c(10,50,200,500),
-                          covariateType=c("cov","corcov"),
                           buildMethod=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit"),
                           numFiles=100,
-                          nameToSave = NULL,
                           completePrint=FALSE,
                           print=TRUE,
-                          cleanCall = FALSE){
+                          cleanCall = TRUE){
   if(cleanCall){
     if(print){cat("===========================================================================\n")}
     source("Fun/cleanFile.R")
-      cleanFile(project,covariateSize,covariateType,buildMethod,completePrint,print)
+      cleanFile(project,covariateSize,buildMethod,completePrint,print)
   }
-
+  
   for(proj in project){
+    miss = setNames(rep(list(c()),length(project)),project)
     printProj = TRUE
       for(cov in covariateSize){
-        for(type in covariateType){
+        for(type in c("cov","corcov")){
+          
+          nameToGiveComp=paste0(cov,type,"comp.RData")
+          nameToGive=paste0(cov,type,".RData")
+          
           for(meth in buildMethod){
             printBuildInfo = TRUE
-            if(dir.exists(paste0("Results",proj)) && dir.exists(paste0("Results",proj,"/Results_",meth))){
+            if(dir.exists(paste0("Results/Results",proj)) && dir.exists(paste0("Results/Results",proj,"/Results_",meth))){
 
               # Folder and paths
-              Folder =paste0("Results",proj,"/")
+              Folder =paste0("Results/Results",proj,"/")
               resultsFolder = paste0(Folder,"Results_",meth,"/",cov,type)
               pathToSave=paste0(Folder,"Results_",meth,"/finalResults/")
               if(!dir.exists(pathToSave)){dir.create(pathToSave)}
 
-              if(is.null(nameToSave)){
-                nameToGiveComp=paste0(cov,type,"comp.RData")
-                nameToGive=paste0(cov,type,".RData")
-              }else{
-                nameToGiveComp=paste0(nameToGive,"comp.RData")
-                nameToGive =paste0(nameToGive,".RData")
-              }
 
               # Get Results
               Models = list()
@@ -52,7 +48,9 @@ gatherResults <- function(project=c("Pasin","Warfarine"),
                   iterationCount <- c(iterationCount,iter)
 
                   names(Models)[length(Models)] <-  names(computationTime)[length(computationTime)] <- names(iterationCount)[length(iterationCount)] <- name
-                }else{missingFile = c(missingFile,i)}
+                }else{missingFile = c(missingFile,i)
+                miss[[proj]] <- sort(unique(c(miss[[proj]],i)))
+                }
               }
 
               # Print information and save data
@@ -81,8 +79,8 @@ gatherResults <- function(project=c("Pasin","Warfarine"),
                       if(stringr::str_detect(meth,"SS")){
                         cat(" with stability selection")
                       }
-                      if(stringr::str_detect(meth,"Cl")){
-                        cat("\nwith a preliminary clustering step")
+                      if(stringr::str_detect(meth,"Crit")){
+                        cat("\nwith multiple thresholds")
                       }
                       cat(" :\n")
                       printBuildInfo = FALSE
@@ -99,5 +97,8 @@ gatherResults <- function(project=c("Pasin","Warfarine"),
           }
         }
       }
+    if(length(miss[[proj]])!=0){
+      cat(paste0("\n\nSUMMARY : missing files ",paste0(miss[[proj]],collapse=","),".\n\n"))
+    }
     }
   }
