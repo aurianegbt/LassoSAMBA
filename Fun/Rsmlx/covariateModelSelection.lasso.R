@@ -124,7 +124,6 @@ covariateModelSelection.lasso <- function(nfolds = 5,
                             criterion,ncrit,covariate.model[[x]],
                             printFrequencySS,p.name=x)})  # contient le résultat de seulement les paramètres variables donc pas dans l'ordre et pas entier
   }
-  print(r.var)
   r <- res <- r.cov0 <- list()
   for(j in 1:n.param){
     nj=param.names[j]
@@ -144,7 +143,6 @@ covariateModelSelection.lasso <- function(nfolds = 5,
       r[[j]]$p.name <- nj
     }
   }
-  print(lapply(r.cov0,length))
   
   e <- as.data.frame(lapply(r[indvar], function(x) {
     x$model$residuals
