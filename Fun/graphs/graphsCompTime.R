@@ -41,7 +41,7 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     ylab("Computation time (s)")+
     ggtitle("Computation Time Comparison",
             subtitle=stringr::str_wrap(subtitle,80))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds"))+
+    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
     # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
@@ -66,7 +66,7 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     }
 
 # Cov graphs
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim =="cov",],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit")),y=time))+
+  ggplot(computationStatsCov[computationStatsCov$TypeOfSim =="cov",],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")),y=time))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayTime[valueDisplayTime$TypeOfSim=="cov",], mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6)+
     #stat_boxplot(geom = "errorbar") +
@@ -74,7 +74,7 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     ylab("Computation time (s)")+
     ggtitle("Computation Time Comparison",
             subtitle=stringr::str_wrap(paste0(subtitle,"With uncorrelated covariates,"),60))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds"))+
+    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
     # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
@@ -97,7 +97,7 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   }
 
   # Corcov graphs
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim =="corcov",],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit")),y=time))+
+  ggplot(computationStatsCov[computationStatsCov$TypeOfSim =="corcov",],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")),y=time))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayTime[valueDisplayTime$TypeOfSim=="corcov",], mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6)+
     #stat_boxplot(geom = "errorbar") +
@@ -105,7 +105,7 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     ylab("Computation time (s)")+
     ggtitle("Computation Time Comparison",
             subtitle=stringr::str_wrap(paste0(subtitle,"With correlated covariates,"),60))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds"))+
+    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
     # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
@@ -146,7 +146,7 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   valueDisplayTime <- cbind(valueDisplayTime,coor=1:length(buildMethod))
 
   # Comparative graphs
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim %in% c("cov","corcov"),],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit")),y=iteration))+
+  ggplot(computationStatsCov[computationStatsCov$TypeOfSim %in% c("cov","corcov"),],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")),y=iteration))+
     geom_violin(lwd=0.5,alpha=0.6)+
     facet_grid(.~TypeOfSim,labeller = as_labeller(c(cov="With uncorrelated covariates",corcov="With correlated covariates")))+
     geom_text(data=valueDisplayTime, mapping=aes(label=textMean,y=Mean,x=coor,color=Method),vjust=-0.2,fontface="bold",size=6)+
@@ -154,7 +154,7 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     ylab("Iteration Count")+
     ggtitle("Number of Iterations Comparison",
             subtitle=stringr::str_wrap(subtitle,80))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds"))+
+    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+
@@ -179,14 +179,14 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
 
   # Cov graphs
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim == "cov",],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit")),y=iteration))+
+  ggplot(computationStatsCov[computationStatsCov$TypeOfSim == "cov",],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")),y=iteration))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayTime[valueDisplayTime$TypeOfSim=="cov",], mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6)+
     xlab("Method used")+
     ylab("Iteration Count")+
     ggtitle("Number of Iterations Comparison",
             subtitle=stringr::str_wrap(paste0(subtitle,"With uncorrelated covariates,"),60))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds"))+
+    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+
@@ -210,14 +210,14 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   }
 
   # Corcov graphs
-  ggplot(computationStatsCov[computationStatsCov$TypeOfSim == "corcov",],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit")),y=iteration))+
+  ggplot(computationStatsCov[computationStatsCov$TypeOfSim == "corcov",],aes(color=Method,fill=Method,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")),y=iteration))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayTime[valueDisplayTime$TypeOfSim=="corcov",], mapping=aes(label=textMean,y=Mean,x=coor),vjust=-0.2,fontface="bold",size=6)+
     xlab("Method used")+
     ylab("Iteration Count")+
     ggtitle("Number of Iterations Comparison",
             subtitle=stringr::str_wrap(paste0(subtitle,"With correlated covariates,"),60))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds"))+
+    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+

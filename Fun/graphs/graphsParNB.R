@@ -97,7 +97,7 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
   }
 
   # Color and fill arguments / cov Graphs
-  precious = c("#468b97","#ef6262", "#74C385","#8e6aa0","#ee6c4d","#007194")[1:length(unlist(H1.all,use.names = F))]
+  precious = rev(c("#468b97","#ef6262", "#74C385","#8e6aa0","#ee6c4d","#007194")[1:length(unlist(H1.all,use.names = F))])
   cmdA = list()
   cmdC = list()
   covPast = 0
@@ -149,10 +149,9 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
     theme(plot.subtitle = element_text(size=12))+
     geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$cov,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5)+
     coord_cartesian(ylim=c(0,unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])),clip="off")+
-    geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2)-2,hjust=0),color=rev(colDisplay),size=5)
+    geom_text(data=valueDisplay[valueDisplay$type=="cov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=if(project=="Pasin"){unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])}else{rev(unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.1)-2)},hjust=0,vjust=1),color=rev(colDisplay),size=5)
 
   # Color and fill arguments / corcov Graphs
-  precious = c("#468b97","#ef6262", "#74C385","#8e6aa0","#ee6c4d","#007194")[1:length(unlist(H1.all,use.names = F))]
   cmdA = list()
   cmdC = list()
   covPast = 0
@@ -204,7 +203,7 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
     theme(plot.subtitle = element_text(size=12))+
     geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="FP",],mapping=aes(label=distext,x=lim$corcov,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5)+
     coord_cartesian(ylim=c(0,unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])),clip="off")+
-    geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="cov","NumberofModel"])*(0.90-(coor-2)*0.2)-2,hjust=0),color=rev(colDisplay),size=5)
+    geom_text(data=valueDisplay[valueDisplay$type=="corcov" & valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=if(project=="Pasin"){unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="corcov","NumberofModel"])}else{rev(unique(resultCovariateParCov[resultCovariateParCov$TypeOfSim=="corcov","NumberofModel"])*(0.90-(coor-2)*0.1)-2)},hjust=0,vjust=1),color=rev(colDisplay),size=5)
 
   # Save plot
   annotate_figure(ggarrange(cov, corcov, nrow = 2),

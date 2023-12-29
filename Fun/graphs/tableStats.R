@@ -118,11 +118,6 @@ tableStats <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,PN
 
   # Save plot
   save_as_html(ft, path = paste0(Folder,"/ErrorTable.html"),expand=10)
-  if(PNG){
-    webshot(url=paste0(Folder,"/ErrorTable.html"),file=paste0(Folder,"/ErrorTable.png"),quiet=TRUE)
-  }
-  if(JPEG){
-    webshot(url=paste0(Folder,"/ErrorTable.html"),file=paste0(Folder,"/ErrorTable.jpeg"),quiet=TRUE)
-  }
+  webshot(url=paste0(Folder,"/ErrorTable.html"),file=paste0(Folder,"/ErrorTable.png"),quiet=TRUE)
   unlink(paste0(Folder,"/ErrorTable.html"))
 }

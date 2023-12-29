@@ -94,7 +94,7 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   # Data Processing
   df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"))
-  methname=c(lassoSS="Lasso",reg="stepAIC",lasso="Lasso without stability selection",lassoSSCrit="Lasso with multiple thresholds",elasticnetSS="Elastic Net",elasticnetSSCrit="Elastic Net with multiple thresholds")
+  methname=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep.")
 
   tableCov = data.frame(Rate = c("With uncorrelated covariates :",
                                  paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
@@ -161,11 +161,8 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   # Save plot
   save_as_html(ft, path = paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"),expand=10)
-  if(PNG){
+  
     webshot(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".png"),quiet=TRUE)
-  }
-  if(JPEG){
-    webshot(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".jpeg"),quiet=TRUE)
-  }
+    
   unlink(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"))
 }
