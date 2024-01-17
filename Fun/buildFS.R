@@ -7,7 +7,8 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
                     thresholdsRep= 0.75,
                     cluster=FALSE,
                     weight=NULL,
-                    ncrit=20,replicatesSS=FALSE){
+                    ncrit=20,replicatesSS=FALSE,
+                    p.max=0.1){
 
   load(paste0("Files/Files",project,"/",covariateSize,covariateType,"/headerTypes.RData"))
 
@@ -45,7 +46,8 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
                  thresholdsSS=thresholdsSS,
                  thresholdsRep=thresholdsRep,
                  ncrit=ncrit,
-                 replicatesSS=replicatesSS)
+                 replicatesSS=replicatesSS,
+                 p.max=p.max)
 
   Model <- Rsmlx:::mlx.getIndividualParameterModel()
   return(list(Model=Model,time=res$time,iter=res$iter))
