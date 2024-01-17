@@ -27,8 +27,7 @@ StepAICSelection <- function(Y,X,
         lm.sat = MASS::stepAIC(model.sature, direction = "backward", 
                              trace = FALSE, k = nrep * pen.coef, scope = list(upper = model.sature, 
                                                                               lower = model.cst), steps = steps, weight = pweight)
-      }
-      else {
+      } else {
         c.cur <- names(which(Rsmlx:::mlx.getIndividualParameterModel()$covariateModel[[p.name]]))
         f.cur <- "y ~ 1"
         if (length(c.cur) > 0) 
@@ -59,7 +58,7 @@ StepAICSelection <- function(Y,X,
       res[, c("ll", "df", "criterion")] <- NULL
     else res[2:nb.model, ] <- res[1, ]
     row.names(res) <- 1:nrow(res)
-    return(list(model = llk, selection=selection))
+    return(list(model = llk, selection=res))
   }else{
     s <- rep("0:1", length(cov.names))
     names(s) <-cov.names

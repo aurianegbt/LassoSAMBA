@@ -93,7 +93,6 @@ covariateModelSelection.reg <- function(covFix = NULL,
   }
   
   
-  
   names(res) <-  param.names
   e <- as.data.frame(lapply(r[indvar], function(x) {x$model$residuals}))
   e.names <- unlist(lapply(r[indvar], function(x) {x$p.name}))
