@@ -1,10 +1,12 @@
 ## On va générer l'ensemble des covariables puis créer les simulations selon celle choisi comme significative 
+set.seed(1710)
 
 ## Load the library required 
 library(dplyr)
 library(lixoftConnectors)
 initializeLixoftConnectors("simulx")
 library(simstudy)
+library(foreach)
 library(data.table)
 library(ggcorrplot)
 library(ggpubr,quietly=TRUE)
@@ -14,7 +16,7 @@ source("Simu/Fun/randomCovariate.R")
 
 ## Generate 500 cov (correlated or not) and then create 500-200-50-10 simulation framework  
 # cov
-distribution = randomCovariate(n=496,NORM = TRUE)
+distribution = randomCovariate(n=996,NORM = TRUE)
 
 loadProject("Simu/PasinMore.smlx")
 
@@ -22,7 +24,9 @@ sim <- getSimulationResults()
 
 dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
 
-for(i in 1:100){
+foreach(i = 1:100) %dopar% {
+  library(dplyr)
+  library(simstudy)
   dataset = sim$res$yAB[sim$res$yAB$rep==i,c("id","time","yAB")]
   
   yAB0 = dataset[dataset$time==0,]
@@ -40,50 +44,60 @@ for(i in 1:100){
   
   dataset = dataset %>% arrange(id,time)
   
-  headerTypes = c("id","time","observation","regressor",rep("contcov",500))
+  headerTypes = c("id","time","observation","regressor",rep("contcov",1000))
   
+  ## 1000 save 
+  dir("Files/FilesPasinMore/1000cov")
+  dir("Files/FilesPasinMore/1000cov/covTable")
+  dir("Files/FilesPasinMore/1000cov/simulation")
+  
+  write.csv(covTable,file=paste0("Files/FilesPasinMore/1000cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset,file=paste0("Files/FilesPasinMore/1000cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  
+  save(headerTypes,file="Files/FilesPasinMore/1000cov/headerTypes.RData")
   
   ## 500 save
-  dir("FilesPasinMore/500cov")
-  dir("FilesPasinMore/500cov/covTable")
-  dir("FilesPasinMore/500cov/simulation")
+  dir("Files/FilesPasinMore/500cov")
+  dir("Files/FilesPasinMore/500cov/covTable")
+  dir("Files/FilesPasinMore/500cov/simulation")
   
-  write.csv(covTable,file=paste0("FilesPasinMore/500cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset,file=paste0("FilesPasinMore/500cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:501],file=paste0("Files/FilesPasinMore/500cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:504],file=paste0("Files/FilesPasinMore/500cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
-  save(headerTypes,file="FilesPasinMore/500cov/headerTypes.RData")
+  headerTypes <- headerTypes[1:504]
+  save(headerTypes,file="Files/FilesPasinMore/500cov/headerTypes.RData")
   
   ## 200 save 
-  dir("FilesPasinMore/200cov")
-  dir("FilesPasinMore/200cov/covTable")
-  dir("FilesPasinMore/200cov/simulation")
+  dir("Files/FilesPasinMore/200cov")
+  dir("Files/FilesPasinMore/200cov/covTable")
+  dir("Files/FilesPasinMore/200cov/simulation")
   
-  write.csv(covTable[,1:201],file=paste0("FilesPasinMore/200cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:204],file=paste0("FilesPasinMore/200cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:201],file=paste0("Files/FilesPasinMore/200cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:204],file=paste0("Files/FilesPasinMore/200cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:204]
-  save(headerTypes,file="FilesPasinMore/200cov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesPasinMore/200cov/headerTypes.RData")
   ## 50 save 
-  dir("FilesPasinMore/50cov")
-  dir("FilesPasinMore/50cov/covTable")
-  dir("FilesPasinMore/50cov/simulation")
+  dir("Files/FilesPasinMore/50cov")
+  dir("Files/FilesPasinMore/50cov/covTable")
+  dir("Files/FilesPasinMore/50cov/simulation")
   
-  write.csv(covTable[,1:51],file=paste0("FilesPasinMore/50cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:54],file=paste0("FilesPasinMore/50cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:51],file=paste0("Files/FilesPasinMore/50cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:54],file=paste0("Files/FilesPasinMore/50cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:54]
-  save(headerTypes,file="FilesPasinMore/50cov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesPasinMore/50cov/headerTypes.RData")
   
   ##10 save 
-  dir("FilesPasinMore/10cov")
-  dir("FilesPasinMore/10cov/covTable")
-  dir("FilesPasinMore/10cov/simulation")
+  dir("Files/FilesPasinMore/10cov")
+  dir("Files/FilesPasinMore/10cov/covTable")
+  dir("Files/FilesPasinMore/10cov/simulation")
   
-  write.csv(covTable[,1:11],file=paste0("FilesPasinMore/10cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:14],file=paste0("FilesPasinMore/10cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:11],file=paste0("Files/FilesPasinMore/10cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:14],file=paste0("Files/FilesPasinMore/10cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:14]
-  save(headerTypes,file="FilesPasinMore/10cov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesPasinMore/10cov/headerTypes.RData")
 }
 
 ## corcov
@@ -145,47 +159,55 @@ for(i in 1:100){
   
   headerTypes = c("id","time","observation","regressor",rep("contcov",500))
 
+  ## 1000 save
+  dir("Files/FilesPasinMore/1000corcov")
+  dir("Files/FilesPasinMore/1000corcov/covTable")
+  dir("Files/FilesPasinMore/1000corcov/simulation")
+  
+  write.csv(covTable,file=paste0("Files/FilesPasinMore/1000corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset,file=paste0("Files/FilesPasinMore/1000corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  
+  save(headerTypes,file="Files/FilesPasinMore/1000corcov/headerTypes.RData")
+  
   ## 500 save
-  dir("FilesPasinMore/500corcov")
-  dir("FilesPasinMore/500corcov/covTable")
-  dir("FilesPasinMore/500corcov/simulation")
+  dir("Files/FilesPasinMore/500corcov")
+  dir("Files/FilesPasinMore/500corcov/covTable")
+  dir("Files/FilesPasinMore/500corcov/simulation")
   
-  write.csv(covTable,file=paste0("FilesPasinMore/500corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset,file=paste0("FilesPasinMore/500corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  save(headerTypes,file="FilesPasinMore/500corcov/headerTypes.RData")
+  write.csv(covTable[,1:501],file=paste0("Files/FilesPasinMore/500corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:504],file=paste0("Files/FilesPasinMore/500corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   ## 200 save 
-  dir("FilesPasinMore/200corcov")
-  dir("FilesPasinMore/200corcov/covTable")
-  dir("FilesPasinMore/200corcov/simulation")
+  dir("Files/FilesPasinMore/200corcov")
+  dir("Files/FilesPasinMore/200corcov/covTable")
+  dir("Files/FilesPasinMore/200corcov/simulation")
   
-  write.csv(covTable[,1:201],file=paste0("FilesPasinMore/200corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:204],file=paste0("FilesPasinMore/200corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:201],file=paste0("Files/FilesPasinMore/200corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:204],file=paste0("Files/FilesPasinMore/200corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:204]
-  save(headerTypes,file="FilesPasinMore/200corcov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesPasinMore/200corcov/headerTypes.RData")
   ## 50 save 
-  dir("FilesPasinMore/50corcov")
-  dir("FilesPasinMore/50corcov/covTable")
-  dir("FilesPasinMore/50corcov/simulation")
+  dir("Files/FilesPasinMore/50corcov")
+  dir("Files/FilesPasinMore/50corcov/covTable")
+  dir("Files/FilesPasinMore/50corcov/simulation")
   
-  write.csv(covTable[,1:51],file=paste0("FilesPasinMore/50corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:54],file=paste0("FilesPasinMore/50corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:51],file=paste0("Files/FilesPasinMore/50corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:54],file=paste0("Files/FilesPasinMore/50corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:54]
-  save(headerTypes,file="FilesPasinMore/50corcov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesPasinMore/50corcov/headerTypes.RData")
   
   ##10 save 
-  dir("FilesPasinMore/10corcov")
-  dir("FilesPasinMore/10corcov/covTable")
-  dir("FilesPasinMore/10corcov/simulation")
+  dir("Files/FilesPasinMore/10corcov")
+  dir("Files/FilesPasinMore/10corcov/covTable")
+  dir("Files/FilesPasinMore/10corcov/simulation")
   
-  write.csv(covTable[,1:11],file=paste0("FilesPasinMore/10corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:14],file=paste0("FilesPasinMore/10corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:11],file=paste0("Files/FilesPasinMore/10corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:14],file=paste0("Files/FilesPasinMore/10corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:14]
-  save(headerTypes,file="FilesPasinMore/10corcov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesPasinMore/10corcov/headerTypes.RData")
   
   unlink("tmpfile.txt")
 }

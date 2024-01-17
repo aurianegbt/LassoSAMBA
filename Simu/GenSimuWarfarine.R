@@ -1,20 +1,24 @@
 ## On va générer l'ensemble des covariables puis créer les simulations selon celle choisi comme significative 
+set.seed(1710)
+
 
 ## Load the library required 
 library(dplyr)
 library(lixoftConnectors)
 initializeLixoftConnectors("simulx")
 library(simstudy)
+library(foreach)
 library(data.table)
 library(ggcorrplot)
 library(ggpubr,quietly=TRUE)
 source("~/Travail/00_Theme.R")
 source("Simu/Fun/genCov.R")
 source("Simu/Fun/randomCovariate.R")
+doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detectCores()-5))
 
 ## Generate 500 cov (correlated or not) and then create 500-200-50-10 simulation framework  
 # cov
-distribution = randomCovariate(n=498,NORM = TRUE)
+distribution = randomCovariate(n=998,NORM = TRUE)
 
 loadProject("Simu/Warfarine.smlx")
 
@@ -22,7 +26,10 @@ sim <- getSimulationResults()
 
 dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
 
-for(i in 1:100){
+
+foreach(i = 1:100) %dopar% {
+  library(dplyr)
+  library(simstudy)
   dataset = sim$res$y1[sim$res$y1$rep==i,c("id","time","y1")]
   
   dataset = rbind(dataset,data.frame(id=unique(dataset$id),time=0,y1=".")) %>%
@@ -44,62 +51,72 @@ for(i in 1:100){
   
   dataset = dataset %>% arrange(id,time)
   
-  headerTypes = c("id","time","observation","amount",rep("contcov",500))
+  headerTypes = c("id","time","observation","amount",rep("contcov",1000))
   
+  
+  ## 1000 save
+  dir("Files/FilesWarfarine/1000cov")
+  dir("Files/FilesWarfarine/1000cov/covTable")
+  dir("Files/FilesWarfarine/1000cov/simulation")
+  
+  write.csv(covTable,file=paste0("Files/FilesWarfarine/1000cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset,file=paste0("Files/FilesWarfarine/1000cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  
+  save(headerTypes,file="Files/FilesWarfarine/1000cov/headerTypes.RData")
   
   ## 500 save
-  dir("FilesWarfarine/500cov")
-  dir("FilesWarfarine/500cov/covTable")
-  dir("FilesWarfarine/500cov/simulation")
+  dir("Files/FilesWarfarine/500cov")
+  dir("Files/FilesWarfarine/500cov/covTable")
+  dir("Files/FilesWarfarine/500cov/simulation")
   
-  write.csv(covTable,file=paste0("FilesWarfarine/500cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset,file=paste0("FilesWarfarine/500cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:501],file=paste0("Files/FilesWarfarine/500cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:504],file=paste0("Files/FilesWarfarine/500cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
-  save(headerTypes,file="FilesWarfarine/500cov/headerTypes.RData")
+  headerTypes <- headerTypes[1:504]
+  save(headerTypes,file="Files/FilesWarfarine/500cov/headerTypes.RData")
   
   ## 200 save 
-  dir("FilesWarfarine/200cov")
-  dir("FilesWarfarine/200cov/covTable")
-  dir("FilesWarfarine/200cov/simulation")
+  dir("Files/FilesWarfarine/200cov")
+  dir("Files/FilesWarfarine/200cov/covTable")
+  dir("Files/FilesWarfarine/200cov/simulation")
   
-  write.csv(covTable[,1:201],file=paste0("FilesWarfarine/200cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:204],file=paste0("FilesWarfarine/200cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:201],file=paste0("Files/FilesWarfarine/200cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:204],file=paste0("Files/FilesWarfarine/200cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:204]
-  save(headerTypes,file="FilesWarfarine/200cov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesWarfarine/200cov/headerTypes.RData")
   ## 50 save 
-  dir("FilesWarfarine/50cov")
-  dir("FilesWarfarine/50cov/covTable")
-  dir("FilesWarfarine/50cov/simulation")
+  dir("Files/FilesWarfarine/50cov")
+  dir("Files/FilesWarfarine/50cov/covTable")
+  dir("Files/FilesWarfarine/50cov/simulation")
   
-  write.csv(covTable[,1:51],file=paste0("FilesWarfarine/50cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:54],file=paste0("FilesWarfarine/50cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:51],file=paste0("Files/FilesWarfarine/50cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:54],file=paste0("Files/FilesWarfarine/50cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:54]
-  save(headerTypes,file="FilesWarfarine/50cov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesWarfarine/50cov/headerTypes.RData")
   
   ##10 save 
-  dir("FilesWarfarine/10cov")
-  dir("FilesWarfarine/10cov/covTable")
-  dir("FilesWarfarine/10cov/simulation")
+  dir("Files/FilesWarfarine/10cov")
+  dir("Files/FilesWarfarine/10cov/covTable")
+  dir("Files/FilesWarfarine/10cov/simulation")
   
-  write.csv(covTable[,1:11],file=paste0("FilesWarfarine/10cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:14],file=paste0("FilesWarfarine/10cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:11],file=paste0("Files/FilesWarfarine/10cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:14],file=paste0("Files/FilesWarfarine/10cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:14]
-  save(headerTypes,file="FilesWarfarine/10cov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesWarfarine/10cov/headerTypes.RData")
 }
 
 
 ## corcov
 # Correlation matrix
-load("Simu/DataTransCoding500SinceD63.RData")
+load("Simu/DataTransCoding.RData")
 
-aux = rbind(arm1,arm2,arm5,arm6,arm7)  %>%
-  filter(visit=="D63") %>%
-  select(AGE,WEIGHT,hla_drb4:rbpms2)
+aux = dataTransCoding %>% filter(visit=="D63") %>%
+  select(age,a1bg:arid5b)
 
-colnames(aux) <- c(1:500)
+colnames(aux) <- c(1:ncol(aux))
 
 corMatrix <- cor(aux,method="spearman")
 epsilon <- 1e-10
@@ -129,7 +146,7 @@ ggsave("Simu/corrPKZoom2.png",
 
 def <- defData(varname = "AGE", formula = 0, variance = 0.3**2, dist = "normal")
 def <- defData(def,varname="WT",formula=0,variance=0.2**2,dist="normal")
-for(i in 1:498){
+for(i in 1:998){
   def <- defData(def,varname=paste0("Gen",i),formula=rnorm(1),variance=rexp(1,0.3),dist="normal")
 }
 setNbReplicates(1)
@@ -170,49 +187,60 @@ for(i in 1:100){
   
   dataset = dataset %>% arrange(id,time)
   
-  headerTypes = c("id","time","observation","amount",rep("contcov",500))
+  headerTypes = c("id","time","observation","amount",rep("contcov",1000))
   
   ## 500 save
-  dir("FilesWarfarine/500corcov")
-  dir("FilesWarfarine/500corcov/covTable")
-  dir("FilesWarfarine/500corcov/simulation")
+  dir("Files/FilesWarfarine/1000corcov")
+  dir("Files/FilesWarfarine/1000corcov/covTable")
+  dir("Files/FilesWarfarine/1000corcov/simulation")
   
-  write.csv(covTable,file=paste0("FilesWarfarine/500corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset,file=paste0("FilesWarfarine/500corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable,file=paste0("Files/FilesWarfarine/1000corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset,file=paste0("Files/FilesWarfarine/1000corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
-  save(headerTypes,file="FilesWarfarine/500corcov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesWarfarine/1000corcov/headerTypes.RData")
+  
+  ## 500 save
+  dir("Files/FilesWarfarine/500corcov")
+  dir("Files/FilesWarfarine/500corcov/covTable")
+  dir("Files/FilesWarfarine/500corcov/simulation")
+  
+  write.csv(covTable[,1:501],file=paste0("Files/FilesWarfarine/500corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:504],file=paste0("Files/FilesWarfarine/500corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  
+  headerTypes <- headerTypes[1:504]
+  save(headerTypes,file="Files/FilesWarfarine/500corcov/headerTypes.RData")
   
   ## 200 save 
-  dir("FilesWarfarine/200corcov")
-  dir("FilesWarfarine/200corcov/covTable")
-  dir("FilesWarfarine/200corcov/simulation")
+  dir("Files/FilesWarfarine/200corcov")
+  dir("Files/FilesWarfarine/200corcov/covTable")
+  dir("Files/FilesWarfarine/200corcov/simulation")
   
-  write.csv(covTable[,1:201],file=paste0("FilesWarfarine/200corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:204],file=paste0("FilesWarfarine/200corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:201],file=paste0("Files/FilesWarfarine/200corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:204],file=paste0("Files/FilesWarfarine/200corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:204]
-  save(headerTypes,file="FilesWarfarine/200corcov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesWarfarine/200corcov/headerTypes.RData")
   ## 50 save 
-  dir("FilesWarfarine/50corcov")
-  dir("FilesWarfarine/50corcov/covTable")
-  dir("FilesWarfarine/50corcov/simulation")
+  dir("Files/FilesWarfarine/50corcov")
+  dir("Files/FilesWarfarine/50corcov/covTable")
+  dir("Files/FilesWarfarine/50corcov/simulation")
   
-  write.csv(covTable[,1:51],file=paste0("FilesWarfarine/50corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:54],file=paste0("FilesWarfarine/50corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:51],file=paste0("Files/FilesWarfarine/50corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:54],file=paste0("Files/FilesWarfarine/50corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:54]
-  save(headerTypes,file="FilesWarfarine/50corcov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesWarfarine/50corcov/headerTypes.RData")
   
   ##10 save 
-  dir("FilesWarfarine/10corcov")
-  dir("FilesWarfarine/10corcov/covTable")
-  dir("FilesWarfarine/10corcov/simulation")
+  dir("Files/FilesWarfarine/10corcov")
+  dir("Files/FilesWarfarine/10corcov/covTable")
+  dir("Files/FilesWarfarine/10corcov/simulation")
   
-  write.csv(covTable[,1:11],file=paste0("FilesWarfarine/10corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:14],file=paste0("FilesWarfarine/10corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  write.csv(covTable[,1:11],file=paste0("Files/FilesWarfarine/10corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  write.csv(dataset[,1:14],file=paste0("Files/FilesWarfarine/10corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   headerTypes <- headerTypes[1:14]
-  save(headerTypes,file="FilesWarfarine/10corcov/headerTypes.RData")
+  save(headerTypes,file="Files/FilesWarfarine/10corcov/headerTypes.RData")
   
   unlink("tmpfile.txt")
 }
