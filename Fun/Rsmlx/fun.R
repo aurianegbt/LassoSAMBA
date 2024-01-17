@@ -18,7 +18,7 @@ source("Fun/Rsmlx/lassoSelectionPAR.R")
 
 source("Fun/Rsmlx/covariateModelSelection.StepAIC.R")
 source("Fun/Rsmlx/applyMethodStepAIC.R")
-source("Fun/Rsmlx/StepAICSelection.R")
+source("Fun/Rsmlx/StepAICselection.R")
 
 
 source("Fun/Rsmlx/covariateModelSelection.elasticnet.R")

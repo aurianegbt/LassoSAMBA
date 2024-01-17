@@ -12,6 +12,8 @@ buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, 
                      buildMethod="lasso",ncrit=20,printFrequencySS=FALSE,
                      replicatesSS=FALSE)
 {
+  doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detectCores()))
+  
   ptm <- proc.time()
   dashed.line <- "--------------------------------------------------\n"
   plain.line <- "__________________________________________________\n"
@@ -960,5 +962,7 @@ buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, 
   res$weight <- weight
   res$covToTest <- covToTest
   options(op.original)
+  
+  
   return(list(res=res,time=ttime,iter=iter))
 }
