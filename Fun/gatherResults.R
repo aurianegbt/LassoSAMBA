@@ -1,18 +1,26 @@
 gatherResults <- function(project=c("Pasin","Warfarine"),
-                          covariateSize=c(10,50,200,500),
-                          buildMethod=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit"),
-                          numFiles=100,
+                          covariateSize=200,
+                          buildMethod="all",
+                          numFiles=50,
                           completePrint=FALSE,
                           print=TRUE,
                           cleanCall = TRUE){
-  if(cleanCall){
-    if(print){cat("===========================================================================\n")}
-    source("Fun/cleanFile.R")
-      cleanFile(project,covariateSize,buildMethod,completePrint,print)
-  }
+  
+  bM=identical(buildMethod,"all")
+  miss = setNames(rep(list(c()),length(project)),project)
   
   for(proj in project){
-    miss = setNames(rep(list(c()),length(project)),project)
+    if(bM){
+      buildMethod <- stringr::str_remove_all(list.dirs(paste0("Results/Results",proj),recursive = F),paste0("Results/Results",proj,"/Results_"))
+      
+      buildMethod = c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")[which( c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP") %in% buildMethod)]
+    }
+    
+    
+    if(cleanCall){
+      source("Fun/cleanFile.R")
+      cleanFile(proj,covariateSize,buildMethod,completePrint,print)
+    }
     printProj = TRUE
       for(cov in covariateSize){
         for(type in c("cov","corcov")){
@@ -29,8 +37,7 @@ gatherResults <- function(project=c("Pasin","Warfarine"),
               resultsFolder = paste0(Folder,"Results_",meth,"/",cov,type)
               pathToSave=paste0(Folder,"Results_",meth,"/finalResults/")
               if(!dir.exists(pathToSave)){dir.create(pathToSave)}
-
-
+              
               # Get Results
               Models = list()
               computationTime = numeric(0)
@@ -49,8 +56,7 @@ gatherResults <- function(project=c("Pasin","Warfarine"),
 
                   names(Models)[length(Models)] <-  names(computationTime)[length(computationTime)] <- names(iterationCount)[length(iterationCount)] <- name
                 }else{missingFile = c(missingFile,i)
-                miss[[proj]] <- sort(unique(c(miss[[proj]],i)))
-                }
+                miss[[proj]] = c(miss[[proj]],i)}
               }
 
               # Print information and save data
@@ -78,6 +84,9 @@ gatherResults <- function(project=c("Pasin","Warfarine"),
                       }
                       if(stringr::str_detect(meth,"SS")){
                         cat(" with stability selection")
+                      }
+                      if(stringr::str_detect(meth,"noCov0")){
+                        cat(" without cov0")
                       }
                       if(stringr::str_detect(meth,"Crit")){
                         cat("\nwith multiple thresholds")

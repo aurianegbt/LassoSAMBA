@@ -72,7 +72,7 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
                 function(x){max(resultCovariateParCov[resultCovariateParCov$Parameter==t.param[x]
                                                       & resultCovariateParCov$TypeOfSim==t
                                                       & !(resultCovariateParCov$Covariate %in% H1.all[[x]]),
-                                                      "ProportionSelected"][(lim[[t]]-5):lim[[t]]]*100,na.rm = TRUE)})
+                                                      "ProportionSelected"]*100,na.rm = TRUE)})
 
 
     covAux = sapply(stringr::str_replace(names(unlist(value)),"\\.",":"),FUN=function(x){gsub(".*:","",x)},USE.NAMES = FALSE)

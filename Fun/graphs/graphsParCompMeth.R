@@ -41,6 +41,12 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
       newbuildMethod[k] <- "Elastic Net with mult.\nthresholds and s.s. on rep."
     }else if(stringr::str_detect(buildMethod[k],"regPEN")){
       newbuildMethod[k] <- paste0("penalized stepAIC\npen=",stringr::str_remove(buildMethod[k],"regPEN"))
+    }else if(buildMethod[k]=="lassoSSnoCov0"){
+      newbuildMethod[k] <- "Lasso\nwhithout stat. test"
+    }else if(buildMethod[k]=="regnoCov0"){
+      newbuildMethod[k] <- "StepAIC\nwhithout stat. test"
+    }else if(buildMethod[k]=="elasticnetSSnoCov0"){
+      newbuildMethod[k] <- "Elastic Net\nwhithout stat. test"
     }
   }
   
@@ -194,7 +200,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
     geom_bar(position=position_dodge(preserve = "single"),alpha=alphaScale,
              color= colorScale,
              fill = colorScale)+
-    facet_nested(factor(Method,levels=c("StepAIC","Lasso","Elastic Net","Lasso with\nmultiple thresholds","Elastic Net with\nclustering step","Elastic Net with\nmultiple thresholds",paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"penalized")],"penalized stepAIC\npen=")),"Lasso with\ns.s. on replicates","Elastic Net with\ns.s. on replicates","Lasso with mult.\nthresholds and s.s. on rep.","Elastic Net with mult.\nthresholds and s.s. on rep."))+Parameter~.,labeller=labeller(Parameter=label_parsed))+
+    facet_nested(factor(Method,levels=c("StepAIC","Lasso","Elastic Net","StepAIC\nwhithout stat. test","Lasso\nwhithout stat. test","Elastic Net\nwhithout stat. test","Lasso with\nmultiple thresholds","Elastic Net with\nclustering step","Elastic Net with\nmultiple thresholds",paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"penalized")],"penalized stepAIC\npen=")),"Lasso with\ns.s. on replicates","Elastic Net with\ns.s. on replicates","Lasso with mult.\nthresholds and s.s. on rep.","Elastic Net with mult.\nthresholds and s.s. on rep."))+Parameter~.,labeller=labeller(Parameter=label_parsed))+
     xlab("Covariates")+
     ylab("Count")+
     ggtitle("With uncorrelated covariates, ")+
@@ -250,7 +256,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
     geom_bar(position=position_dodge(preserve = "single"),alpha=alphaScale,
              color= colorScale,
              fill = colorScale)+
-     facet_nested(factor(Method,levels=c("StepAIC","Lasso","Elastic Net","Lasso with\nmultiple thresholds","Elastic Net with\nclustering step","Elastic Net with\nmultiple thresholds",paste0("penalized stepAIC\npen=",stringr::str_remove(buildMethod[stringr::str_detect(buildMethod,"penalized")],"penalized stepAIC\npen=")),"Lasso with\ns.s. on replicates","Elastic Net with\ns.s. on replicates","Lasso with mult.\nthresholds and s.s. on rep.","Elastic Net with mult.\nthresholds and s.s. on rep."))+Parameter~.,labeller=labeller(Parameter=label_parsed))+
+     facet_nested(factor(Method,levels=c("StepAIC","Lasso","Elastic Net","StepAIC\nwhithout stat. test","Lasso\nwhithout stat. test","Elastic Net\nwhithout stat. test","Lasso with\nmultiple thresholds","Elastic Net with\nclustering step","Elastic Net with\nmultiple thresholds",paste0("penalized stepAIC\npen=",stringr::str_remove(buildMethod[stringr::str_detect(buildMethod,"penalized")],"penalized stepAIC\npen=")),"Lasso with\ns.s. on replicates","Elastic Net with\ns.s. on replicates","Lasso with mult.\nthresholds and s.s. on rep.","Elastic Net with mult.\nthresholds and s.s. on rep."))+Parameter~.,labeller=labeller(Parameter=label_parsed))+
     xlab("Covariates")+
     ylab("Count")+
     ggtitle("With correlated covariates, ")+

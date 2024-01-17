@@ -6,20 +6,25 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   # Data.frame to use
   resultModelCov <- resultModel[resultModel$ProjectNumber == paste(covariateSize,"covariates") & resultModel$Method %in% buildMethod, ]
+  
+  
   resultModelParCov <- resultModelPar[resultModelPar$ProjectNumber == paste(covariateSize,"covariates") & resultModelPar$Method %in% buildMethod, ]
 
   errorStatsCov <- errorStats[errorStats$ProjectNumber == paste(covariateSize,"covariates") & errorStats$Method %in% buildMethod,]
-  errorStatsParCov <-  suppressMessages(errorStatsPar %>%
+  errorStatsParCov <- errorStatsPar[errorStatsPar$ProjectNumber == paste(covariateSize,"covariates") & errorStatsPar$Method %in% buildMethod,]
+  errorStatsParCov <-  suppressMessages(errorStatsParCov %>%
     group_by(Model,ProjectNumber,TypeOfSim,Method) %>%
     summarise(
       FP = sum(FP),
       TP = sum(TP), 
       FN = sum(FN),
       TN = sum(TN)
-    ) %>% 
-    mutate(FDR = (FP/max(FP+TP,1)),.after = "TP") %>%
-    mutate(FNR = (FN/max(FN+TN,1)),.after="TN") %>%
-    as.data.frame())
+    )) %>%
+    as.data.frame()
+
+  errorStatsParCov <- errorStatsParCov  %>% 
+    mutate(FDR = (FP/sapply(FP+TP,FUN=function(x){max(x,1)})),.after = "TP") %>%
+    mutate(FNR = (FN/sapply(FP+TP,FUN=function(x){max(x,1)})),.after="TN") 
 
   df = data.frame(TypeOfSim=rep(c("cov","corcov"),each=length(buildMethod)),
                   Method = rep(buildMethod,2),
@@ -94,7 +99,7 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   # Data Processing
   df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"))
-  methname=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep.")
+  methname=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test",lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep.")
 
   tableCov = data.frame(Rate = c("With uncorrelated covariates :",
                                  paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),

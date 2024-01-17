@@ -8,6 +8,7 @@ suppressWarnings(suppressMessages(library(grid,quietly=TRUE)))
 suppressWarnings(suppressMessages(library(gtable,quietly=TRUE)))
 suppressWarnings(suppressMessages(library(gridExtra,quietly=TRUE)))
 suppressWarnings(suppressMessages(library(scales,quietly=TRUE)))
+sapply(paste0("Fun/graphs/",list.files("Fun/graphs")),source)
 
 graphsGenerate <- function(project="Pasin",
                            covariateSize=c(10,50,200,500),
@@ -20,7 +21,6 @@ graphsGenerate <- function(project="Pasin",
   load(paste0("Save/BuildResults_",project,".RData"))
   
   # Load data
-  sapply(paste0("Fun/graphs/",list.files("Fun/graphs")),source)
   
   for(sim in covariateSize){
 
@@ -34,11 +34,15 @@ graphsGenerate <- function(project="Pasin",
                      lassoSSREPCrit= "Model built with a lasso approach within SAMBA, and multiple thresholds and s.s. on replicates.",
                      elasticnetSSREPCrit="Model built with an elastic net approach within SAMBA, and multiple thresholds and s.s. on replicates.",
                      lassoSSREP= "Model built with a lasso approach within SAMBA, and s.s. on replicates.",
-                     elasticnetSSREP="Model built with an elastic net approach within SAMBA, and on replicates.")[buildMethod[which(!stringr::str_detect(buildMethod,"regPEN"))]]
+                     elasticnetSSREP="Model built with an elastic net approach within SAMBA, and on replicates.")[buildMethod[which(!stringr::str_detect(buildMethod,"regPEN") & !stringr::str_detect(buildMethod,"noCov0"))]]
     
     for(k in 1:length(buildMethod)){
       if(stringr::str_detect(buildMethod[k],"regPEN")){
         Titlelist <- append(Titlelist, paste0("Model built with SAMBA, whose criterion is ", stringr::str_remove(buildMethod[k],"regPEN")," times penalized."))
+        names(Titlelist)[length(Titlelist)] <- buildMethod[k]
+      }
+      if(stringr::str_detect(buildMethod[k],"noCov0")){
+        Titlelist <- append(Titlelist, paste0(stringr::str_sub(Titlelist[stringr::str_remove(buildMethod[k],"noCov0")],end=-2),", whithout statistical test to exclude covariates."))
         names(Titlelist)[length(Titlelist)] <- buildMethod[k]
       }
     }

@@ -1,10 +1,20 @@
 suppressWarnings(suppressMessages(library(dplyr)))
+suppressWarnings(suppressMessages(library(stringr)))
 
 getResults <- function(project=c("Pasin","Warfarine"),
-                       buildMethod=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit"),
+                       buildMethod="all",
                        covariateSize=c(10,50,200,500),
                        files="all.computed"){
+  
+  bM = identical(buildMethod,"all")
+  
   for(proj in project){
+    if(bM){
+      buildMethod <- stringr::str_remove_all(list.dirs(paste0("Results/Results",proj),recursive = F),paste0("Results/Results",proj,"/Results_"))
+      
+      buildMethod = c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")[which( c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP") %in% buildMethod)]
+    }
+    
     source(paste0("Files/Files",proj,"/H1.all.R"))
     
     
@@ -14,7 +24,11 @@ getResults <- function(project=c("Pasin","Warfarine"),
       orderList = list()
       
       for(type in c("cov","corcov")){
-        sim = max(covariateSize)
+        sim = max(list.dirs(paste0("Files/Files",proj,"/"),recursive=FALSE) %>%
+                    str_remove_all(paste0("Files/Files",proj,"/")) %>%
+                    str_remove_all("corcov") %>%
+                    str_remove_all("cov") %>%
+                    setdiff("keep"))
         covTable = read.csv(paste0("Files/Files",proj,"/",sim,type,"/covTable/covTable_1.txt"))
         covnames = colnames(covTable)[-1]
         
