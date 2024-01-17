@@ -10,6 +10,7 @@ dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
 # suppressMessages(library(stringr))
 # suppressMessages(library(dplyr))
 # suppressMessages(library(slurmR))
+library(foreach)
 suppressMessages(library(lixoftConnectors))
 
 # Load Functions and softwares
@@ -19,8 +20,8 @@ invisible(purrr::quietly(lixoftConnectors::initializeLixoftConnectors)(software=
 arr <- as.numeric(slurmR::Slurm_env(x='SLURM_ARRAY_TASK_ID'))
 
 args = commandArgs(trailingOnly=TRUE)
-# args=c("Warfarine","reg","cov","10","FALSE","NULL","0.7")
-# project,  method,type, size, rep, weight, thresholds 
+
+# project,  method,type, size, rep, weight, thresholdsSS , thresholdsRep
 
 project = args[1]
 buildMethod <- args[2]
@@ -42,11 +43,13 @@ covariateSize <- as.numeric(args[4])
 
 
 REP = as.logical(args[5])
-weight <- if(args[6]=="NULL"){NULL}else{list(covariate=as.numeric(args[6]))}
+weight <- if(args[6]=="NULL"){NULL}else{as.numeric(args[6])}
 PEN <- !is.null(weight)
 eval(parse(text=paste0("thresholdsSS = ",args[7])))
-
+eval(parse(text=paste0("thresholdsRep = ",args[8])))
 source("Fun/Rsmlx/fun.R")
+
+cov0 = as.logical(args[9])
 # source("Fun/buildFS.R")
 
 ## Presentation of work :
@@ -54,9 +57,9 @@ cat("===========================================================================
 - - - - - - - - - - - - - - Work Information - - - - - - - - - - - - - - -\n")
 cat(" • Method used : ",
     if(buildMethod=="reg"){"stepAIC"}else if(buildMethod=="lasso"){"lasso"}else
-      if(buildMethod=="elasticnet"){"elastic net"}," ",
+      if(buildMethod=="elasticnet"){"elastic net"}else if(buildMethod=="StepAIC"){"custom stepAIC"}," ",
     if(stabilitySelection){"with stability selection"}," ",
-    if(length(thresholdsSS)!=1){"using multiple thresholds"},";\n")
+    if((buildMethod!="reg" & buildMethod!="StepAIC") & length(thresholdsSS)!=1){"using multiple thresholds"},";\n")
 cat(" • Penalization : ",if(is.null(weight)){"None"}else{weight},";\n")
 cat(" • StabSel on replicates : ",REP,";\n")
 cat("Working on file n°",arr," from ",project," simulations with ",covariateSize,if(covariateType=="corcov"){" correlated"}," covariates.\n")
@@ -68,9 +71,10 @@ pathToResults = paste0("Results/Results",project)
   dir(pathToResults)
 pathToResults = paste0(pathToResults,"/Results_",buildMethod,
                        if(stabilitySelection){"SS"},
-                       if(buildMethod!="reg" & length(thresholdsSS)!=1){"Crit"},
+                       if(!(buildMethod%in%c("reg","StepAIC")) & length(thresholdsSS)!=1){"Crit"},
                        if(PEN){paste0("PEN",paste0(weight,collapse="-"))},
-                       if(REP){"REP"})
+                       if(REP){"REP"},
+                       if(cov0){"noCov0"})
   dir(pathToResults)
   
 pathToResults <- paste0(pathToResults,"/",covariateSize,covariateType)
@@ -93,18 +97,19 @@ replicatesSS=REP
 
 
 if(file.exists(pathToResults) && file.exists(pathToCompResults)){cat("Model already built.\n")}else{
-
-
+  
   resBuild = buildFS(pathToSim,covariateSize,covariateType,
                      project,
                      temporaryDirectory = temporaryDirectory,
                      buildMethod = buildMethod,
                      stabilitySelection = stabilitySelection,
                      thresholdsSS = thresholdsSS,
+                     thresholdsRep=thresholdsRep,
                      cluster=cluster,
-                     weight= weight,
+                     weight = weight,
                      ncrit=ncrit,
-                     replicatesSS=REP)
+                     replicatesSS=REP,
+                     p.max=if(cov0){1}else{0.1})
 
   model = resBuild$Model
   time = resBuild$time
