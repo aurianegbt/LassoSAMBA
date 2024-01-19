@@ -1,5 +1,5 @@
 ## On va générer l'ensemble des covariables puis créer les simulations selon celle choisi comme significative 
-set.seed(1710)
+set.seed(81511807)
 
 
 ## Load the library required 
@@ -23,6 +23,8 @@ doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detect
 distribution = randomCovariate(n=197)
 
 loadProject("Simu/Pasin.smlx")
+
+runSimulation()
 
 sim <- getSimulationResults()
 
@@ -51,28 +53,7 @@ foreach(i = 1:100) %dopar% {
   
   dataset = dataset %>% arrange(id,time)
   
-  headerTypes = c("id","time","observation","regressor",rep("contcov",1000))
-  # 
-  # ## 1000 save 
-  # dir("Files/FilesPasinWeird/1000cov")
-  # dir("Files/FilesPasinWeird/1000cov/covTable")
-  # dir("Files/FilesPasinWeird/1000cov/simulation")
-  # 
-  # write.csv(covTable,file=paste0("Files/FilesPasinWeird/1000cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  # write.csv(dataset,file=paste0("Files/FilesPasinWeird/1000cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  # 
-  # save(headerTypes,file="Files/FilesPasinWeird/1000cov/headerTypes.RData")
-  # 
-  # ## 500 save
-  # dir("Files/FilesPasinWeird/500cov")
-  # dir("Files/FilesPasinWeird/500cov/covTable")
-  # dir("Files/FilesPasinWeird/500cov/simulation")
-  # 
-  # write.csv(covTable[,1:501],file=paste0("Files/FilesPasinWeird/500cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  # write.csv(dataset[,1:504],file=paste0("Files/FilesPasinWeird/500cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  # 
-  # headerTypes <- headerTypes[1:504]
-  # save(headerTypes,file="Files/FilesPasinWeird/500cov/headerTypes.RData")
+  headerTypes = c("id","time","observation","regressor",rep("contcov",200))
   
   ## 200 save 
   dir("Files/FilesPasinWeird/200cov")
@@ -108,48 +89,70 @@ foreach(i = 1:100) %dopar% {
 }
 
 ## corcov
-load("Simu/DataTransCoding.RData")
+# load("Simu/DataTransCoding.RData")
+# 
+# aux = (dataTransCoding %>% filter(visit=="M12"))[,c(7,9:18662)] 
+# genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[1:999]
+# 
+# aux <- aux[,c("age",genesKept)]
+# colnames(aux) <- c(1:ncol(aux))
+# 
+# genCorMat <- cor(aux,method="spearman")
+# epsilon <- 1e-10
+# genCorMat <- genCorMat + epsilon * diag(ncol(genCorMat))
+# 
+# save(genCorMat,file="Simu/corrMatrixPasinWeird.RData")
+# 
+# corrplot =  ggcorrplot(genCorMat[1:200,1:200],ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain")) + theme(plot.title = element_text(size=20, face="plain"))
+# 
+# 
+# annotate_figure(corrplot,
+#                 top = text_grob("Theoretical Correlation Matrix used, zoomed on the first 200 covariates.",
+#                                 face="bold",size=30,color="#882255"))
+# ggsave("Simu/corrPasinWeirdZoom200.png",
+#        height = 6000, width = 6000, units = "px", bg='transparent')
+# 
+# corrplot =  ggcorrplot(genCorMat,ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain")) + theme(plot.title = element_text(size=20, face="plain"))
+# 
+# 
+# annotate_figure(corrplot,
+#                 top = text_grob("Theoretical Correlation Matrix used.",
+#                                 face="bold",size=50,color="#882255"))
+# ggsave("Simu/corrPasinWeird.png",
+#        height = 10000, width = 10000, units = "px", bg='transparent')
+load("Simu/corrMatrixPasin.RData")
+genCorMat <- genCorMat[1:200,1:200]
 
-aux = dataTransCoding %>% filter(visit=="D63") %>%
-  select(age,a1bg:arid5b)
+source("Simu/Fun/randomCovariate2.R")
+dist = randomCovariate(n=197)
 
-aux <- aux[,1:200]
-
-
-colnames(aux) <- c(1:ncol(aux))
-
-genCorMat <- cor(aux,method="spearman")
-epsilon <- 1e-10
-genCorMat <- genCorMat + epsilon * diag(ncol(genCorMat))
-
-corrplot = ggcorrplot(genCorMat,ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain"))
-
-
-annotate_figure(corrplot,
-                top = text_grob("Theoretical Correlation Matrix used",
-                                face="bold",size=20,color="#882255"))
-ggsave("Simu/corrPasinWeird.png",
-       height = 6000, width = 6000, units = "px", bg='transparent')
-
-corrplot = ggcorrplot(genCorMat[1:50,1:50],ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain"))
-
-
-annotate_figure(corrplot)
-ggsave("Simu/corrPasinZoom.png",
-       height = 6000, width = 6000, units = "px", bg='transparent')
 
 def <- defData(varname="AGE",formula = "20;50", dist = "uniform")
 def <- defData(def,varname="G1",formula=0,variance=1,dist="normal")
 def <- defData(def,varname="G2",formula=0,variance=1,dist="normal")
-for(i in 1:997){
-  def <- defData(def,varname=paste0("Gen",i),formula=rnorm(1),variance=rexp(1,0.3),dist="normal")
+for(i in 1:197){
+  # def <- defData(def,varname=paste0("Gen",i),formula=rnorm(1),variance=rexp(1,0.3),dist="normal")
+  
+  d= dist[[i]]
+  if(d$distribution=="gamma"){
+    theta = d$elements$scale
+    k = d$elements$shape
+    def <- defData(def,varname=paste0("Gen",i),dist=d$distribution,
+                   formula=k*theta,variance = theta)
+  }else if(d$distribution=="normal"){
+    def <- defData(def,varname=paste0("Gen",i),dist=d$distribution,
+                   formula=d$elements$mean,variance=d$elements$sd)
+  }else if(d$distribution=="poisson"){
+    def <- defData(def,varname=paste0("Gen",i),dist=d$distribution,
+                   formula=d$elements$lambda)
+  }else if(d$distribution=="uniform"){
+    def <- defData(def,varname=paste0("Gen",i),dist=d$distribution,
+                   formula=paste0(d$elements,collapse = ";"))
+  }
 }
 setNbReplicates(1)
 
 for(i in 1:100){
-  library(dplyr)
-  library(lixoftConnectors)
-  library(simstudy)
   covTable = genCorFlex(100,def,corMatrix=genCorMat)
   
   write.csv(covTable [,1:4],"tmpfile.txt",quote = F,row.names = F)
@@ -179,29 +182,7 @@ for(i in 1:100){
   
   dataset = dataset %>% arrange(id,time)
   
-  headerTypes = c("id","time","observation","regressor",rep("contcov",1000))
-
-  ## 1000 save
-  dir("Files/FilesPasinWeird/1000corcov")
-  dir("Files/FilesPasinWeird/1000corcov/covTable")
-  dir("Files/FilesPasinWeird/1000corcov/simulation")
-  
-  write.csv(covTable,file=paste0("Files/FilesPasinWeird/1000corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset,file=paste0("Files/FilesPasinWeird/1000corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  save(headerTypes,file="Files/FilesPasinWeird/1000corcov/headerTypes.RData")
-  
-  ## 500 save
-  dir("Files/FilesPasinWeird/500corcov")
-  dir("Files/FilesPasinWeird/500corcov/covTable")
-  dir("Files/FilesPasinWeird/500corcov/simulation")
-  
-  write.csv(covTable[,1:501],file=paste0("Files/FilesPasinWeird/500corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:504],file=paste0("Files/FilesPasinWeird/500corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  
-  headerTypes <- headerTypes[1:504]
-  save(headerTypes,file="Files/FilesPasinWeird/500corcov/headerTypes.RData")
+  headerTypes = c("id","time","observation","regressor",rep("contcov",200))
   
   ## 200 save 
   dir("Files/FilesPasinWeird/200corcov")

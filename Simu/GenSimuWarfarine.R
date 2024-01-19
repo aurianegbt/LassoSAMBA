@@ -1,5 +1,10 @@
 ## On va générer l'ensemble des covariables puis créer les simulations selon celle choisi comme significative 
-set.seed(1710)
+# generateSeed <- function(){
+#   t <- as.numeric(Sys.time())
+#   seed <- 1e8 * (t - floor(t))
+#   return(seed)
+# }
+set.seed(37525892)
 
 
 ## Load the library required 
@@ -22,6 +27,8 @@ distribution = randomCovariate(n=998,NORM = TRUE)
 
 loadProject("Simu/Warfarine.smlx")
 
+runSimulation()
+
 sim <- getSimulationResults()
 
 dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
@@ -36,7 +43,7 @@ foreach(i = 1:100) %dopar% {
     arrange(id,time) 
   
   trt = sim$doses$simulationGroup1[sim$doses$simulationGroup1$rep==i,] %>%
-    select(id,time,amt)
+    dplyr::select(id,time,amt)
   
   dataset <- merge(dataset,trt,all.x = TRUE,by=c("id","time")) %>%
     arrange(id,time,y1) 
@@ -113,33 +120,36 @@ foreach(i = 1:100) %dopar% {
 # Correlation matrix
 load("Simu/DataTransCoding.RData")
 
-aux = dataTransCoding %>% filter(visit=="D63") %>%
-  select(age,a1bg:arid5b)
+aux = (dataTransCoding %>% filter(visit=="D63"))[,c(7,9:18662)] 
+genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[1:999]
 
+aux <- aux[,c("age",genesKept)]
 colnames(aux) <- c(1:ncol(aux))
 
-corMatrix <- cor(aux,method="spearman")
-epsilon <- 1e-10
-corMatrix <- corMatrix + epsilon * diag(ncol(corMatrix))
 
-corrplot = ggcorrplot(corMatrix,ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain"))
+genCorMat <- cor(aux,method="spearman")
+epsilon <- 1e-10
+genCorMat <- genCorMat + epsilon * diag(ncol(genCorMat))
+
+save(genCorMat,file="Simu/corrMatrixWarfarine.RData")
+
+corrplot =  ggcorrplot(genCorMat[1:200,1:200],ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain")) + theme(plot.title = element_text(size=20, face="plain"))
 
 
 annotate_figure(corrplot,
-                top = text_grob("Theoretical Correlation Matrix used",
-                                face="bold",size=20,color="#882255"))
-ggsave("Simu/corrPK.png",
+                top = text_grob("Theoretical Correlation Matrix used, zoomed on the first 200 covariates.",
+                                face="bold",size=30,color="#882255"))
+ggsave("Simu/corrWarfarineZoom200.png",
        height = 6000, width = 6000, units = "px", bg='transparent')
 
-corrplot = ggcorrplot(corMatrix[1:50,1:50],ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain"))
-annotate_figure(corrplot)
-ggsave("Simu/corrPKZoom1.png",
-       height = 6000, width = 6000, units = "px", bg='transparent')
+corrplot =  ggcorrplot(genCorMat,ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain")) + theme(plot.title = element_text(size=20, face="plain"))
 
-corrplot = ggcorrplot(corMatrix[1:150,1:150],ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain"))
-annotate_figure(corrplot)
-ggsave("Simu/corrPKZoom2.png",
-       height = 6000, width = 6000, units = "px", bg='transparent')
+
+annotate_figure(corrplot,
+                top = text_grob("Theoretical Correlation Matrix used.",
+                                face="bold",size=50,color="#882255"))
+ggsave("Simu/corrWarfarine.png",
+       height = 10000, width = 10000, units = "px", bg='transparent')
 
 
 # Generation 
@@ -150,9 +160,9 @@ for(i in 1:998){
   def <- defData(def,varname=paste0("Gen",i),formula=rnorm(1),variance=rexp(1,0.3),dist="normal")
 }
 setNbReplicates(1)
-
+save(dist,file="Simu/distSave.RData")
 for(i in 1:100){
-  covTable =  genCorFlex(100,def,corMatrix = corMatrix)  %>% 
+  covTable =  genCorFlex(100,def,corMatrix = genCorMat)  %>% 
     mutate(AGE = 29*exp(AGE)) %>%  # to simulate log-normal distribution
     mutate(WT = 68*exp(WT))   # as it is not straightforward in simstudy
   
@@ -172,7 +182,7 @@ for(i in 1:100){
     arrange(id,time) 
   
   trt = sim$doses$simulationGroup1 %>%
-    select(id,time,amt)
+    dplyr::select(id,time,amt)
   
   dataset <- merge(dataset,trt,all.x = TRUE,by=c("id","time")) %>%
     arrange(id,time,y1) 
@@ -189,7 +199,7 @@ for(i in 1:100){
   
   headerTypes = c("id","time","observation","amount",rep("contcov",1000))
   
-  ## 500 save
+  ## 1000 save
   dir("Files/FilesWarfarine/1000corcov")
   dir("Files/FilesWarfarine/1000corcov/covTable")
   dir("Files/FilesWarfarine/1000corcov/simulation")
