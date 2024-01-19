@@ -13,6 +13,7 @@ source("Fun/Rsmlx/updateCov0.R")
 
 
 source("Fun/Rsmlx/covariateModelSelection.lasso.R")
+source("Fun/Rsmlx/covariateModelSelection.rlasso.R")
 source("Fun/Rsmlx/applyMethodLasso.R")
 source("Fun/Rsmlx/lassoSelectionPAR.R")
 
@@ -22,7 +23,8 @@ source("Fun/Rsmlx/StepAICselection.R")
 
 
 source("Fun/Rsmlx/covariateModelSelection.elasticnet.R")
-source("Fun/Rsmlx/applyMethodElasticNet.R")
+source("Fun/Rsmlx/covariateModelSelection.relasticnet.R")
+source("Fun/Rsmlx/applyMethodElasticnet.R")
 source("Fun/Rsmlx/elasticnetSelectionPAR.R")
 
 p.weight <- Rsmlx:::p.weight

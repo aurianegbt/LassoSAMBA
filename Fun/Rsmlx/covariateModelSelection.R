@@ -29,6 +29,10 @@ covariateModelSelection <- function(buildMethod,
     covariateModelSelection.StepAIC(covFix,pen.coef,weight,n.full,nb.model,direction,paramToUse,eta,p.max,steps,sp0,iter)
   }else if(buildMethod=="lasso"){
     covariateModelSelection.lasso(nfolds,alpha,stabilitySelection,nSS,thresholdsSS,thresholdsRep,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS,replicatesSS)
+  }else if(buildMethod=="rlasso"){
+    covariateModelSelection.rlasso(nfolds,alpha,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS)
+  }else if(buildMethod=="relasticnet"){
+    covariateModelSelection.rlasso(nfolds,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS)
   }else if(buildMethod=="elasticnet"){
     covariateModelSelection.elasticnet(nfolds,stabilitySelection,nSS,thresholdsSS,thresholdsRep,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS,replicatesSS)
   }

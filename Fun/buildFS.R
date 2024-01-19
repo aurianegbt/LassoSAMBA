@@ -7,7 +7,9 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
                     thresholdsRep= 0.75,
                     cluster=FALSE,
                     weight=NULL,
-                    ncrit=20,replicatesSS=FALSE,
+                    ncrit=20,
+                    nSS=1000,
+                    replicatesSS=FALSE,
                     p.max=0.1){
 
   load(paste0("Files/Files",project,"/",covariateSize,covariateType,"/headerTypes.RData"))
@@ -34,11 +36,18 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
   scenario <- getScenario()
   scenario$tasks['standardErrorEstimation'] <- TRUE
   setScenario(scenario)
-
+  
+  if(buildMethod %in% c("rlasso","relasticnet")){
+    opt <- getConditionalDistributionSamplingSettings()
+    opt$nbsimulatedparameters <- nSS
+    setConditionalDistributionSamplingSettings(opt)
+  }
+  
   saveProject(projectFile=paste0(temporaryDirectory,"/Build.mlxtran"))
   
+  
   # Model Building
-  res = buildmlx(project =paste0(temporaryDirectory,"/Build.mlxtran"),
+  res = buildmlx(project = paste0(temporaryDirectory,"/Build.mlxtran"),
                  buildMethod = buildMethod,
                  stabilitySelection = stabilitySelection,
                  model=model,
@@ -46,6 +55,7 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
                  thresholdsSS=thresholdsSS,
                  thresholdsRep=thresholdsRep,
                  ncrit=ncrit,
+                 nSS=nSS,
                  replicatesSS=replicatesSS,
                  p.max=p.max)
 
