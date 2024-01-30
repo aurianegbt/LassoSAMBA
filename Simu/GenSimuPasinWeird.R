@@ -13,7 +13,7 @@ library(foreach)
 library(ggpubr,quietly=TRUE)
 source("~/Travail/00_Theme.R")
 source("Simu/Fun/genCov.R")
-source("Simu/Fun/randomCovariate.R")
+source("Simu/Fun/randomCovariate2.R")
 
 doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detectCores()-5))
 
@@ -21,6 +21,8 @@ doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detect
 ## Generate 500 cov (correlated or not) and then create 500-200-50-10 simulation framework  
 # cov
 distribution = randomCovariate(n=197)
+headerTypes = sapply(sapply(distribution,FUN=function(x){x$distribution})=="poisson",FUN=function(x){if(x){"catcov"}else{"contcov"}})
+
 
 loadProject("Simu/Pasin.smlx")
 
@@ -29,8 +31,6 @@ runSimulation()
 sim <- getSimulationResults()
 
 dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
-
-
 
 foreach(i = 1:100) %dopar% {
   library(dplyr)
@@ -52,8 +52,6 @@ foreach(i = 1:100) %dopar% {
   dataset$id <- as.numeric(dataset$id)
   
   dataset = dataset %>% arrange(id,time)
-  
-  headerTypes = c("id","time","observation","regressor",rep("contcov",200))
   
   ## 200 save 
   dir("Files/FilesPasinWeird/200cov")
@@ -123,9 +121,6 @@ foreach(i = 1:100) %dopar% {
 load("Simu/corrMatrixPasin.RData")
 genCorMat <- genCorMat[1:200,1:200]
 
-source("Simu/Fun/randomCovariate2.R")
-dist = randomCovariate(n=197)
-
 
 def <- defData(varname="AGE",formula = "20;50", dist = "uniform")
 def <- defData(def,varname="G1",formula=0,variance=1,dist="normal")
@@ -133,7 +128,7 @@ def <- defData(def,varname="G2",formula=0,variance=1,dist="normal")
 for(i in 1:197){
   # def <- defData(def,varname=paste0("Gen",i),formula=rnorm(1),variance=rexp(1,0.3),dist="normal")
   
-  d= dist[[i]]
+  d= distribution[[i]]
   if(d$distribution=="gamma"){
     theta = d$elements$scale
     k = d$elements$shape

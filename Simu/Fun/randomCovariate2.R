@@ -52,8 +52,8 @@ covRD_one <- function(NORM=FALSE){
       prob[size]=1-sum(prob)
       elements=list(prob=prob)
     }else if(distribution =="normal"){
-      mean = rnorm(1)
-      sd=rexp(1,0.3)
+      mean = rnorm(1,sd=5)
+      sd=rexp(1,0.2)
       elements=list(mean=mean,sd=sd)
     }else if(distribution =="poisson"){
       lambda=rexp(1,0.1)

@@ -27,7 +27,7 @@
 
 ############################################################################################################
 genCov <- function(covSettings,individualsNumber,covariateChar="X"){
-  checkSettings(covSettings)
+  #checkSettings(covSettings)
   covariateChar = paste0(covariateChar,1:length(covSettings))
   
   n=length(covSettings)
@@ -41,6 +41,13 @@ genCov <- function(covSettings,individualsNumber,covariateChar="X"){
     if(is.null(covName)){covName <- covariateChar[i]}
     
     distribution = covInfo$distribution
+    if(distribution=="uniform"){
+      distribution="unif"
+    }else if(distribution=="normal"){
+        distribution="norm"
+    }else if(distribution=="poisson"){
+        distribution="pois"
+      }
     elements = covInfo$elements
     bounds = covInfo$bounds
     
