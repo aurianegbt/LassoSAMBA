@@ -10,10 +10,8 @@ covariateModelSelection.rlasso <- function(nfolds = 5,
                                           sp0=NULL,
                                           covariate.model=NULL,
                                           criterion="BIC",
-                                          ncrit=20,
-                                          printFrequencySS = FALSE){
+                                          ncrit=20){
   # Simulate Individual Parameters and setup parameters
-  
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
   if (is.null(sp.df$rep))
     sp.df$rep <- 1
@@ -89,7 +87,6 @@ covariateModelSelection.rlasso <- function(nfolds = 5,
   Y.mat = lapply(split(Y,f = Y$rep),FUN=function(x){x[,-which(colnames(x) %in% c("rep","id"))]})
   
   X.mat  = covariates[,setdiff(colnames(covariates),"id")]
-
   runREP = foreach(k = 1:nrep) %dopar% {
     source("Fun/Rsmlx/applyMethodLasso.R")
     source("Fun/Rsmlx/lassoSelection.R")
@@ -101,9 +98,10 @@ covariateModelSelection.rlasso <- function(nfolds = 5,
                        stabilitySelection=FALSE,nfolds=nfolds,
                        thresholdsSS=thresholdsSS,
                        criterion=criterion,ncrit=ncrit,
-                       covariate.model=covariate.model[[x]],
-                       printFrequencySS=printFrequencySS,p.name=x,rep=k)$res}))
+                       covariate.model=NULL,
+                       printFrequencySS=FALSE,p.name=x)$res}))
   }
+  
   # cov0 compute prior 
   
   r.AUX = Reduce("+",runREP)

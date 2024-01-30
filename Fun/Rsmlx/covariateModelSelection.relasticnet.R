@@ -9,8 +9,7 @@ covariateModelSelection.relasticnet <- function(nfolds = 5,
                                           sp0=NULL,
                                           covariate.model=NULL,
                                           criterion="BIC",
-                                          ncrit=20,
-                                          printFrequencySS = FALSE){
+                                          ncrit=20){
   # Simulate Individual Parameters and setup parameters
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
   if (is.null(sp.df$rep))
@@ -89,6 +88,9 @@ covariateModelSelection.relasticnet <- function(nfolds = 5,
   
   
   runREP = foreach(k = 1:nrep) %dopar% {
+    source("Fun/Rsmlx/applyMethodElasticnet.R")
+    source("Fun/Rsmlx/elasticnetSelection.R")
+    source("Fun/Rsmlx/modelFromSelection.R")
     Yk.mat = as.matrix(Y.mat[[k]])
     sapply(param.names[which(indvar)],FUN=function(x){
       applyMethodElasticnet(Yk.mat[,stringr::str_detect(colnames(Yk.mat),x),drop=F],
@@ -97,7 +99,7 @@ covariateModelSelection.relasticnet <- function(nfolds = 5,
                             thresholdsSS=thresholdsSS,
                             criterion=criterion,ncrit=ncrit,
                             covariate.model=covariate.model[[x]],
-                            printFrequencySS=printFrequencySS,p.name=x,rep=k)$res})
+                            printFrequencySS=FALSE,p.name=x)$res})
   }
   
   

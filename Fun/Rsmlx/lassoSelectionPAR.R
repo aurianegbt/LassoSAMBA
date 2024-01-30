@@ -7,8 +7,7 @@ lassoSelection <- function(Y,X,
                            nSS=1000,
                            thresholdsSS=seq(0.5,0.95,0.05), # can be a vector of thresholdsSS
                            criterion="BIC",
-                           printFrequencySS = FALSE,
-                           MSE=FALSE){
+                           printFrequencySS = FALSE){
   # depends on for each 
   if(criterion %in% c("BIC","BICc")){
     critFUN <- BIC
@@ -85,29 +84,16 @@ lassoSelection <- function(Y,X,
         return(resSelection)
       })
       
-      if(MSE){
-        critThresholds = setNames(sapply(resThresholds,function(res){
-          if(all(!as.logical(res))){
-            model=lm(Ywh ~ NULL)
-          }else{
-            Xkeep = Xwh[,as.logical(res)]
-            model = lm(Ywh~Xkeep)
-          }
-          
-          criterion = mean(summary(model)$residuals^2)
-          return(criterion)
-        }),thresholdsSS)
-      }else{
-        critThresholds = setNames(sapply(resThresholds,function(res){
-          if(all(!as.logical(res))){
-            criterion = critFUN(lm(Ywh ~ NULL))
-          }else{
-            Xkeep = Xwh[,as.logical(res)]
-            criterion = critFUN(lm(Ywh~Xkeep))
-          }
-          return(criterion)
-        }),thresholdsSS)
-      }
+      critThresholds = setNames(sapply(resThresholds,function(res){
+        if(all(!as.logical(res))){
+          criterion = critFUN(lm(Ywh ~ NULL))
+        }else{
+          Xkeep = Xwh[,as.logical(res)]
+          criterion = critFUN(lm(Ywh~Xkeep))
+        }
+        return(criterion)
+      }),thresholdsSS)
+      
       thresholdsFinal = min(thresholdsSS[which(critThresholds==min(critThresholds))])
       
       resSelection[resSelection>=thresholdsFinal] <- 1

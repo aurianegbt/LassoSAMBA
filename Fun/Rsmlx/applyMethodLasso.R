@@ -1,6 +1,6 @@
 applyMethodLasso <- function(Y,X,omega,alpha=1,cov0,
                              stabilitySelection=FALSE,nfolds=5,nSS=1000,thresholdsSS=0.9,
-                             criterion="BIC",ncrit=20,covariate.model=NULL,printFrequencySS = TRUE,p.name=NULL,MSE=FALSE,rep=NULL){
+                             criterion="BIC",ncrit=20,covariate.model=NULL,printFrequencySS = TRUE,p.name=NULL){
   # X et Y on juste la bonne "forme" mais pas scale encore (ça c'est fait dans la sélection en elle même !!!! )
   # Le but de cette fonction est de construit le modèle linéaire pour chaque paramètr
   if(criterion %in% c("BIC","BICc")){
@@ -35,7 +35,7 @@ applyMethodLasso <- function(Y,X,omega,alpha=1,cov0,
       Xkeep = Xwh[,prevSelection]
       oldCriterion =critFUN(lm(Ywh ~ Xkeep))
     }
-    cat("\nSearch of a lasso selection improving the ",criterion," criterion (max ",ncrit," searchs) for ",p.name,if(!is.null(rep)){paste0(", replicates n°",rep)}," :\n ")
+    cat("\nSearch of a lasso selection improving the ",criterion," criterion (max ",ncrit," searchs) for ",p.name," :\n ")
     cat("  ▶ old Criterion ",criterion," : ",round(oldCriterion,digits=2))
   }
 

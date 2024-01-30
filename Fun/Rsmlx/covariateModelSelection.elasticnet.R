@@ -2,7 +2,6 @@ covariateModelSelection.elasticnet <- function(nfolds = 5,
                                           stabilitySelection = TRUE,
                                           nSS=1000,
                                           thresholdsSS=0.80,
-                                          thresholdsRep=0.75,
                                           covFix = NULL,
                                           pen.coef=NULL,
                                           weight=1,
@@ -13,8 +12,7 @@ covariateModelSelection.elasticnet <- function(nfolds = 5,
                                           covariate.model=NULL,
                                           criterion="BIC",
                                           ncrit=20,
-                                          printFrequencySS = FALSE,
-                                          replicatesSS=FALSE){
+                                          printFrequencySS = FALSE){
   # Simulate Individual Parameters and setup parameters
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
   if (is.null(sp.df$rep))
@@ -91,37 +89,13 @@ covariateModelSelection.elasticnet <- function(nfolds = 5,
   X.mat  = covariates[,setdiff(colnames(covariates),"id")]
   Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
   
-  if(replicatesSS){
-    
-    runREP = lapply(1:nrep,FUN=function(k){
-      Yk.mat = as.matrix(Y[Y$rep==k,-c(1,2)])
-      sapply(param.names[which(indvar)],FUN=function(x){
-        applyMethodElasticnet(Yk.mat[,stringr::str_detect(colnames(Yk.mat),x),drop=F],
-                              X.mat,Sigma[x,x],cov0.list[[x]],
-                              stabilitySelection,nfolds,nSS,thresholdsSS,
-                              criterion,ncrit,covariate.model[[x]],
-                              printFrequencySS,p.name=x,rep=k)$res})})
-    # cov0 compute prior 
-    
-    r.AUX = Reduce("+",runREP)
-    
-    ### COMMENT ???????
-    sel = t(apply(r.AUX/nrep>=thresholdsRep,MARGIN=2,FUN=as.numeric))
-    colnames(sel) <- rownames(r.AUX)
-
-    r.var = lapply(param.names[which(indvar)],
-                   FUN=function(x){
-                     mod = modelFromSelection(Y.mat[,stringr::str_detect(colnames(Y.mat),x),drop=F],X.mat,setNames(sel[x,],colnames(sel)))
-                     list(model=mod,res=setNames(as.logical(sel[x,]),colnames(sel)),cov0=cov0.list[[x]],p.name=x)})
-
-  }else{
-    r.var <- lapply(param.names[which(indvar)],FUN=function(x){
+  r.var <- lapply(param.names[which(indvar)],FUN=function(x){
       applyMethodElasticnet(Y.mat[,stringr::str_detect(colnames(Y.mat),x),drop=F],
                             X.mat,Sigma[x,x],cov0.list[[x]],
                             stabilitySelection,nfolds,nSS,thresholdsSS,
                             criterion,ncrit,covariate.model[[x]],
                             printFrequencySS,p.name=x)})  # contient le résultat de seulement les paramètres variables donc pas dans l'ordre et pas entier
-  }
+  
  
   r <- res <- r.cov0 <- list()
   for(j in 1:n.param){
