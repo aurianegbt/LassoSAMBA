@@ -1,18 +1,53 @@
-buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, weight=NULL, coef.w1=0.5,
-                     paramToUse="all", covToTest="all", covToTransform="none", center.covariate=FALSE,
-                     criterion="BICc", linearization=FALSE, ll=T, test=T,
-                     direction=NULL, steps=1000, n.full=10,
-                     max.iter=20, explor.iter=2, fError.min=1e-3,
-                     seq.cov=FALSE, seq.cov.iter=0, seq.corr=TRUE,
-                     p.max=0.1, p.min=c(0.075, 0.05, 0.1),
-                     print=TRUE, nb.model=1,
-                     nfolds=5,alpha=1,
-                     stabilitySelection=TRUE,nSS=1000,thresholdsSS=0.80,
-                     thresholdsRep=0.75,
-                     buildMethod="lasso",ncrit=20,printFrequencySS=FALSE,
-                     replicatesSS=FALSE)
+buildmlx <- function(project=NULL,
+                     final.project=NULL,
+                     model="all",
+                     prior=NULL,
+                     weight=NULL,
+                     coef.w1=0.5,
+                     paramToUse="all",
+                     covToTest="all",
+                     covToTransform="none",
+                     center.covariate=FALSE,
+                     criterion="BICc",
+                     linearization=FALSE,
+                     ll=T,
+                     test=T,
+                     direction=NULL,
+                     steps=1000,
+                     n.full=10,
+                     max.iter=20,
+                     explor.iter=2,
+                     fError.min=1e-3,
+                     seq.cov=FALSE,
+                     seq.cov.iter=0,
+                     seq.corr=TRUE,
+                     p.max=0.1,
+                     p.min=c(0.075, 0.05, 0.1),
+                     print=TRUE,
+                     nb.model=1,
+                     nfolds=5,
+                     alpha=1,
+                     nSS=1000, 
+                     thresholdsSS=0.80, 
+                     buildMethod="lasso",
+                     ncrit=20, 
+                     printFrequencySS=FALSE
+                     )
 {
+  ###########################################
+  if(buildMethod %in% c("rlasso","relasticnet","rsharp")){
+    opt <- Rsmlx:::mlx.getConditionalDistributionSamplingSettings()
+    opt$nbsimulatedparameters <- nSS
+    opt$enablemaxiterations <- TRUE
+    opt$nbmaxiterations <- 3*nSS
+    Rsmlx:::mlx.setConditionalDistributionSamplingSettings(opt)
+    opt$nbminiterations <- 3*nSS
+    Rsmlx:::mlx.setConditionalDistributionSamplingSettings(opt)
+  }
+  saveProject(projectFile=project)
+  
   doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detectCores()))
+  ##########################################
   
   ptm <- proc.time()
   dashed.line <- "--------------------------------------------------\n"
@@ -240,14 +275,12 @@ buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, 
     pmax.cov <-  p.max
     # eta = e ; pen.coef = pen.coef[1] ; weight = weight.covariate ; p.max = pmax.cov 
     if (model$covariate){
-      #      pmax.cov <- ifelse(iter <= 1, 1, p.max)
+      ##################################################
       res.covariate <- covariateModelSelection(buildMethod = buildMethod,
                                                nfolds = nfolds,
                                                alpha = alpha,
-                                               stabilitySelection = stabilitySelection,
                                                nSS=nSS,
                                                thresholdsSS=thresholdsSS,
-                                               thresholdsRep=thresholdsRep,
                                                covFix = covFix,
                                                pen.coef=pen.coef[1],
                                                weight=weight.covariate,
@@ -264,9 +297,8 @@ buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, 
                                                correlation.model=correlation.model,
                                                covariate.model=covariate.model,
                                                criterion = criterion,
-                                               ncrit=ncrit,
-                                               replicatesSS=replicatesSS)
-
+                                               ncrit=ncrit)
+      ##################################
       res.covariate$res <- Rsmlx:::sortCov(res.covariate$res, cov.ini)
       if (iter>explor.iter) sp0 <- res.covariate$sp
       covToTransform <- setdiff(covToTransform, res.covariate$tr0)
@@ -963,6 +995,7 @@ buildmlx <- function(project=NULL, final.project=NULL, model="all", prior=NULL, 
   res$covToTest <- covToTest
   options(op.original)
   
-  
+  #################################
   return(list(res=res,time=ttime,iter=iter))
+  #################################
 }
