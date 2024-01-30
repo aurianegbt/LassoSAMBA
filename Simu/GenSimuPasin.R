@@ -18,6 +18,15 @@ source("Simu/Fun/randomCovariate.R")
 doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detectCores()-5))
 
 
+
+
+
+
+
+
+
+
+
 ## Generate 500 cov (correlated or not) and then create 500-200-50-10 simulation framework  
 # cov
 distribution = randomCovariate(n=997,NORM = TRUE)
@@ -29,8 +38,6 @@ runSimulation()
 sim <- getSimulationResults()
 
 dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
-
-
 
 foreach(i = 1:100) %dopar% {
   library(dplyr)
@@ -55,15 +62,15 @@ foreach(i = 1:100) %dopar% {
   
   headerTypes = c("id","time","observation","regressor",rep("contcov",1000))
   
-  ## 1000 save 
-  dir("Files/FilesPasin/1000cov")
-  dir("Files/FilesPasin/1000cov/covTable")
-  dir("Files/FilesPasin/1000cov/simulation")
-  
-  write.csv(covTable,file=paste0("Files/FilesPasin/1000cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset,file=paste0("Files/FilesPasin/1000cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  save(headerTypes,file="Files/FilesPasin/1000cov/headerTypes.RData")
+  # ## 1000 save 
+  # dir("Files/FilesPasin/1000cov")
+  # dir("Files/FilesPasin/1000cov/covTable")
+  # dir("Files/FilesPasin/1000cov/simulation")
+  # 
+  # write.csv(covTable,file=paste0("Files/FilesPasin/1000cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(dataset,file=paste0("Files/FilesPasin/1000cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  # 
+  # save(headerTypes,file="Files/FilesPasin/1000cov/headerTypes.RData")
   
   ## 500 save
   dir("Files/FilesPasin/500cov")
@@ -109,11 +116,12 @@ foreach(i = 1:100) %dopar% {
   save(headerTypes,file="Files/FilesPasin/10cov/headerTypes.RData")
 }
 
-## corcov
+## CORCOV
+# correlation matrix
 load("Simu/DataTransCoding.RData")
 
 aux = (dataTransCoding %>% filter(visit=="M12"))[,c(7,9:18662)] 
-genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[1:999]
+genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[3:1001]
 
 aux <- aux[,c("age",genesKept)]
 colnames(aux) <- c(1:ncol(aux))
@@ -124,15 +132,7 @@ genCorMat <- genCorMat + epsilon * diag(ncol(genCorMat))
 
 save(genCorMat,file="Simu/corrMatrixPasin.RData")
 
-# corrplot = ggcorrplot(genCorMat,ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain"))
-
-
-# annotate_figure(corrplot,
-#                 top = text_grob("Theoretical Correlation Matrix used",
-#                                 face="bold",size=20,color="#882255"))
-# ggsave("Simu/corrPasin.png",
-#        height = 6000, width = 6000, units = "px", bg='transparent')
-
+# Plot
 corrplot =  ggcorrplot(genCorMat[1:200,1:200],ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain")) + theme(plot.title = element_text(size=20, face="plain"))
 
 
@@ -150,6 +150,7 @@ annotate_figure(corrplot,
                                 face="bold",size=50,color="#882255"))
 ggsave("Simu/corrPasin.png",
        height = 10000, width = 10000, units = "px", bg='transparent')
+
 
 def <- defData(varname="AGE",formula = "20;50", dist = "uniform")
 def <- defData(def,varname="G1",formula=0,variance=1,dist="normal")
@@ -194,15 +195,15 @@ for(i in 1:100){
   
   headerTypes = c("id","time","observation","regressor",rep("contcov",1000))
 
-  ## 1000 save
-  dir("Files/FilesPasin/1000corcov")
-  dir("Files/FilesPasin/1000corcov/covTable")
-  dir("Files/FilesPasin/1000corcov/simulation")
-  
-  write.csv(covTable,file=paste0("Files/FilesPasin/1000corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset,file=paste0("Files/FilesPasin/1000corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  save(headerTypes,file="Files/FilesPasin/1000corcov/headerTypes.RData")
+  # ## 1000 save
+  # dir("Files/FilesPasin/1000corcov")
+  # dir("Files/FilesPasin/1000corcov/covTable")
+  # dir("Files/FilesPasin/1000corcov/simulation")
+  # 
+  # write.csv(covTable,file=paste0("Files/FilesPasin/1000corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(dataset,file=paste0("Files/FilesPasin/1000corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  # 
+  # save(headerTypes,file="Files/FilesPasin/1000corcov/headerTypes.RData")
   
   ## 500 save
   dir("Files/FilesPasin/500corcov")
