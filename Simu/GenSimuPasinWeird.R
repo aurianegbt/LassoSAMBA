@@ -122,7 +122,7 @@ load("Simu/corrMatrixPasin.RData")
 genCorMat <- genCorMat[1:200,1:200]
 
 
-def <- defData(varname="AGE",formula = "20;50", dist = "uniform")
+def <- defData(varname="AGE",formula =35,variance=8, dist = "normal")
 def <- defData(def,varname="G1",formula=0,variance=1,dist="normal")
 def <- defData(def,varname="G2",formula=0,variance=1,dist="normal")
 for(i in 1:197){
