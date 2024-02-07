@@ -20,7 +20,7 @@ invisible(purrr::quietly(lixoftConnectors::initializeLixoftConnectors)(software=
 arr <- as.numeric(slurmR::Slurm_env(x='SLURM_ARRAY_TASK_ID'))
 
 args = commandArgs(trailingOnly=TRUE)
-# args = c("Pasin","rsharp","cov","50","NULL","0.95","FALSE")
+# args = c("Pasin","sharp","cov","50","NULL","NULL","FALSE")
 # project,  method,type, size, weight, thresholdsSS , nocov0
 # seq(0.6,0.95,length.out=50)
 
@@ -106,12 +106,12 @@ if(file.exists(pathToResults) && file.exists(pathToCompResults)){cat("Model alre
                      ncrit=ncrit,
                      p.max=if(noCov0){1}else{0.1})
 
-  # model = resBuild$Model
-  # time = resBuild$time
-  # iter = resBuild$iter
-  # 
-  # save(model,file=pathToResults)
-  # save(time,iter,file=pathToCompResults)
+  model = resBuild$Model
+  time = resBuild$time
+  iter = resBuild$iter
+
+  save(model,file=pathToResults)
+  save(time,iter,file=pathToCompResults)
 }
 unlink(temporaryDirectory,recursive = TRUE)
 cat("\n===========================================================================\n")
