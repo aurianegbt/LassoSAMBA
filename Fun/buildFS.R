@@ -16,7 +16,7 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
                          headerTypes = headerTypes),
              modelFile = paste0(project,".txt"))
 
-  if(project=="Pasin" | project=="PasinMore"){
+  if(project=="Pasin" | project=="PasinWeird"){
     setIndividualParameterVariability(delta_S=FALSE,delta_L=FALSE)
     
     setPopulationParameterInformation(
@@ -26,6 +26,8 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
     model="covariate"
   }else if(project=="Warfarine"){
     model=c("covariate","correlation")
+  }else if(project=="PK"){
+    model="covariate"
   }
 
   # Scenario
