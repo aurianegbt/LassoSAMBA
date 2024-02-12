@@ -43,15 +43,32 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
   valueDisplayFDR <- cbind(valueDisplayFDR,coor=1:length(buildMethod))
 
   # Comparative plot
-  ggplot(errorStatsCov[errorStatsCov$TypeOfSim %in% c("cov","corcov"),],aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP"))))+
+  ggplot(errorStatsCov[errorStatsCov$TypeOfSim %in% c("cov","corcov"),],aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
-    geom_text(data=valueDisplayFDR, mapping=aes(label=text,x=coor,color=Method),y=0.10,vjust=-0.2,fontface="bold",size=3)+
+    geom_text(data=valueDisplayFDR, mapping=aes(label=text,x=coor),y=0.10,vjust=-0.2,fontface="bold",size=3,color="black")+
     facet_grid(.~TypeOfSim,labeller = as_labeller(c(cov="With uncorrelated covariates",corcov="With correlated covariates"))) +
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
     xlab("Method used")+
     ggtitle("False Discovery Rate Distribution",
             subtitle=stringr::str_wrap(subtitle,90))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test",lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
+    scale_x_discrete(labels=c(reg="stepAIC",
+                              lasso="lasso\nwhithout s.s.",
+                              elastinet="elastic net\nwhithout s.s.",
+                              lassoSS="Lasso",
+                              elasticnetSS="Elastic Net",
+                              rlasso="Lasso with\ns.s. on replicates",
+                              relasticnet="Elastic Net with\ns.s. on replicates",
+                              lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",
+                              elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",
+                              lassoSSCrit="Lasso with\nmultiple thresholds",
+                              elasticnetSSCrit="Elastic Net with\nmultiple thresholds",
+                              rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
+                              relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",
+                              setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),
+                              regnoCov0="stepAIC\nwhithout stat. test",
+                              lassoSSCov0="Lasso\nwhithout stat. test",
+                              elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"
+                              ))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+
@@ -73,14 +90,30 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
   }
 
   # Cov plot
-  ggplot(errorStatsCov[errorStatsCov$TypeOfSim =="cov",],aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP"))))+
+  ggplot(errorStatsCov[errorStatsCov$TypeOfSim =="cov",],aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
-    geom_text(data=valueDisplayFDR[valueDisplayFDR$TypeOfSim=="cov",], mapping=aes(label=text,x=coor,color=Method),y=0.10,vjust=-0.2,fontface="bold",size=3)+
+    geom_text(data=valueDisplayFDR[valueDisplayFDR$TypeOfSim=="cov",], mapping=aes(label=text,x=coor),color="black",y=0.10,vjust=-0.2,fontface="bold",size=3)+
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
     xlab("Method used")+
     ggtitle("False Discovery Rate Distribution",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test",lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
+    scale_x_discrete(labels=c(reg="stepAIC",
+                              lasso="lasso\nwhithout s.s.",
+                              elastinet="elastic net\nwhithout s.s.",
+                              lassoSS="Lasso",
+                              elasticnetSS="Elastic Net",
+                              rlasso="Lasso with\ns.s. on replicates", 
+                              relasticnet="Elastic Net with\ns.s. on replicates",   
+                              lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
+                              elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",  
+                              lassoSSCrit="Lasso with\nmultiple thresholds",   
+                              elasticnetSSCrit="Elastic Net with\nmultiple thresholds", 
+                              rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
+                              relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
+                     setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),   
+                     regnoCov0="stepAIC\nwhithout stat. test",     
+                     lassoSSCov0="Lasso\nwhithout stat. test", 
+                     elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"                               ))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+
@@ -102,14 +135,30 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
   }
 
   # Corcov plot
-  ggplot(errorStatsCov[errorStatsCov$TypeOfSim =="corcov",],aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP"))))+
+  ggplot(errorStatsCov[errorStatsCov$TypeOfSim =="corcov",],aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
-    geom_text(data=valueDisplayFDR[valueDisplayFDR$TypeOfSim=="corcov",], mapping=aes(label=text,x=coor,color=Method),y=0.10,vjust=-0.2,fontface="bold",size=3)+
+    geom_text(data=valueDisplayFDR[valueDisplayFDR$TypeOfSim=="corcov",], mapping=aes(label=text,x=coor),y=0.10,vjust=-0.2,fontface="bold",size=3,color="black")+
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
     xlab("Method used")+
     ggtitle("False Discovery Rate Distribution",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test",lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
+       scale_x_discrete(labels=c(reg="stepAIC",
+                                 lasso="lasso\nwhithout s.s.", 
+                                 elastinet="elastic net\nwhithout s.s.",   
+                                 lassoSS="Lasso",                
+                                 elasticnetSS="Elastic Net",        
+                                 rlasso="Lasso with\ns.s. on replicates", 
+                                 relasticnet="Elastic Net with\ns.s. on replicates",  
+                                 lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",
+                                 elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",                        
+                                 lassoSSCrit="Lasso with\nmultiple thresholds", 
+                                 elasticnetSSCrit="Elastic Net with\nmultiple thresholds",
+                                 rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",                              
+                                 relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",                
+                                 setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]), 
+                                 regnoCov0="stepAIC\nwhithout stat. test",   
+                                 lassoSSCov0="Lasso\nwhithout stat. test", 
+                                 elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"                               ))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+
@@ -157,7 +206,7 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
   #   xlab("Method used")+
   #   ggtitle("False Negative Rate Distribution",
   #           subtitle=stringr::str_wrap(subtitle,90))+
-  #   scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test",lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
+  #      scale_x_discrete(labels=c(reg="stepAIC",                               lasso="lasso\nwhithout s.s.",                               elastinet="elastic net\nwhithout s.s.",                               lassoSS="Lasso",                               elasticnetSS="Elastic Net",                               rlasso="Lasso with\ns.s. on replicates",                                relasticnet="Elastic Net with\ns.s. on replicates",                                  lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",                                 elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",                                 lassoSSCrit="Lasso with\nmultiple thresholds",                                  elasticnetSSCrit="Elastic Net with\nmultiple thresholds",                                rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",                               relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",                       setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),                         regnoCov0="stepAIC\nwhithout stat. test",                           lassoSSCov0="Lasso\nwhithout stat. test",                       elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"                               ))+
   #   scale_fill_manual(values=colpas)+
   #   scale_color_manual(values=colFonce)+
   #   theme(axis.text.x = element_text(size = 10))+
@@ -186,7 +235,7 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
   #   xlab("Method used")+
   #   ggtitle("False Negative Rate Distribution",
   #           subtitle=stringr::str_wrap(subtitle,60))+
-  #   scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test",lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
+  #      scale_x_discrete(labels=c(reg="stepAIC",                               lasso="lasso\nwhithout s.s.",                               elastinet="elastic net\nwhithout s.s.",                               lassoSS="Lasso",                               elasticnetSS="Elastic Net",                               rlasso="Lasso with\ns.s. on replicates",                                relasticnet="Elastic Net with\ns.s. on replicates",                                  lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",                                 elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",                                 lassoSSCrit="Lasso with\nmultiple thresholds",                                  elasticnetSSCrit="Elastic Net with\nmultiple thresholds",                                rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",                               relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",                       setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),                         regnoCov0="stepAIC\nwhithout stat. test",                           lassoSSCov0="Lasso\nwhithout stat. test",                       elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"                               ))+
   #   scale_fill_manual(values=colpas)+
   #   scale_color_manual(values=colFonce)+
   #   theme(axis.text.x = element_text(size = 10))+
@@ -215,7 +264,7 @@ graphsCompFR <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,
   #   xlab("Method used")+
   #   ggtitle("False Negative Rate Distribution",
   #           subtitle=stringr::str_wrap(subtitle,60))+
-  #   scale_x_discrete(labels=c(reg="stepAIC",lassoSS="Lasso",elasticnetSS="Elastic Net",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test",lassoSSREP="Lasso with\ns.s. on replicates",elasticnetSSREP="Elastic Net with\ns.s. on replicates",lassoSSCritREP="Lasso with mult.\nthresholds and s.s. on rep.",elasticnetSSCritREP="Elastic Net with mult.\nthresholds and s.s. on rep."))+
+  #      scale_x_discrete(labels=c(reg="stepAIC",                               lasso="lasso\nwhithout s.s.",                               elastinet="elastic net\nwhithout s.s.",                               lassoSS="Lasso",                               elasticnetSS="Elastic Net",                               rlasso="Lasso with\ns.s. on replicates",                                relasticnet="Elastic Net with\ns.s. on replicates",                                  lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",                                 elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",                                 lassoSSCrit="Lasso with\nmultiple thresholds",                                  elasticnetSSCrit="Elastic Net with\nmultiple thresholds",                                rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",                               relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",                       setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),                         regnoCov0="stepAIC\nwhithout stat. test",                           lassoSSCov0="Lasso\nwhithout stat. test",                       elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"                               ))+
   #   scale_fill_manual(values=colpas)+
   #   scale_color_manual(values=colFonce)+
   #   theme(axis.text.x = element_text(size = 10))+

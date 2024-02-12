@@ -17,27 +17,25 @@ graphsParCompMethod <- function(Folder,subtitle,project,covariateSize,buildMetho
   for(k in 1:length(buildMethod)){
     if(buildMethod[k]=="reg"){
       newbuildMethod[k] <- "StepAIC"
-    }else if(buildMethod[k]=="lassoSSCl"){
-      newbuildMethod[k] <- "Lasso with\nclustering step"
-    }else if(buildMethod[k]=="lassoSS"){
-      newbuildMethod[k] <- "Lasso"
     }else if(buildMethod[k]=="lasso"){
       newbuildMethod[k] <- "Lasso without\nstability selection"
     }else if(buildMethod[k]=="elasticnet"){
       newbuildMethod[k] <- "Elastic Net without\nstability selection"
+    }else if(buildMethod[k]=="lassoSS"){
+      newbuildMethod[k] <- "Lasso"
     }else if(buildMethod[k]=="elasticnetSS"){
       newbuildMethod[k] <- "Elastic Net"
+    }else if(buildMethod[k]=="rlasso"){
+      newbuildMethod[k] <- "Lasso with\ns.s. on replicates"
+    }else if(buildMethod[k]=="relasticnet"){
+      newbuildMethod[k] <- "Elastic Net with\ns.s. on replicates"
     }else if(buildMethod[k]=="lassoSSCrit"){
       newbuildMethod[k] <- "Lasso with\nmultiple thresholds"
     }else if(buildMethod[k]=="elasticnetSSCrit"){
       newbuildMethod[k] <- "Elastic Net with\nmultiple thresholds"
-    }else if(buildMethod[k]=="lassoSSREP"){
-      newbuildMethod[k] <- "Lasso with\ns.s. on replicates"
-    }else if(buildMethod[k]=="elasticnetSSREP"){
-      newbuildMethod[k] <- "Elastic Net with\ns.s. on replicates"
-    }else if(buildMethod[k]=="lassoSSCritREP"){
+    }else if(buildMethod[k]=="rlassoCrit"){
       newbuildMethod[k] <- "Lasso with mult.\nthresholds and s.s. on rep."
-    }else if(buildMethod[k]=="elasticnetSSCritREP"){
+    }else if(buildMethod[k]=="relasticnetCrit"){
       newbuildMethod[k] <- "Elastic Net with mult.\nthresholds and s.s. on rep."
     }else if(stringr::str_detect(buildMethod[k],"regPEN")){
       newbuildMethod[k] <- paste0("penalized stepAIC\npen=",stringr::str_remove(buildMethod[k],"regPEN"))
