@@ -27,24 +27,33 @@ buildmlx <- function(project=NULL,
                      nb.model=1,
                      nfolds=5,
                      alpha=1,
-                     nSS=1000, 
+                     nSS=NULL, 
                      thresholdsSS=0.80, 
                      buildMethod="lasso",
                      ncrit=20, 
                      printFrequencySS=FALSE
                      )
 {
+  if(is.null(nSS)){
+    if(buildMethod %in% c("rlasso","relasticnet","rsharp")){
+      nSS = 100
+    }else{
+      nSS = 1000
+    }
+  }
   ###########################################
   if(buildMethod %in% c("rlasso","relasticnet","rsharp")){
     opt <- Rsmlx:::mlx.getConditionalDistributionSamplingSettings()
     opt$nbsimulatedparameters <- nSS
-    opt$enablemaxiterations <- TRUE
-    opt$nbmaxiterations <- 3*nSS
     Rsmlx:::mlx.setConditionalDistributionSamplingSettings(opt)
-    opt$nbminiterations <- 3*nSS
-    Rsmlx:::mlx.setConditionalDistributionSamplingSettings(opt)
+    # opt <- Rsmlx:::mlx.getConditionalDistributionSamplingSettings()
+    # opt$nbsimulatedparameters <- nSS
+    # opt$enablemaxiterations <- TRUE
+    # opt$nbmaxiterations <- 3*nSS
+    # Rsmlx:::mlx.setConditionalDistributionSamplingSettings(opt)
+    # opt$nbminiterations <- 3*nSS
+    # Rsmlx:::mlx.setConditionalDistributionSamplingSettings(opt)
   }
-  saveProject(projectFile=project)
   
   doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detectCores()))
   ##########################################
