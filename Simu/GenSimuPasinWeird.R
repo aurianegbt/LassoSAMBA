@@ -21,7 +21,7 @@ doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detect
 ## Generate 500 cov (correlated or not) and then create 500-200-50-10 simulation framework  
 # cov
 distribution = randomCovariate(n=197)
-headerTypes = sapply(sapply(distribution,FUN=function(x){x$distribution})=="poisson",FUN=function(x){if(x){"catcov"}else{"contcov"}})
+headerTypes = c("id","time","observation","regressor",rep("contcov",3),sapply(sapply(distribution,FUN=function(x){x$distribution})=="poisson",FUN=function(x){if(x){"catcov"}else{"contcov"}}))
 
 
 loadProject("Simu/Pasin.smlx")
@@ -177,7 +177,7 @@ for(i in 1:100){
   
   dataset = dataset %>% arrange(id,time)
   
-  headerTypes = c("id","time","observation","regressor",rep("contcov",200))
+  headerTypes = c("id","time","observation","regressor",rep("contcov",3),sapply(sapply(distribution,FUN=function(x){x$distribution})=="poisson",FUN=function(x){if(x){"catcov"}else{"contcov"}}))
   
   ## 200 save 
   dir("Files/FilesPasinWeird/200corcov")
