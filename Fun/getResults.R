@@ -1,9 +1,9 @@
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressWarnings(suppressMessages(library(stringr)))
 
-getResults <- function(project=c("Pasin","Warfarine"),
+getResults <- function(project=c("Pasin","PK"),
                        buildMethod="all",
-                       covariateSize=c(10,50,200,500),
+                       covariateSize=200,
                        files="all.computed"){
   
   bM = identical(buildMethod,"all")
@@ -12,8 +12,10 @@ getResults <- function(project=c("Pasin","Warfarine"),
     if(bM){
       buildMethod <- stringr::str_remove_all(list.dirs(paste0("Results/Results",proj),recursive = F),paste0("Results/Results",proj,"/Results_"))
       
-      buildMethod = c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")[which( c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP") %in% buildMethod)]
+      buildMethod = c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit")[which( c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit") %in% buildMethod)]
     }
+    cat("For ",proj," project, build method are ",paste0(buildMethod,collapse = ", "),"\n")
+    
     
     source(paste0("Files/Files",proj,"/H1.all.R"))
     

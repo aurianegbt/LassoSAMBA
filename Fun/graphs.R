@@ -26,15 +26,20 @@ graphsGenerate <- function(project="Pasin",
 
     generalsubtitle = paste0("Among ",length(unique(errorStats$Model))," simulated datasets of ",dataType," for ",nInd," individuals, with ",sim," covariates.\n")
     Titlelist = list(reg = "Model built with SAMBA.",
-                     lasso = "Model built with a lasso approach within SAMBA, whithout stability selection and a 100 search scoope.",
+                     lasso = "Model built with a lasso approach within SAMBA, whithout stability selection.",
+                     elasticnet="Model built with a lasso approach within SAMBA, whithout stability selection.",
                      lassoSS = "Model built with a lasso approach within SAMBA.",
                      elasticnetSS = "Model built with an elastic net approach within SAMBA.",
+                     rlasso= "Model built with a lasso approach within SAMBA, and s.s. on replicates.",
+                     relasticnet="Model built with an elastic net approach within SAMBA, and on replicates.",
+                     lassoCrit = "Model built with a lasso approach within SAMBA, and multiple thresholds, whithout stability selection.",
+                     elasticnetCrit = "Model built with an elastic net approach within SAMBA, and multiple thresholds, whithout stability selection.",
                      lassoSSCrit = "Model built with a lasso approach within SAMBA, and multiple thresholds.",
                      elasticnetSSCrit ="Model built with an elastic net approach within SAMBA, and multiple thresholds",
-                     lassoSSREPCrit= "Model built with a lasso approach within SAMBA, and multiple thresholds and s.s. on replicates.",
-                     elasticnetSSREPCrit="Model built with an elastic net approach within SAMBA, and multiple thresholds and s.s. on replicates.",
-                     lassoSSREP= "Model built with a lasso approach within SAMBA, and s.s. on replicates.",
-                     elasticnetSSREP="Model built with an elastic net approach within SAMBA, and on replicates.")[buildMethod[which(!stringr::str_detect(buildMethod,"regPEN") & !stringr::str_detect(buildMethod,"noCov0"))]]
+                     rlassoCrit= "Model built with a lasso approach within SAMBA, and multiple thresholds and s.s. on replicates.",
+                     relasticnetCrit="Model built with an elastic net approach within SAMBA, and multiple thresholds and s.s. on replicates.",
+                     rsharp = "Model built with sharp method on replicates.",
+                     sharp="Model built with sharp method.")[buildMethod[which(!stringr::str_detect(buildMethod,"regPEN") & !stringr::str_detect(buildMethod,"noCov0"))]]
     
     for(k in 1:length(buildMethod)){
       if(stringr::str_detect(buildMethod[k],"regPEN")){

@@ -1,7 +1,7 @@
-gatherResults <- function(project=c("Pasin","Warfarine"),
+gatherResults <- function(project=c("Pasin","PK"),
                           covariateSize=200,
                           buildMethod="all",
-                          numFiles=50,
+                          numFiles=100,
                           completePrint=FALSE,
                           print=TRUE,
                           cleanCall = TRUE){
@@ -13,8 +13,10 @@ gatherResults <- function(project=c("Pasin","Warfarine"),
     if(bM){
       buildMethod <- stringr::str_remove_all(list.dirs(paste0("Results/Results",proj),recursive = F),paste0("Results/Results",proj,"/Results_"))
       
-      buildMethod = c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP")[which( c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP") %in% buildMethod)]
+      buildMethod = c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit")[which( c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassonoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit") %in% buildMethod)]
     }
+    cat("For ",proj," project, build method are ",paste0(buildMethod,collapse = ", "),"\n")
+    
     
     
     if(cleanCall){
@@ -74,23 +76,7 @@ gatherResults <- function(project=c("Pasin","Warfarine"),
                     if(printBuildInfo){
                       cat(paste0("▶ For ",cov))
                       if(type=="corcov"){cat(" correlated covariates, ")}else if(type=="cov"){cat(" covariates,")}
-                      cat(" built with ")
-                      if(meth == "reg"){
-                        cat("stepAIC regression")
-                      }else if(stringr::str_detect(meth,"lasso")){
-                        cat("lasso")
-                      }else if(stringr::str_detect(meth,"elasticnet")){
-                        cat("elastic net")
-                      }
-                      if(stringr::str_detect(meth,"SS")){
-                        cat(" with stability selection")
-                      }
-                      if(stringr::str_detect(meth,"noCov0")){
-                        cat(" without cov0")
-                      }
-                      if(stringr::str_detect(meth,"Crit")){
-                        cat("\nwith multiple thresholds")
-                      }
+                      cat(" built with ", meth)
                       cat(" :\n")
                       printBuildInfo = FALSE
                     }
