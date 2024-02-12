@@ -42,6 +42,7 @@ buildFS <- function(pathToSim,covariateSize,covariateType,
   res = buildmlx(project = paste0(temporaryDirectory,"/Build.mlxtran"),
                  buildMethod = buildMethod,
                  model=model,
+                 weight=if(is.null(weight)){NULL}else{list(covariate=weight)},
                  test=FALSE,
                  thresholdsSS=thresholdsSS,
                  p.max=p.max)
