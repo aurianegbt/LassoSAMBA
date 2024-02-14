@@ -120,9 +120,9 @@ foreach(i = 1:100) %dopar% {
 #        height = 10000, width = 10000, units = "px", bg='transparent')
 load("Simu/corrMatrixPasin.RData")
 genCorMat <- genCorMat[1:200,1:200]
+genCorMat[1,1] <- 1
 
-
-def <- defData(varname="AGE",formula =35,variance=8, dist = "normal")
+def <- defData(varname="AGE",formula =35,variance=16, dist = "normal")
 def <- defData(def,varname="G1",formula=0,variance=1,dist="normal")
 def <- defData(def,varname="G2",formula=0,variance=1,dist="normal")
 for(i in 1:197){
@@ -148,7 +148,7 @@ for(i in 1:197){
 setNbReplicates(1)
 
 for(i in 1:100){
-  covTable = genCorFlex(100,def,corMatrix=genCorMat)
+  covTable = genCorFlex(10000,def,corMatrix=genCorMat)
   
   write.csv(covTable [,1:4],"tmpfile.txt",quote = F,row.names = F)
   

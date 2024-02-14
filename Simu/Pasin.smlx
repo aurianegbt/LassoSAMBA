@@ -26,7 +26,7 @@ parameters={phi_S, phi_L, delta_AB}
 COVARIATE:
 continuousCovariates={AGE, G1, G2}
 'Covariates' = {{{values={1, 1, 1}}}}
-'covDistrib1' = {{distribution=uniform, min=20, max=50}, {distribution=normal, typical=0, sd=1}, {distribution=normal, typical=0, sd=1}}
+'covDistrib1' = {{distribution=normal, typical=35, sd=4}, {distribution=normal, typical=0, sd=1}, {distribution=normal, typical=0, sd=1}}
 
 [SIMULATION]
 GROUPS:

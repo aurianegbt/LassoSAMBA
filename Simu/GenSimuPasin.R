@@ -27,6 +27,7 @@ colnames(aux) <- c(1:ncol(aux))
 genCorMat <- cor(aux,method="spearman")
 epsilon <- 1e-10
 genCorMat <- genCorMat + epsilon * diag(ncol(genCorMat))
+genCorMat[1, 1] <- 16
 
 save(genCorMat,file="Simu/corrMatrixPasin.RData")
 
@@ -147,6 +148,7 @@ setNbReplicates(1)
 
 for(i in 1:100){
   covTable = as.data.frame(mvtnorm::rmvnorm(n=100,mean=mu,sigma = genCorMat))
+  
   colnames(covTable) <- c("AGE","G1","G2",paste0("Gen",1:497))
   covTable <- cbind(id=1:100,covTable)
   
