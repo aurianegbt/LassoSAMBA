@@ -12,6 +12,14 @@ covariateModelSelection.rlasso <- function(nfolds = 5,
                                           criterion="BIC",
                                           ncrit=20){
   # Simulate Individual Parameters and setup parameters
+  if(criterion %in% c("BIC","BICc")){
+    critFUN <- BIC
+  }else if(criterion=="AIC"){
+    critFUN <- AIC 
+  }else{
+    critFUN = function(mod){criterion*length(coef(mod))}
+  }
+  
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
   if (is.null(sp.df$rep))
     sp.df$rep <- 1
@@ -96,20 +104,46 @@ covariateModelSelection.rlasso <- function(nfolds = 5,
       applyMethodLasso(Yk.mat[,stringr::str_detect(colnames(Yk.mat),x),drop=F],
                        X.mat,Sigma[x,x],alpha,cov0.list[[x]],
                        stabilitySelection=FALSE,nfolds=nfolds,
-                       thresholdsSS=thresholdsSS,
+                       thresholdsSS=NULL,
                        criterion=criterion,ncrit=ncrit,
                        covariate.model=NULL,
                        printFrequencySS=FALSE,p.name=x)$res}))
   }
   
   # cov0 compute prior 
+  Y.mat =  sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))})
   
   r.AUX = Reduce("+",runREP)
+  resSelection = t(r.AUX/nrep)
   
-  sel = t(apply(r.AUX/nrep>=thresholdsSS,MARGIN=2,FUN=as.numeric))
-  colnames(sel) <- rownames(r.AUX)
+  if(length(thresholdsSS)!=1){
+    sel=t(sapply(param.names[which(indvar)],FUN=function(p){
+      selection.p <- resSelection[p,]
+      Yp.mat = Y.mat[,stringr::str_detect(colnames(Y.mat),p),drop=F]
+      
+      critThresholds = setNames(sapply(thresholdsSS,FUN=function(tSS){
+        res = selection.p>=tSS
+        
+        if(all(!res)){
+          crit.tSS = critFUN(lm(Yp.mat ~ NULL))
+        }else{
+          Xkeep = as.matrix(X.mat[,res])
+          crit.tSS = critFUN(lm(Yp.mat~Xkeep))
+        }
+        return(crit.tSS)
+      }),thresholdsSS)
+      
+      thresholdsFinal = min(thresholdsSS[which(critThresholds==min(critThresholds))])
+      
+      res.p = selection.p >=thresholdsFinal
+      mode(res.p) <- "integer"
+      return(res.p)
+    }))
+  }else{
+    sel = apply(resSelection>=thresholdsSS,MARGIN=2,FUN=as.numeric)
+    rownames(sel) <- rownames(resSelection)
+  }
   
-  Y.mat =  sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))})
   
   r.var = lapply(param.names[which(indvar)],
                  FUN=function(x){
