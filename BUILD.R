@@ -103,7 +103,6 @@ if(file.exists(pathToResults) && file.exists(pathToCompResults)){cat("Model alre
                      buildMethod = buildMethod,
                      thresholdsSS = thresholdsSS,
                      weight = weight,
-                     ncrit=ncrit,
                      p.max=if(noCov0){1}else{0.1})
 
   model = resBuild$Model
