@@ -1,5 +1,7 @@
 ## On va générer l'ensemble des covariables puis créer les simulations selon celle choisi comme significative 
 set.seed(1710)
+# pb avec la seed ? tous les AB0 sont identiques ? sur cov pas gênant car juste constant sur réplicats ? mais sur corcov ils sont TOUS pareil... je pense à cause de la graine de simulx ? 
+# -> TEST SAY NO, juste because same group each time ? 
 
 
 ## Load the library required 
@@ -19,7 +21,7 @@ doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detect
 load("Simu/DataTransCoding.RData")
 
 aux = (dataTransCoding %>% filter(visit=="M12"))[,c(7,9:18662)] 
-genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[3:501]
+genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[3:201]
 
 aux <- aux[,c("age",genesKept)]
 colnames(aux) <- c(1:ncol(aux))
@@ -75,7 +77,7 @@ foreach(i = 1:100) %dopar% {
 
   # covTable = merge(sim$IndividualParameters$simulationGroup1[sim$IndividualParameters$simulationGroup1$rep==i,c("id","AGE","G1","G2")],genCov(distribution,individualsNumber = 100,covariateChar = "Gen"),by="id") %>% 
   cov = mvtnorm::rmvnorm(100,mean=mu[-c(1:3)])
-  colnames(cov) <- paste0("Gen",1:497)
+  colnames(cov) <- paste0("Gen",1:197)
   cov <- cbind(id=1:100,cov)
   covTable =  merge(sim$IndividualParameters$simulationGroup1[sim$IndividualParameters$simulationGroup1$rep==i,c("id","AGE","G1","G2")],cov,by="id") %>%
     mutate(AGE = AGE - mean(sim$IndividualParameters$simulationGroup1[sim$IndividualParameters$simulationGroup1$rep==i,"AGE"])) %>%
@@ -87,7 +89,7 @@ foreach(i = 1:100) %dopar% {
   
   dataset = dataset %>% arrange(id,time)
   
-  headerTypes = c("id","time","observation","regressor",rep("contcov",500))
+  headerTypes = c("id","time","observation","regressor",rep("contcov",200))
   
   # ## 1000 save 
   # dir("Files/FilesPasin/1000cov")
@@ -100,15 +102,15 @@ foreach(i = 1:100) %dopar% {
   # save(headerTypes,file="Files/FilesPasin/1000cov/headerTypes.RData")
   
   ## 500 save
-  dir("Files/FilesPasin/500cov")
-  dir("Files/FilesPasin/500cov/covTable")
-  dir("Files/FilesPasin/500cov/simulation")
-  
-  write.csv(covTable[,1:501],file=paste0("Files/FilesPasin/500cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:504],file=paste0("Files/FilesPasin/500cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  headerTypes <- headerTypes[1:504]
-  save(headerTypes,file="Files/FilesPasin/500cov/headerTypes.RData")
+  # dir("Files/FilesPasin/500cov")
+  # dir("Files/FilesPasin/500cov/covTable")
+  # dir("Files/FilesPasin/500cov/simulation")
+  # 
+  # write.csv(covTable[,1:501],file=paste0("Files/FilesPasin/500cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(dataset[,1:504],file=paste0("Files/FilesPasin/500cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  # 
+  # headerTypes <- headerTypes[1:504]
+  # save(headerTypes,file="Files/FilesPasin/500cov/headerTypes.RData")
   
   ## 200 save 
   dir("Files/FilesPasin/200cov")
@@ -131,46 +133,56 @@ foreach(i = 1:100) %dopar% {
   headerTypes <- headerTypes[1:54]
   save(headerTypes,file="Files/FilesPasin/50cov/headerTypes.RData")
   
-  ##10 save 
-  dir("Files/FilesPasin/10cov")
-  dir("Files/FilesPasin/10cov/covTable")
-  dir("Files/FilesPasin/10cov/simulation")
-  
-  write.csv(covTable[,1:11],file=paste0("Files/FilesPasin/10cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:14],file=paste0("Files/FilesPasin/10cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  headerTypes <- headerTypes[1:14]
-  save(headerTypes,file="Files/FilesPasin/10cov/headerTypes.RData")
+  # ##10 save 
+  # dir("Files/FilesPasin/10cov")
+  # dir("Files/FilesPasin/10cov/covTable")
+  # dir("Files/FilesPasin/10cov/simulation")
+  # 
+  # write.csv(covTable[,1:11],file=paste0("Files/FilesPasin/10cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(dataset[,1:14],file=paste0("Files/FilesPasin/10cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  # 
+  # headerTypes <- headerTypes[1:14]
+  # save(headerTypes,file="Files/FilesPasin/10cov/headerTypes.RData")
 }
 
 # CORCOV
 setNbReplicates(1)
+covTableALL = as.data.frame(mvtnorm::rmvnorm(n=100*100,mean=mu,sigma = genCorMat))
+colnames(covTableALL) <- c("AGE","G1","G2",paste0("Gen",1:197))
 
 for(i in 1:100){
-  covTable = as.data.frame(mvtnorm::rmvnorm(n=100,mean=mu,sigma = genCorMat))
-  
-  colnames(covTable) <- c("AGE","G1","G2",paste0("Gen",1:497))
+  covTable = covTableALL[(1+(i-1)*100):(i*100),]
   covTable <- cbind(id=1:100,covTable)
   
-  write.csv(covTable [,1:4],"tmpfile.txt",quote = F,row.names = F)
+  write.csv(covTable[,1:4],paste0("tmpfile",i,".txt"),quote = F,row.names = F)
   
   defineCovariateElement(name=paste0("covTable",i),
-                         element = "tmpfile.txt")
+                         element = paste0("tmpfile",i,".txt"))
   
-  setGroupElement(group="simulationGroup1", elements = c(paste0("covTable",i)))
+  if(i==1){
+    setGroupElement(group=paste0("simulationGroup",i), elements = c(paste0("covTable",i)))
+  }else{
+    addGroup(paste0("simulationGroup",i))
+    setGroupElement(group=paste0("simulationGroup",i), elements = c(paste0("covTable",i)))
+  }
+}
   
-  runSimulation()
-  sim <- getSimulationResults()
-  
-  dataset = sim$res$yAB[,c("id","time","yAB")]
+runSimulation()
+sim <- getSimulationResults()
+
+
+for(i in 1:100){
+  dataset = sim$res$yAB[sim$res$yAB$group==paste0("simulationGroup",i),c("original_id","time","yAB")] %>%
+    rename(id=original_id)
   
   yAB0 = dataset[dataset$time==0,]
   colnames(yAB0)[3] <- "yAB0"
   
   dataset = merge(dataset,yAB0,by=c("id","time"),all.x = TRUE) 
   
-  covTable = covTable %>% 
-    mutate(AGE = AGE - mean(covTable$AGE)) %>%
+  covTable = covTableALL[(1+(i-1)*100):(i*100),] %>% 
+    mutate(AGE = AGE - mean(covTableALL[(1+(i-1)*100):(i*100),]$AGE)) %>%
+    mutate(id=1:100,.before = AGE) %>%
     rename(cAGE = AGE)
   
   dataset = merge(dataset,covTable,by = "id")
@@ -179,7 +191,7 @@ for(i in 1:100){
   
   dataset = dataset %>% arrange(id,time)
   
-  headerTypes = c("id","time","observation","regressor",rep("contcov",500))
+  headerTypes = c("id","time","observation","regressor",rep("contcov",200))
 
   # ## 1000 save
   # dir("Files/FilesPasin/1000corcov")
@@ -191,17 +203,17 @@ for(i in 1:100){
   # 
   # save(headerTypes,file="Files/FilesPasin/1000corcov/headerTypes.RData")
   
-  ## 500 save
-  dir("Files/FilesPasin/500corcov")
-  dir("Files/FilesPasin/500corcov/covTable")
-  dir("Files/FilesPasin/500corcov/simulation")
-  
-  write.csv(covTable[,1:501],file=paste0("Files/FilesPasin/500corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:504],file=paste0("Files/FilesPasin/500corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  
-  headerTypes <- headerTypes[1:504]
-  save(headerTypes,file="Files/FilesPasin/500corcov/headerTypes.RData")
+  # ## 500 save
+  # dir("Files/FilesPasin/500corcov")
+  # dir("Files/FilesPasin/500corcov/covTable")
+  # dir("Files/FilesPasin/500corcov/simulation")
+  # 
+  # write.csv(covTable[,1:501],file=paste0("Files/FilesPasin/500corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(dataset[,1:504],file=paste0("Files/FilesPasin/500corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  # 
+  # 
+  # headerTypes <- headerTypes[1:504]
+  # save(headerTypes,file="Files/FilesPasin/500corcov/headerTypes.RData")
   
   ## 200 save 
   dir("Files/FilesPasin/200corcov")
@@ -224,16 +236,16 @@ for(i in 1:100){
   headerTypes <- headerTypes[1:54]
   save(headerTypes,file="Files/FilesPasin/50corcov/headerTypes.RData")
   
-  ##10 save 
-  dir("Files/FilesPasin/10corcov")
-  dir("Files/FilesPasin/10corcov/covTable")
-  dir("Files/FilesPasin/10corcov/simulation")
-  
-  write.csv(covTable[,1:11],file=paste0("Files/FilesPasin/10corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:14],file=paste0("Files/FilesPasin/10corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  headerTypes <- headerTypes[1:14]
-  save(headerTypes,file="Files/FilesPasin/10corcov/headerTypes.RData")
+  # ##10 save 
+  # dir("Files/FilesPasin/10corcov")
+  # dir("Files/FilesPasin/10corcov/covTable")
+  # dir("Files/FilesPasin/10corcov/simulation")
+  # 
+  # write.csv(covTable[,1:11],file=paste0("Files/FilesPasin/10corcov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(dataset[,1:14],file=paste0("Files/FilesPasin/10corcov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  # 
+  # headerTypes <- headerTypes[1:14]
+  # save(headerTypes,file="Files/FilesPasin/10corcov/headerTypes.RData")
   
   unlink("tmpfile.txt")
 }

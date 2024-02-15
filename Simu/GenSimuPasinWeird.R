@@ -74,16 +74,16 @@ foreach(i = 1:100) %dopar% {
   headerTypes <- headerTypes[1:54]
   save(headerTypes,file="Files/FilesPasinWeird/50cov/headerTypes.RData")
   
-  ##10 save 
-  dir("Files/FilesPasinWeird/10cov")
-  dir("Files/FilesPasinWeird/10cov/covTable")
-  dir("Files/FilesPasinWeird/10cov/simulation")
-  
-  write.csv(covTable[,1:11],file=paste0("Files/FilesPasinWeird/10cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
-  write.csv(dataset[,1:14],file=paste0("Files/FilesPasinWeird/10cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
-  
-  headerTypes <- headerTypes[1:14]
-  save(headerTypes,file="Files/FilesPasinWeird/10cov/headerTypes.RData")
+  # ##10 save 
+  # dir("Files/FilesPasinWeird/10cov")
+  # dir("Files/FilesPasinWeird/10cov/covTable")
+  # dir("Files/FilesPasinWeird/10cov/simulation")
+  # 
+  # write.csv(covTable[,1:11],file=paste0("Files/FilesPasinWeird/10cov/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(dataset[,1:14],file=paste0("Files/FilesPasinWeird/10cov/simulation/simulation_",i,".txt"),quote = F,row.names = F)
+  # 
+  # headerTypes <- headerTypes[1:14]
+  # save(headerTypes,file="Files/FilesPasinWeird/10cov/headerTypes.RData")
 }
 
 ## corcov
@@ -146,29 +146,39 @@ for(i in 1:197){
   }
 }
 setNbReplicates(1)
+covTableALL = genCorFlex(100*100,def,corMatrix=genCorMat)
 
 for(i in 1:100){
-  covTable = genCorFlex(10000,def,corMatrix=genCorMat)
-  
-  write.csv(covTable [,1:4],"tmpfile.txt",quote = F,row.names = F)
+  covTable = covTableALL[(1+(i-1)*100):(i*100),]
+
+  write.csv(covTable[,1:4],paste0("tmpfile",i,".txt"),quote = F,row.names = F)
   
   defineCovariateElement(name=paste0("covTable",i),
-                         element = "tmpfile.txt")
+                         element = paste0("tmpfile",i,".txt"))
   
-  setGroupElement(group="simulationGroup1", elements = c(paste0("covTable",i)))
-  
-  runSimulation()
-  sim <- getSimulationResults()
-  
-  dataset = sim$res$yAB[,c("id","time","yAB")]
+  if(i==1){
+    setGroupElement(group=paste0("simulationGroup",i), elements = c(paste0("covTable",i)))
+  }else{
+    addGroup(paste0("simulationGroup",i))
+    setGroupElement(group=paste0("simulationGroup",i), elements = c(paste0("covTable",i)))
+  }
+}
+
+runSimulation()
+sim <- getSimulationResults()
+
+for(i in 1:100){
+  dataset = sim$res$yAB[sim$res$yAB$group==paste0("simulationGroup",i),c("original_id","time","yAB")] %>%
+    rename(id=original_id)
   
   yAB0 = dataset[dataset$time==0,]
   colnames(yAB0)[3] <- "yAB0"
   
   dataset = merge(dataset,yAB0,by=c("id","time"),all.x = TRUE) 
   
-  covTable = covTable %>% 
-    mutate(AGE = AGE - mean(covTable$AGE)) %>%
+  covTable = covTableALL[(1+(i-1)*100):(i*100),] %>% 
+    mutate(AGE = AGE - mean(covTableALL[(1+(i-1)*100):(i*100),]$AGE)) %>%
+    mutate(id=1:100,.before = AGE) %>%
     rename(cAGE = AGE)
   
   dataset = merge(dataset,covTable,by = "id")
