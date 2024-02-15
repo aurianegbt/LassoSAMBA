@@ -195,7 +195,6 @@ covariateModelSelection.reg <- function(covFix = NULL,
     }
   }
   res <- Rsmlx:::formatCovariateModel(res)
-  print(res)
   return(list(model=covariate.model, residuals=e, res=res, add.covariate=trs, 
               sp=sp.df, tr0=tr0, r.cov0=r.cov0))
 }

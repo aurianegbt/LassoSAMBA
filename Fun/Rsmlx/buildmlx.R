@@ -55,6 +55,10 @@ buildmlx <- function(project=NULL,
     # Rsmlx:::mlx.setConditionalDistributionSamplingSettings(opt)
   }
   
+  if(!is.null(project)){
+    Rsmlx:::mlx.saveProject(projectFile=paste0(temporaryDirectory,"/Build.mlxtran"))
+  }
+  
   doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detectCores()))
   ##########################################
   
