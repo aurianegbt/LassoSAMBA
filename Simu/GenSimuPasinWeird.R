@@ -149,7 +149,7 @@ setNbReplicates(1)
 covTableALL = genCorFlex(100*100,def,corMatrix=genCorMat)
 
 for(i in 1:100){
-  covTable = covTableALL[(1+(i-1)*100):(i*100),]
+  covTable = covTableALL[(1+(i-1)*100):(i*100),] %>% mutate(id = (id-1)%%100+1)
 
   write.csv(covTable[,1:4],paste0("tmpfile",i,".txt"),quote = F,row.names = F)
   
