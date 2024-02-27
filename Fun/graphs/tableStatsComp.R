@@ -24,7 +24,8 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   errorStatsParCov <- errorStatsParCov  %>% 
     mutate(FDR = (FP/sapply(FP+TP,FUN=function(x){max(x,1)})),.after = "TP") %>%
-    mutate(FNR = (FN/sapply(FP+TP,FUN=function(x){max(x,1)})),.after="TN") 
+    mutate(FNR = (FN/sapply(FP+TP,FUN=function(x){max(x,1)})),.after="TN") %>%
+    mutate(F1_score = TP/(TP+1/2*(FN+FP)),.after="FNR")
 
   df = data.frame(TypeOfSim=rep(c("cov","corcov"),each=length(buildMethod)),
                   Method = rep(buildMethod,2),
@@ -84,6 +85,35 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
                                      FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")],
                               sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","FNR"],
                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),
+                                     FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")]),
+                  
+                  F1_score_mean = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","F1_score"],
+                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN = mean)[buildMethod],
+                               sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","F1_score"],
+                                            errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = mean)[buildMethod]),
+                  
+                  F1_score_median = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","F1_score"],
+                                              errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN = median)[buildMethod],
+                                 sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","F1_score"],
+                                              errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = median)[buildMethod]),
+                  
+                  F1_score_sd = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","F1_score"],
+                                          errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),FUN = sd)[buildMethod],
+                             sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","F1_score"],
+                                          errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),FUN = sd)[buildMethod]),
+                  
+                  F1_score_q975 =  c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","F1_score"],
+                                             errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),
+                                       FUN = function(x){quantile(x,0.975)})[paste0(buildMethod,".97.5%")],
+                                sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","F1_score"],
+                                             errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),
+                                       FUN = function(x){quantile(x,0.975)})[paste0(buildMethod,".97.5%")]),
+                  
+                  F1_score_q25 = c(sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","F1_score"],
+                                           errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","Method"]),
+                                     FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")],
+                              sapply(split(errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","F1_score"],
+                                           errorStatsParCov[errorStatsParCov$TypeOfSim=="corcov","Method"]),
                                      FUN = function(x){quantile(x,0.025)})[paste0(buildMethod,".2.5%")]))
 
   # Function
@@ -98,34 +128,40 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
                   ";",sapply(ub,FUN=function(x){percent(min(1,x))}),"]"))}
 
   # Data Processing
-  df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"))
+  df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"),F1_score_CB=CB(df,"F1_score"))
   methname=c(reg="stepAIC",lasso="Lasso\nwhithout s.s.",elastinet="Elastic net\nwhithout s.s.",lassoSS="Lasso",elasticnetSS="Elastic Net",rlasso="Lasso with\ns.s. on replicates",relasticnet="Elastic Net with\ns.s. on replicates",lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test")
 
   tableCov = data.frame(Rate = c("With uncorrelated covariates :",
                                  paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
                                  paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
-                                 paste0(" • Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="cov","NoFNModel"],resultModelParCov[resultModelParCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
-                                 paste0("  • Final model is the true one :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="cov","TrueModel"],resultModelParCov[resultModelParCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
+                                 paste0("F1 score :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
+                                 paste0(" • Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",stringr::str_replace_all(methname[buildMethod],"\n"," ")," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="cov","NoFNModel"],resultModelParCov[resultModelParCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
+                                 paste0("  • Final model is the true one :\n ",paste0(paste0("\t\t - ",stringr::str_replace_all(methname[buildMethod],"\n"," ")," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="cov","TrueModel"],resultModelParCov[resultModelParCov$TypeOfSim=="cov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
 
                         Median = c("",paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("FDR_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),
-                                   paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("FNR_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
+                                   paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("FNR_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),
+                                   paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="cov",c("F1_score_median")],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
 
                         CB = c("",paste0("\n",paste0(split(df[df$TypeOfSim=="cov","FDR_CB"],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],collapse="\n")),
-                               paste0("\n",paste0(split(df[df$TypeOfSim=="cov","FNR_CB"],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],collapse="\n")),"",""))
+                               paste0("\n",paste0(split(df[df$TypeOfSim=="cov","FNR_CB"],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],collapse="\n")),
+                               paste0("\n",paste0(split(df[df$TypeOfSim=="cov","F1_score_CB"],df[df$TypeOfSim=="cov",c("Method")])[buildMethod],collapse="\n")),"",""))
 
   colnames(tableCov) <- c("Rate","Median","Confidence Interval\n(quantiles 95%)")
 
   tableCorcov = data.frame(Rate = c("With correlated covariates :",
                                     paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
                                     paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
-                                    paste0("• Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="corcov","NoFNModel"],resultModelParCov[resultModelParCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
-                                    paste0("• Final model is the true one :\n ",paste0(paste0("\t\t - ",methname[buildMethod]," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="corcov","TrueModel"],resultModelParCov[resultModelParCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
+                                    paste0("F1 score :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
+                                    paste0("• Final Final model without any False Negatives :\n ",paste0(paste0("\t\t - ",stringr::str_replace_all(methname[buildMethod],"\n"," ")," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="corcov","NoFNModel"],resultModelParCov[resultModelParCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n")),
+                                    paste0("• Final model is the true one :\n ",paste0(paste0("\t\t - ",stringr::str_replace_all(methname[buildMethod],"\n"," ")," : ",sapply(split(resultModelParCov[resultModelParCov$TypeOfSim=="corcov","TrueModel"],resultModelParCov[resultModelParCov$TypeOfSim=="corcov","Method"])[buildMethod],FUN=function(x){percent(x,digits=0)})[buildMethod]),collapse="\n"))),
 
                            Median = c("",paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("FDR_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),
-                                      paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("FNR_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
+                                      paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("FNR_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),
+                                      paste0("\n",paste0(sapply(split(df[df$TypeOfSim=="corcov",c("F1_score_median")],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],percent),collapse="\n")),"",""),
 
                            CB = c("",paste0("\n",paste0(split(df[df$TypeOfSim=="corcov","FDR_CB"],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],collapse="\n")),
-                                  paste0("\n",paste0(split(df[df$TypeOfSim=="corcov","FNR_CB"],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],collapse="\n")),"",""))
+                                  paste0("\n",paste0(split(df[df$TypeOfSim=="corcov","FNR_CB"],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],collapse="\n")),
+                                  paste0("\n",paste0(split(df[df$TypeOfSim=="corcov","F1_score_CB"],df[df$TypeOfSim=="corcov",c("Method")])[buildMethod],collapse="\n")),"",""))
 
   colnames(tableCorcov) <- c("Rate","Median","Confidence Interval\n(quantiles 95%)")
 
@@ -133,29 +169,30 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   table <-  tibble::as_tibble(rbind(tableCov,tableCorcov))
 
   # Table with stats info
-  ft <- flextable(table) %>%
-    merge_at(i=1,j=1:3) %>%
-    merge_at(i=4,j=1:3) %>%
+  ft <-
+    flextable(table) %>%
+    merge_at(i=1,j=1:3) %>% 
     merge_at(i=5,j=1:3) %>%
     merge_at(i=6,j=1:3) %>%
-    merge_at(i=9,j=1:3) %>%
-    merge_at(i=10,j=1:3) %>%
-    color(i=c(1,6),color="indianred") %>%
-    bold(i=c(1,6)) %>%
+    merge_at(i=7,j=1:3) %>%
+    merge_at(i=11,j=1:3) %>%
+    merge_at(i=12,j=1:3) %>%
+    color(i=c(1,7),color="indianred") %>%
+    bold(i=c(1,7)) %>%
     set_table_properties(layout="autofit",width=1) %>%
-    bg(i=c(4:5,9:10),j=1:3,bg="#e4e6eb",part="body") %>%
-    hline(i = 5, part = "body", border = fp_border_default(color = "grey1", width = 1) ) %>%
+    bg(i=c(5:6,11:12),j=1:3,bg="#e4e6eb",part="body") %>%
+    hline(i = 6, part = "body", border = fp_border_default(color = "grey1", width = 1) ) %>%
     hline(i = 1, part = "body", border = fp_border_default(color = "grey", width = 0.7) ) %>%
-    hline(i = 6, part = "body", border = fp_border_default(color = "grey", width = 0.7) ) %>%
-    vline(j=c(2,1),i=c(2,3,7,8),part="body", border = fp_border_default(color = "grey", width = 1)) %>%
+    hline(i = 7, part = "body", border = fp_border_default(color = "grey", width = 0.7) ) %>%
+    vline(j=c(2,1),i=c(2,3,4,8,9,10),part="body", border = fp_border_default(color = "grey", width = 1)) %>%
     add_header_lines("Error Rate Comparison Table") %>%
     bold(part="header") %>%
     fontsize(size=22,part="header",i=1)%>%
     fontsize(size=20,part="header",i=2)%>%
     fontsize(size=18,part="body") %>%
-    fontsize(size=20,i=c(1,6),part="body") %>%
+    fontsize(size=20,i=c(1,7),part="body") %>%
     align(align = "center", part = "header",i=1) %>%
-    fontsize(size=16,i=c(4,5,9,10),part="body")%>%
+    fontsize(size=16,i=c(5,6,11,12),part="body")%>%
     add_footer_lines("Covariates presence in final model with parameters link")%>%
     add_footer_lines(subtitle) %>%
     fontsize(size=16,part="footer") %>%

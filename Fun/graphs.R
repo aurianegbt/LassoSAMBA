@@ -11,7 +11,7 @@ suppressWarnings(suppressMessages(library(scales,quietly=TRUE)))
 sapply(paste0("Fun/graphs/",list.files("Fun/graphs")),source)
 
 graphsGenerate <- function(project="Pasin",
-                           covariateSize=c(10,50,200,500),
+                           covariateSize=200,
                            buildMethod=c("reg","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit"),
                            JPEG = FALSE,
                            PNG = TRUE){

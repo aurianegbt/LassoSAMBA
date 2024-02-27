@@ -4,7 +4,7 @@ suppressWarnings(suppressMessages(library(stringr)))
 getResults <- function(project=c("Pasin","PK"),
                        buildMethod="all",
                        covariateSize=200,
-                       files="all.computed"){
+                       files="all"){
   
   bM = identical(buildMethod,"all")
   

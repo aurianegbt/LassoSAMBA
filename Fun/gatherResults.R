@@ -81,7 +81,7 @@ gatherResults <- function(project=c("Pasin","PK"),
                       printBuildInfo = FALSE
                     }
                     if(length(missingFile)!=0){
-                      cat(paste0("      • built model missing are : ",paste0(missingFile,collapse=","),".\n"))
+                      cat(paste0("      • built model missing are : ",paste0(sort(unique(missingFile)),collapse=","),".\n"))
                     }else{
                       cat(paste0("      • no built model missing !\n"))
                     }
@@ -93,7 +93,7 @@ gatherResults <- function(project=c("Pasin","PK"),
         }
       }
     if(length(miss[[proj]])!=0){
-      cat(paste0("\n\nSUMMARY : missing files ",paste0(miss[[proj]],collapse=","),".\n\n"))
+      cat(paste0("\n\nSUMMARY : missing files ",paste0(sort(unique(miss[[proj]])),collapse=","),".\n\n"))
     }
     }
   }
