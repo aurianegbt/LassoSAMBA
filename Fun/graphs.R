@@ -65,8 +65,8 @@ graphsGenerate <- function(project="Pasin",
       Folder=paste0(initFolder,"/",meth)
       if(!dir.exists(Folder)){dir.create(Folder)}
       subtitle = paste0(generalsubtitle,Titlelist[[meth]])
-      graphsTotalNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
-      graphsParNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
+      # graphsTotalNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
+      # graphsParNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
       tableStats(Folder,subtitle,project,sim,meth,JPEG,PNG)
     }
     
@@ -74,9 +74,9 @@ graphsGenerate <- function(project="Pasin",
     if(length(buildMethod)>1){
       Folder=initFolder
       subtitle = generalsubtitle
-      graphsCompMethod(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
-      graphsParCompMethod(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
-      graphsCompFR(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
+      # graphsCompMethod(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
+      # graphsParCompMethod(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
+      # graphsCompFR(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
       tableStatsComp(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
       graphsCompTime(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
     }

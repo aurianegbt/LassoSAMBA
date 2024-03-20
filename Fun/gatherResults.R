@@ -1,4 +1,4 @@
-gatherResults <- function(project=c("Pasin","PK"),
+gatherResults <- function(project=c("Pasin","PasinWeird"),
                           covariateSize=200,
                           buildMethod="all",
                           numFiles=100,
