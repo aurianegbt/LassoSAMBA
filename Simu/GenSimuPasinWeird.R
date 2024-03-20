@@ -21,9 +21,6 @@ doParallel::registerDoParallel(cluster <- parallel::makeCluster(parallel::detect
 ## Generate 500 cov (correlated or not) and then create 500-200-50-10 simulation framework  
 # cov
 distribution = randomCovariate(n=197)
-headerTypes = c("id","time","observation","regressor",rep("contcov",3),sapply(sapply(distribution,FUN=function(x){x$distribution})=="poisson",FUN=function(x){if(x){"catcov"}else{"contcov"}}))
-
-
 loadProject("Simu/Pasin.smlx")
 
 runSimulation()
@@ -35,6 +32,8 @@ dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
 foreach(i = 1:100) %dopar% {
   library(dplyr)
   library(simstudy)
+  headerTypes = c("id","time","observation","regressor",rep("contcov",3),sapply(sapply(distribution,FUN=function(x){x$distribution})=="poisson",FUN=function(x){if(x){"catcov"}else{"contcov"}}))
+  
   
   dataset = sim$res$yAB[sim$res$yAB$rep==i,c("id","time","yAB")]
   
