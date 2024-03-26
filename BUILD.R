@@ -3,15 +3,17 @@ rm(list=ls())
 dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
 
 # Required Packages :
-# suppressMessages(library(Rsmlx))
-# suppressMessages(library(stats))
-# suppressMessages(library(MASS))
-# suppressMessages(library(glmnet))
-# suppressMessages(library(stringr))
-# suppressMessages(library(dplyr))
-# suppressMessages(library(slurmR))
-suppressWarnings(library(foreach))
-suppressWarnings(suppressMessages(library(lixoftConnectors)))
+# suppressMessages({
+# library(Rsmlx)
+# library(stats)
+# library(MASS)
+# library(glmnet)
+# library(stringr)
+# library(dplyr)
+# library(slurmR)})
+suppressWarnings({
+  suppressMessages(library(lixoftConnectors))
+  library(foreach)})
 
 # Load Functions and softwares
 invisible(purrr::quietly(lixoftConnectors::initializeLixoftConnectors)(software='monolix', force=T))
@@ -20,7 +22,7 @@ invisible(purrr::quietly(lixoftConnectors::initializeLixoftConnectors)(software=
 arr <- as.numeric(slurmR::Slurm_env(x='SLURM_ARRAY_TASK_ID'))
 
 args = commandArgs(trailingOnly=TRUE)
-# args = c("Pasin","sharp","cov","50","NULL","NULL","FALSE")
+args = c("PasinWeird","reg","cov","200","NULL","NULL","FALSE")
 # project,  method,type, size, weight, thresholdsSS , nocov0
 # seq(0.6,0.95,length.out=50)
 
