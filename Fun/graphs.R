@@ -62,7 +62,7 @@ graphsGenerate <- function(project="Pasin",
     
     # Graphs summarizing building result
     for(meth in buildMethod){
-      Folder=paste0(initFolder,"/",meth)
+      Folder=paste0(initFolder,"/SOLO_",meth)
       if(!dir.exists(Folder)){dir.create(Folder)}
       subtitle = paste0(generalsubtitle,Titlelist[[meth]])
       # graphsTotalNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
@@ -72,7 +72,8 @@ graphsGenerate <- function(project="Pasin",
     
     # Comparison graphs
     if(length(buildMethod)>1){
-      Folder=initFolder
+      Folder=paste0(initFolder,"/COMP_",paste0(buildMethod,collapse="_"))
+      if(!dir.exists(Folder)){dir.create(Folder)}
       subtitle = generalsubtitle
       # graphsCompMethod(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
       # graphsParCompMethod(Folder,subtitle,project,sim,buildMethod,JPEG,PNG)
