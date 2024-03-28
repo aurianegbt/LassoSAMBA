@@ -136,7 +136,7 @@ tableStats <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,PN
     fontsize(size=18,part="body") %>%
     fontsize(size=20,i=c(1,7),part="body") %>%
     align(align = "center", part = "header",i=1) %>%
-    fontsize(size=16,i=c(6,7,11,12),part="body") %>%
+    # fontsize(size=16,i=c(6,7,11,12),part="body") %>%
     add_footer_lines("Covariates presence in final model with parameters link")%>%
     add_footer_lines(subtitle) %>%
     fontsize(size=16,part="footer") %>%

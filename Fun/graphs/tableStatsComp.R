@@ -207,4 +207,75 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     webshot(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".png"),quiet=TRUE)
     
   unlink(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"))
+  
+  table <-  tibble::as_tibble(tableCorcov)[-1,]
+  
+  # Table with stats info
+  ft <-
+    flextable(table) %>%
+    merge_at(i=4,j=1:3) %>%
+    merge_at(i=5,j=1:3) %>%
+    set_table_properties(layout="autofit",width=1) %>%
+    bg(i=c(4:5),j=1:3,bg="#e4e6eb",part="body") %>%
+    hline(i = 5, part = "body", border = fp_border_default(color = "grey1", width = 1) ) %>%
+    vline(j=c(2,1),i=c(1,2,3),part="body", border = fp_border_default(color = "grey", width = 1)) %>%
+    add_header_lines("Error Rate Comparison Table") %>%
+    bold(part="header") %>%
+    fontsize(size=22,part="header",i=1)%>%
+    fontsize(size=20,part="header",i=2)%>%
+    fontsize(size=18,part="body") %>%
+    align(align = "center", part = "header",i=1) %>%
+    fontsize(size=16,i=c(4,5),part="body")%>%
+    add_footer_lines("Covariates presence in final model with parameters link")%>%
+    add_footer_lines(gsub("(\\d+)\\s+(covariates)", "\\1 correlated \\2", subtitle)) %>%
+    fontsize(size=16,part="footer") %>%
+    italic(i=1,par="footer")%>%
+    fontsize(i=1,size=12,part="footer") %>%
+    align( i =1, align="right",part="footer") %>%
+    align( i =2, align="left",part="footer")
+  
+  
+  # Save plot
+  save_as_html(ft, path = paste0(Folder,"/ErrorTableCorcov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"),expand=10)
+  
+  webshot(paste0(Folder,"/ErrorTableCorcov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTableCorcov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".png"),quiet=TRUE)
+  
+  unlink(paste0(Folder,"/ErrorTableCorcov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"))
+  
+  
+  table <-  tibble::as_tibble(tableCov)[-1,]
+  
+  # Table with stats info
+  ft <-
+    flextable(table) %>%
+    merge_at(i=4,j=1:3) %>%
+    merge_at(i=5,j=1:3) %>%
+    set_table_properties(layout="autofit",width=1) %>%
+    bg(i=c(4:5),j=1:3,bg="#e4e6eb",part="body") %>%
+    hline(i = 5, part = "body", border = fp_border_default(color = "grey1", width = 1) ) %>%
+    vline(j=c(2,1),i=c(1,2,3),part="body", border = fp_border_default(color = "grey", width = 1)) %>%
+    add_header_lines("Error Rate Comparison Table") %>%
+    bold(part="header") %>%
+    fontsize(size=22,part="header",i=1)%>%
+    fontsize(size=20,part="header",i=2)%>%
+    fontsize(size=18,part="body") %>%
+    align(align = "center", part = "header",i=1) %>%
+    fontsize(size=16,i=c(4,5),part="body")%>%
+    add_footer_lines("Covariates presence in final model with parameters link")%>%
+    add_footer_lines(gsub("(\\d+)\\s+(covariates)", "\\1 uncorrelated \\2", subtitle)) %>%
+    fontsize(size=16,part="footer") %>%
+    italic(i=1,par="footer")%>%
+    fontsize(i=1,size=12,part="footer") %>%
+    align( i =1, align="right",part="footer") %>%
+    align( i =2, align="left",part="footer")
+  
+  
+  # Save plot
+  save_as_html(ft, path = paste0(Folder,"/ErrorTableCov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"),expand=10)
+  
+  webshot(paste0(Folder,"/ErrorTableCov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTableCov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".png"),quiet=TRUE)
+  
+  unlink(paste0(Folder,"/ErrorTableCov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"))
+  
+  
 }
