@@ -56,12 +56,12 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   # Save comparative plot
     if(PNG){
-      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
+      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(buildMethod,collapse="-"),".png"),
              height = 1700, width =  1000+500*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
     }
 
     if(JPEG){
-      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
+      ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(buildMethod,collapse="-"),".jpeg"),
              height = 1700, width =  1000+500*length(buildMethod), units = "px",device=grDevices::jpeg)
     }
 
@@ -87,13 +87,13 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     theme(legend.position = "none")
 
   if(PNG){
-    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
-            height = 1700, width =   800+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
+    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(buildMethod,collapse="-"),"_Cov.png"),
+            height = 1700, width =   1500+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   }
 
   if(JPEG){
-    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.jpeg"),
-            height = 1700, width =   800+300*length(buildMethod), units = "px",device=grDevices::jpeg)
+    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(buildMethod,collapse="-"),"_Cov.jpeg"),
+            height = 1700, width =   1500+300*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
 
   # Corcov graphs
@@ -118,13 +118,13 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     theme(legend.position = "none")
 
   if(PNG){
-    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
-            height = 1700, width =   800+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
+    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(buildMethod,collapse="-"),"_Corcov.png"),
+            height = 1700, width =   1500+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   }
 
   if(JPEG){
-    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.jpeg"),
-            height = 1700, width =   800+300*length(buildMethod), units = "px",device=grDevices::jpeg)
+    ggsave(paste0(Folder,"/ComputationTime",covariateSize,"_",paste0(buildMethod,collapse="-"),"_Corcov.jpeg"),
+            height = 1700, width =   1500+300*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
 
 
@@ -167,13 +167,13 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   # 
   # 
   # if(PNG){
-  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".png"),
+  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(buildMethod,collapse="-"),".png"),
   #          height = 1700, width =  1000+500*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   # }
   # 
   # 
   # if(JPEG){
-  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),".jpeg"),
+  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(buildMethod,collapse="-"),".jpeg"),
   #          height = 1700, width =  1000+500*length(buildMethod), units = "px",device=grDevices::jpeg)
   # }
   # 
@@ -199,13 +199,13 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   # 
   # 
   # if(PNG){
-  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.png"),
+  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(buildMethod,collapse="-"),"_Cov.png"),
   #          height = 1700, width =   800+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   # }
   # 
   # 
   # if(JPEG){
-  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Cov.jpeg"),
+  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(buildMethod,collapse="-"),"_Cov.jpeg"),
   #          height = 1700, width =   800+300*length(buildMethod), units = "px",device=grDevices::jpeg)
   # }
   # 
@@ -230,12 +230,12 @@ graphsCompTime <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   # 
   # 
   # if(PNG){
-  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.png"),
+  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(buildMethod,collapse="-"),"_Corcov.png"),
   #          height = 1700, width =   800+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   # }
   # 
   # if(JPEG){
-  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),"_Corcov.jpeg"),
+  #   ggsave(paste0(Folder,"/IterationCount",covariateSize,"_",paste0(buildMethod,collapse="-"),"_Corcov.jpeg"),
   #          height = 1700, width =   800+300*length(buildMethod), units = "px",device=grDevices::jpeg)
   # }
 }

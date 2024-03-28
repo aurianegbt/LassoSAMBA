@@ -24,7 +24,7 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   errorStatsParCov <- errorStatsParCov  %>% 
     mutate(FDR = (FP/sapply(FP+TP,FUN=function(x){max(x,1)})),.after = "TP") %>%
-    mutate(FNR = (FN/sapply(FP+TP,FUN=function(x){max(x,1)})),.after="TN") %>%
+    mutate(FNR = (FN/sapply(FN+TN,FUN=function(x){max(x,1)})),.after="TN") %>%
     mutate(F1_score = TP/(TP+1/2*(FN+FP)),.after="FNR")
 
   df = data.frame(TypeOfSim=rep(c("cov","corcov"),each=length(buildMethod)),
@@ -129,7 +129,7 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
 
   # Data Processing
   df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"),F1_score_CB=CB(df,"F1_score"))
-  methname=c(reg="stepAIC",lasso="Lasso\nwhithout s.s.",elastinet="Elastic net\nwhithout s.s.",lassoSS="Lasso",elasticnetSS="Elastic Net",rlasso="Lasso with\ns.s. on replicates",relasticnet="Elastic Net with\ns.s. on replicates",lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test")
+  methname=c(reg="stepAIC",lasso="Lasso\nwhithout s.s.",elastinet="Elastic net\nwhithout s.s.",lassoSS="Lasso",elasticnetSS="Elastic Net",rlasso="Lasso with\ns.s. on replicates",relasticnet="Elastic Net with\ns.s. on replicates",lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC\nwhithout stat. test",lassoSSnoCov0="Lasso\nwhithout stat. test",elasticnetSSnoCov0="Elastic Net\nwhithout stat. test")
 
   tableCov = data.frame(Rate = c("With uncorrelated covariates :",
                                  paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
@@ -202,11 +202,11 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
     align( i =2, align="left",part="footer")
 
   # Save plot
-  save_as_html(ft, path = paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"),expand=10)
+  save_as_html(ft, path = paste0(Folder,"/ErrorTable",paste0(buildMethod,collapse="-"),covariateSize,".html"),expand=10)
   
-    webshot(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".png"),quiet=TRUE)
+    webshot(paste0(Folder,"/ErrorTable",paste0(buildMethod,collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTable",paste0(buildMethod,collapse="-"),covariateSize,".png"),quiet=TRUE)
     
-  unlink(paste0(Folder,"/ErrorTable",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"))
+  unlink(paste0(Folder,"/ErrorTable",paste0(buildMethod,collapse="-"),covariateSize,".html"))
   
   table <-  tibble::as_tibble(tableCorcov)[-1,]
   
@@ -236,11 +236,11 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   
   
   # Save plot
-  save_as_html(ft, path = paste0(Folder,"/ErrorTableCorcov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"),expand=10)
+  save_as_html(ft, path = paste0(Folder,"/ErrorTableCorcov",paste0(buildMethod,collapse="-"),covariateSize,".html"),expand=10)
   
-  webshot(paste0(Folder,"/ErrorTableCorcov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTableCorcov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".png"),quiet=TRUE)
+  webshot(paste0(Folder,"/ErrorTableCorcov",paste0(buildMethod,collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTableCorcov",paste0(buildMethod,collapse="-"),covariateSize,".png"),quiet=TRUE)
   
-  unlink(paste0(Folder,"/ErrorTableCorcov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"))
+  unlink(paste0(Folder,"/ErrorTableCorcov",paste0(buildMethod,collapse="-"),covariateSize,".html"))
   
   
   table <-  tibble::as_tibble(tableCov)[-1,]
@@ -271,11 +271,11 @@ tableStatsComp <- function(Folder,subtitle,project,covariateSize,buildMethod,JPE
   
   
   # Save plot
-  save_as_html(ft, path = paste0(Folder,"/ErrorTableCov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"),expand=10)
+  save_as_html(ft, path = paste0(Folder,"/ErrorTableCov",paste0(buildMethod,collapse="-"),covariateSize,".html"),expand=10)
   
-  webshot(paste0(Folder,"/ErrorTableCov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTableCov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".png"),quiet=TRUE)
+  webshot(paste0(Folder,"/ErrorTableCov",paste0(buildMethod,collapse="-"),covariateSize,".html"), paste0(Folder,"/ErrorTableCov",paste0(buildMethod,collapse="-"),covariateSize,".png"),quiet=TRUE)
   
-  unlink(paste0(Folder,"/ErrorTableCov",paste0(sapply(buildMethod,function(x){toupper(stringr::str_sub(x,end=2))}),collapse="-"),covariateSize,".html"))
+  unlink(paste0(Folder,"/ErrorTableCov",paste0(buildMethod,collapse="-"),covariateSize,".html"))
   
   
 }
