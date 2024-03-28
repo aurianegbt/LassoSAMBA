@@ -26,9 +26,6 @@ tableStats <- function(Folder,subtitle,project,covariateSize,buildMethod,JPEG,PN
     mutate(FNR = (FN/sapply(FN+TN,FUN=function(x){max(x,1)})),.after="TN") %>%
     mutate(F1_score = TP/(TP+1/2*(FN+FP)),.after="FNR")
   
-  
-  print(errorStatsParCov)
-  print(errorStatsCov)
 
   df = data.frame(TypeOfSim=c("cov","corcov"),
                   FDR_mean = c(mean(errorStatsParCov[errorStatsParCov$TypeOfSim=="cov","FDR"]),
