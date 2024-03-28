@@ -227,8 +227,11 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
            height = 2000+400*length(t.param),width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units = "px",device=grDevices::jpeg)
   }
 
+  cov <- cov + ggtitle("",subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim=="cov","NoFNModel"]*100,"%","\n",
+                                           "   • Final model is the true one  : ",resultModelCov[resultModelCov$TypeOfSim=="cov","TrueModel"]*100,"%"))
+  
   annotate_figure(cov,
-                  top=text_grob(stringr::str_wrap(subtitle,100)),
+                  top=text_grob(stringr::str_wrap(gsub("(\\d+)\\s+(covariates)", "\\1 uncorrelated \\2", subtitle),100)),
   ) %>%
     annotate_figure(
       top=text_grob("covariates presence in final model with parameters link",
@@ -247,9 +250,13 @@ graphsParNB <- function(Folder,subtitle,project,covariateSize, buildMethod,JPEG,
     ggsave(paste0(Folder,"/NumberSelectionParameterCov.jpeg"),
            height = 1000+200*length(t.param),width = list("10"=2500,"50"=3000,"200"=4000,"500"=5000)[[as.character(covariateSize)]], units = "px",device=grDevices::jpeg)
   }
+  
+  
+  corcov <- corcov + ggtitle("",subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[resultModelCov$TypeOfSim=="corcov","NoFNModel"]*100,"%","\n",
+                                           "   • Final model is the true one  : ",resultModelCov[resultModelCov$TypeOfSim=="corcov","TrueModel"]*100,"%"))
 
 annotate_figure(corcov,
-                top=text_grob(stringr::str_wrap(subtitle,100)),
+                top=text_grob(stringr::str_wrap(gsub("(\\d+)\\s+(covariates)", "\\1 correlated \\2", subtitle),100)),
 ) %>%
   annotate_figure(
     top=text_grob("covariates presence in final model with parameters link",

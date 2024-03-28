@@ -13,8 +13,8 @@ sapply(paste0("Fun/graphs/",list.files("Fun/graphs")),source)
 graphsGenerate <- function(project="Pasin",
                            covariateSize=200,
                            buildMethod=c("reg","lassoSS"),
-                           JPEG = FALSE,
-                           PNG = TRUE){
+                           JPEG = T,
+                           PNG = F){
   eval(parse(text=readLines(paste0("Files/Files",project,"/info.txt"))))
   
   source("~/Travail/00_Theme.R")
@@ -65,8 +65,8 @@ graphsGenerate <- function(project="Pasin",
       Folder=paste0(initFolder,"/",meth)
       if(!dir.exists(Folder)){dir.create(Folder)}
       subtitle = paste0(generalsubtitle,Titlelist[[meth]])
-      graphsTotalNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
-      graphsParNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
+      # graphsTotalNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
+      # graphsParNB(Folder,subtitle,project,sim,meth,JPEG,PNG)
       tableStats(Folder,subtitle,project,sim,meth,JPEG,PNG)
     }
     
