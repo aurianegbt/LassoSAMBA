@@ -30,6 +30,15 @@ covariateModelSelection <- function(buildMethod,
     covariateModelSelection.elasticnet(nfolds,stabilitySelection=FALSE,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS)
   }else if(buildMethod=="elasticnetSS"){
     covariateModelSelection.elasticnet(nfolds,stabilitySelection=TRUE,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS=FALSE)
+  }else if(buildMethod=="rlasso"){
+    covariateModelSelection.rlasso(nfolds,alpha,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS)
+    covariateModelSelection.rlasso(nfolds,alpha,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit)
+  }else if(buildMethod=="relasticnet"){
+    covariateModelSelection.rlasso(nfolds,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS)
+  }else if(buildMethod=="rsharp"){
+    covariateModelSelection.rsharp(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0)
+  }else if(buildMethod=="sharp"){
+    covariateModelSelection.sharp(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,nSS)
   }
 }
 
