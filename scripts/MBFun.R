@@ -19,4 +19,8 @@ source("scripts/modelBuildingFun/covariateModelSelection.elasticnet.R")
 source("scripts/modelBuildingFun/applyMethodElasticnet.R")
 source("scripts/modelBuildingFun/elasticnetSelectionPAR.R")
 
+
+source("scripts/modelBuildingFun/covariateModelSelection.sharp.R")
+source("scripts/modelBuildingFun/applyMethodsharp.R")
+
 p.weight <- Rsmlx:::p.weight
