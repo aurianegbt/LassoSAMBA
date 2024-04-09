@@ -31,6 +31,10 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
       newbuildMethod[k] <- "StepAIC\nwhithout stat. test"
     }else if(buildMethod[k]=="elasticnetSSnoCov0"){
       newbuildMethod[k] <- "Elastic Net\nwhithout stat. test"
+    }else if(buildMethod[k]=="sharp"){
+      newbuildMethod[k] <- "Lasso with sharp calibration"
+    }else if(buildMethod[k]=="sharpnoCov0"){
+      newbuildMethod[k] <- "Lasso with sharp calibration\nwhithout stat. test"
     }
   }
   

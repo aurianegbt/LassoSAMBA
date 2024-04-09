@@ -38,7 +38,8 @@ graphsGenerate <- function(project="Pasin",
                    lasso = "Model built with a lasso approach within SAMBA, whithout stability selection.",
                    elasticnet="Model built with a lasso approach within SAMBA, whithout stability selection.",
                    lassoSS = "Model built with a lasso approach within SAMBA.",
-                   elasticnetSS = "Model built with an elastic net approach within SAMBA.")[buildMethod[which(!stringr::str_detect(buildMethod,"regPEN") & !stringr::str_detect(buildMethod,"noCov0"))]]
+                   elasticnetSS = "Model built with an elastic net approach within SAMBA.",
+                   sharp = "Model built with a lasso approach, calibrated using sharp method.")[buildMethod[which(!stringr::str_detect(buildMethod,"regPEN") & !stringr::str_detect(buildMethod,"noCov0"))]]
   
   for(k in 1:length(buildMethod)){
     if(stringr::str_detect(buildMethod[k],"regPEN")){
