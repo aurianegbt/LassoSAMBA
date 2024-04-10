@@ -1,18 +1,22 @@
-randomCovariate <-function(n=1,NORM=FALSE){
+randomCovariate <-function(n=1,NORM=FALSE,exclude=NULL){
   if( n %% 1 != 0 | n==0 ){stop("The number of covariates to generate must be an integer.")}
   res = list()
-  for(i in 1:n){ res <- append(res,list(covRD_one(NORM)))}
+  for(i in 1:n){ res <- append(res,list(covRD_one(NORM,exclude)))}
   return(res)
 }
 
-covRD_one <- function(NORM=FALSE){
+covRD_one <- function(NORM=FALSE,exclude=NULL){
   if(NORM){
     mean = rnorm(1,sd=5)
     sd=rexp(1,0.2)
     elements=list(mean=mean,sd=sd)
     return(list(distribution="normal",elements=elements))
   }else{
-    listDist = c("gamma","normal","poisson","uniform")
+    if(is.null(exclude)){
+      listDist = c("gamma","normal","poisson","uniform")
+    }else{
+      listDist = setdiff(c("gamma","normal","poisson","uniform"),exclude)
+    }
     distribution = sample(listDist,size=1)
     if(distribution == "beta"){
       shape1 = rpois(1,20)
