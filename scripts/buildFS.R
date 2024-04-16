@@ -1,12 +1,12 @@
 buildFS <- function(pathToSim,
-                    gaussian=F,
+                    project,
                     temporaryDirectory = NULL,
                     buildMethod = "reg",
                     thresholdsSS = 0.90,
                     weight=NULL,
                     p.max=0.1){
 
-  load(paste0("data/simulationFiles/Files",if(gaussian){"Gaussian"},"Pasin/headerTypes.RData"))
+  load(paste0("data/simulationFiles/Files",project,"/headerTypes.RData"))
 
 
   # Project initialization
@@ -23,7 +23,11 @@ buildFS <- function(pathToSim,
     delta_L_pop=list(initialValue=0.000316,method="FIXED"))
     
   setErrorModel(yAB_="constant")
-
+  
+  if(project=="CplxPasin"){
+    setCorrelationBlocks(id=list(c("phi_L","delta_AB")))
+  }
+  
   # Scenario
   scenario <- getScenario()
   scenario$tasks['standardErrorEstimation'] <- TRUE
