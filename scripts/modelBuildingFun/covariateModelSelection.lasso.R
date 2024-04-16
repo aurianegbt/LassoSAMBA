@@ -83,9 +83,9 @@ covariateModelSelection.lasso <- function(nfolds = 5,
   cov0.list <- updateCov0(Y, eta.list, covariates, p.max, covFix,
                             pen.coef, pweight.list, cov0.list)
   
-  Sigma=Rsmlx::getEstimatedCovarianceMatrix()$cov.matrix
-  colnames(Sigma) <- colnames(Rsmlx::getEstimatedCovarianceMatrix()$cor.matrix)
-  rownames(Sigma) <- rownames(Rsmlx::getEstimatedCovarianceMatrix()$cor.matrix)
+  Sigma=diag(Rsmlx:::mlx.getEstimatedPopulationParameters()[paste0("omega_",param.names[which(indvar)])]**2)
+  colnames(Sigma) <- param.names[which(indvar)]
+  rownames(Sigma) <- param.names[which(indvar)]
   # # param.names for order in r :
   N = length(unique(Y$id))
   Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
