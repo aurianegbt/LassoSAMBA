@@ -1,0 +1,45 @@
+
+<MODEL>
+file = 'Pasin.txt'
+
+<SIMULX>
+
+[SETTINGS]
+GLOBAL:
+exportpath='Pasin'
+
+[DEFINITION]
+POPULATION:
+parameters={phi_S_pop, phi_L_pop, delta_AB_pop, omega_S, omega_L, omega_AB, beta_AGE, beta_G1, beta_G2, delta_S, delta_L, sigma_AB}
+'PopParameters' = {{{values={3057, 16.6, 0.0251, 0.92, 0.85, 0.3, 0.9340000000000001, 1.2, 0.8, 0.23, 0.000316, 0.11}}}}
+
+OUTPUT:
+'regularYAB' = {output=yAB, {{start=0, interval=1, final=100}}}
+'regularTAB' = {output=tAB, {{start=0, interval=1, final=100}}}
+'outputManual1' = {output=yAB, {{times={0, 7, 21, 123, 180, 300}}}}
+
+INDIVIDUAL:
+parameters={phi_S, phi_L, delta_AB}
+'IndivParameters' = {{{values={1, 1, 1}}}}
+'PopParameters_indiv' = {{{values={3057, 16.6, 0.0251}}}}
+
+COVARIATE:
+continuousCovariates={AGE, G1, G2}
+'Covariates' = {{{values={1, 1, 1}}}}
+'covDistrib1' = {{distribution=normal, typical=35, sd=4}, {distribution=normal, typical=0, sd=1}, {distribution=normal, typical=0, sd=1}}
+
+[SIMULATION]
+GROUPS:
+'simulationGroup1'={size=100, parameter='PopParameters', remaining={delta_L=1, delta_S=1, sigma_AB=1}, covariate='covDistrib1', outputs={'outputManual1'}}
+
+SETTINGS:
+nbReplicates=100
+
+[EXPLORATION]
+GROUPS:
+'explorationGroup1'={remaining={delta_L=1, delta_S=1, sigma_AB=1}, parameter='IndivParameters', outputs={'regularTAB'}}
+
+[TASKS]
+simulation()
+endpoint(run=false)
+
