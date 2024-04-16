@@ -2,7 +2,7 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
 
   # Load data
   load(paste0("outputs/finalResults/BuildResults_",project,".RData"))
-  source(paste0("data/simulationFiles/H1.all.R"))
+  source(paste0("data/simulationFiles/Files",project,"/H1.all.R"))
 
   # Color
   colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(buildMethod)]
