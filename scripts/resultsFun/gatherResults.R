@@ -1,5 +1,6 @@
 gatherResults <- function(project=c("Pasin","GaussianPasin"),
                           buildMethod="all",
+                          exclude=NULL
                           numFiles=100,
                           completePrint=FALSE,
                           print=TRUE,
@@ -13,6 +14,9 @@ gatherResults <- function(project=c("Pasin","GaussianPasin"),
       buildMethod <- stringr::str_remove_all(list.dirs(paste0("outputs/buildingResults/simulation/Results",proj),recursive = F),paste0("outputs/buildingResults/simulation/Results",proj,"/Results_"))
       
       buildMethod = c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","sharpnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit")[which( c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","sharpnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit") %in% buildMethod)]
+      if(!is.null(exclude)){
+        buildMethod = setdiff(buildMethod,exclude)
+      }
     }
     cat("For ",proj," project, build method are ",paste0(buildMethod,collapse = ", "),"\n")
     

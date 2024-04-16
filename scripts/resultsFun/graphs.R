@@ -14,6 +14,7 @@ suppressMessages({
 
 graphsGenerate <- function(project="Pasin",
                            buildMethod="all",
+                           exclude=NULL,
                            JPEG = T,
                            PNG = F){
   
@@ -21,19 +22,23 @@ graphsGenerate <- function(project="Pasin",
     buildMethod <- stringr::str_remove_all(list.dirs(paste0("outputs/buildingResults/simulation/Results",project),recursive = F),paste0("outputs/buildingResults/simulation/Results",project,"/Results_"))
     
     buildMethod = c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit")[which( c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit") %in% buildMethod)]
+    if(!is.null(exclude)){
+      buildMethod = setdiff(buildMethod,exclude)
+    }
+    
     cat("For ",project," project, build method are ",paste0(buildMethod,collapse = ", "),"\n")
   }
 
   
   
   
-  eval(parse(text=readLines("data/simulationFiles/info.txt")))
+  eval(parse(text=readLines(paste0("data/simulationFiles/Files",project,"/info.txt"))))
   
   source("~/Travail/00_Theme.R")
   load(paste0("outputs/finalResults/BuildResults_",project,".RData"))
   
   # Load data
-  generalsubtitle = paste0("Among ",length(unique(errorStats$Model))," simulated datasets of ",dataType," for ",nInd," individuals, with 200 correlated covariates.\n")
+  generalsubtitle = paste0("Among ",length(unique(errorStats$Model))," simulated datasets of ",dataType," for ",nInd," individuals, with ",nbCov," correlated covariates.\n")
   Titlelist = list(reg = "Model built with SAMBA.",
                    lasso = "Model built with a lasso approach within SAMBA, whithout stability selection.",
                    elasticnet="Model built with a lasso approach within SAMBA, whithout stability selection.",
