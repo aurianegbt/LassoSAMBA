@@ -14,7 +14,7 @@ suppressMessages({
 
 graphsGenerate <- function(project="Pasin",
                            buildMethod="all",
-                           exclude=NULL,
+                           exclude="sharp",
                            JPEG = T,
                            PNG = F){
   

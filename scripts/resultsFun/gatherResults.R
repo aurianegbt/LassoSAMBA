@@ -1,6 +1,6 @@
 gatherResults <- function(project=c("Pasin","GaussianPasin"),
                           buildMethod="all",
-                          exclude=NULL
+                          exclude="sharp",
                           numFiles=100,
                           completePrint=FALSE,
                           print=TRUE,

@@ -3,7 +3,7 @@ suppressWarnings(suppressMessages(library(stringr)))
 
 getResults <- function(project=c("Pasin","GaussianPasin"),
                        buildMethod="all",
-                       exclude=NULL,
+                       exclude="sharp",
                        files="all"){
   
   bM = identical(buildMethod,"all")
