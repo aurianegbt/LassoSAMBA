@@ -28,7 +28,7 @@ load("data/applicationFiles/DataTransD63.RData")
 load("data/simulationSetup/ComplexPasin/genesKept.RData")
 
 aux = genesD63[,-1] 
-genesKept = c(genesKept,setdiff(names(sort(apply(aux,2,sd),decreasing = TRUE)),genesKept))[1:500]
+genesKept = c(genesKept,setdiff(names(sort(apply(aux,2,sd),decreasing = TRUE)),genesKept))[1:200]
 
 aux <- aux %>% select(all_of(genesKept))
 # colnames(aux) <- c(1:ncol(aux))
@@ -44,7 +44,7 @@ mu <- apply(aux[1:19],2,mean)
 save(genCorMat,file="data/simulationSetup/corrMatrixCplxPasin.RData")
 
 # Draw distribution
-distribution = randomCovariate(n=(500-19))
+distribution = randomCovariate(n=(200-19))
 
 ## Generate 200 correlated covariates and then create 100 replicates
 
@@ -52,7 +52,7 @@ def <- defData(varname="G1",formula = mu[1],variance=sd_genes[1]**2, dist = "nor
 for(i in 2:19){
   def <- defData(def,varname=paste0("G",i),formula=mu[i],variance=sd_genes[i]**2,dist="normal")
 }
-for(i in 20:500){
+for(i in 20:200){
   d= distribution[[i-19]]
   if(d$distribution=="gamma"){
     theta = d$elements$scale
