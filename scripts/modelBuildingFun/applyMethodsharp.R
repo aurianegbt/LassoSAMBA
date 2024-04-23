@@ -34,12 +34,20 @@ applyMethodsharp <- function(Y,X,omega,cov0,
     selection = rep(0,ncol(Xwh))
     selection[-exclude] <- 1
   }else{
-    selection = sharp::SelectedVariables(sharp::VariableSelection(Xwh,Ywh,exclude=exclude,nfolds=nfolds,alpha=alpha,K=nSS))
+    VariableSelection.outputs = sharp::VariableSelection(Xwh,Ywh,exclude=exclude,nfolds=nfolds,alpha=alpha,K=nSS,n_cores = parallel::detectCores())
+    selection = sharp::SelectedVariables(VariableSelection.outputs)
   }
+  cat("\n Lasso selection calibrated by sharp method for parameter",p.name," :" )
+  cat("\n     > parameter values : ",
+      paste0(c("lambda","thresholds"),"=",c("","0."),
+             sapply(ArgmaxId(VariableSelection.outputs),function(x){
+               10**floor(log10(x))*round(x/(10**floor(log10(x))),digits=2)
+             }),collapse=", "))
   
   
   model.list = modelFromSelection(Ywh,Xwh,selection)
   
   
+  cat("\n")
   return(list(model=model.list,res=selection,cov0=cov0,p.name=p.name))
 }
