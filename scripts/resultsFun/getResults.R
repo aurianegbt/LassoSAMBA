@@ -9,7 +9,7 @@ getResults <- function(project=c("Pasin","GaussianPasin"),
   bM = identical(buildMethod,"all")
   
   for(proj in project){
-    source(paste0("data/simulationFiles/",proj,"/H1.all.R"))
+    source(paste0("data/simulationFiles/Files",proj,"/H1.all.R"))
     if(bM){
       buildMethod <- stringr::str_remove_all(list.dirs(paste0("outputs/buildingResults/simulation/Results",proj),recursive = F),paste0("outputs/buildingResults/simulation/Results",proj,"/Results_"))
       

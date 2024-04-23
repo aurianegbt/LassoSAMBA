@@ -67,7 +67,7 @@ applyMethodLasso <- function(Y,X,omega,alpha=1,cov0,
           paste0(names(resSelection$param),"=",
                  sapply(resSelection$param,function(x){
                    10**floor(log10(x))*round(x/(10**floor(log10(x))),digits=2)
-                   }),collapse=","))
+                   }),collapse=", "))
       flag = newCriterion < oldCriterion
     }
 
