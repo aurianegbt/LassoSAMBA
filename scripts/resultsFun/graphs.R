@@ -39,12 +39,12 @@ graphsGenerate <- function(project="Pasin",
   
   # Load data
   generalsubtitle = paste0("Among ",length(unique(errorStats$Model))," simulated datasets of ",dataType," for ",nInd," individuals, with ",nbCov," correlated covariates.\n")
-  Titlelist = list(reg = "Model built with SAMBA.",
-                   lasso = "Model built with a lasso approach within SAMBA, whithout stability selection.",
-                   elasticnet="Model built with a lasso approach within SAMBA, whithout stability selection.",
-                   lassoSS = "Model built with a lasso approach within SAMBA.",
-                   elasticnetSS = "Model built with an elastic net approach within SAMBA.",
-                   sharp = "Model built with a lasso approach, calibrated using sharp method.")[buildMethod[which(!stringr::str_detect(buildMethod,"regPEN") & !stringr::str_detect(buildMethod,"noCov0"))]]
+  Titlelist = list(reg = "Model built with SAMBA, with statistic test to exclude covariates at each iteration.",
+                   lasso = "Model built with a lasso approach within SAMBA, whithout stability selection, with statistic test to exclude covariates at each iteration.",
+                   elasticnet="Model built with a lasso approach within SAMBA, whithout stability selection, with statistic test to exclude covariates at each iteration..",
+                   lassoSS = "Model built with a lasso approach within SAMBA, with statistic test to exclude covariates at each iteration.",
+                   elasticnetSS = "Model built with an elastic net approach within SAMBA, with statistic test to exclude covariates at each iteration.",
+                   sharp = "Model built with a lasso approach, calibrated using sharp method, with statistic test to exclude covariates at each iteration.")[union(buildMethod[which((!stringr::str_detect(buildMethod,"regPEN") & !stringr::str_detect(buildMethod,"noCov0")))],stringr::str_remove_all(buildMethod[which(stringr::str_detect(buildMethod,"noCov0"))],"noCov0"))]
   
   for(k in 1:length(buildMethod)){
     if(stringr::str_detect(buildMethod[k],"regPEN")){
@@ -52,7 +52,7 @@ graphsGenerate <- function(project="Pasin",
       names(Titlelist)[length(Titlelist)] <- buildMethod[k]
     }
     if(stringr::str_detect(buildMethod[k],"noCov0")){
-      Titlelist <- append(Titlelist, paste0(stringr::str_sub(Titlelist[stringr::str_remove(buildMethod[k],"noCov0")],end=-2),", whithout statistical test to exclude covariates."))
+      Titlelist <- append(Titlelist, stringr::str_remove(Titlelist[stringr::str_remove(buildMethod[k],"noCov0")],", with statistic test to exclude covariates at each iteration"))
       names(Titlelist)[length(Titlelist)] <- buildMethod[k]
     }
   }

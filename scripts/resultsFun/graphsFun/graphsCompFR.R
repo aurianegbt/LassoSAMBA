@@ -50,11 +50,11 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     xlab("Method used")+
     ggtitle("False Discovery Rate Distribution",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(reg="stepAIC",
+    scale_x_discrete(labels=c(reg="stepAIC\nwhith stat. test",
                               lasso="lasso\nwhithout s.s.",
                               elastinet="elastic net\nwhithout s.s.",
-                              lassoSS="Lasso",
-                              elasticnetSS="Elastic Net",
+                              lassoSS="Lasso\nwhith stat. test",
+                              elasticnetSS="Elastic Net\nwhith stat. test",
                               rlasso="Lasso with\ns.s. on replicates", 
                               relasticnet="Elastic Net with\ns.s. on replicates",   
                               lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
@@ -64,9 +64,9 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
                               relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
                               setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),   
-                              regnoCov0="stepAIC\nwhithout stat. test",     
-                              lassoSSCov0="Lasso\nwhithout stat. test", 
-                              elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"                               ))+
+                              regnoCov0="stepAIC",     
+                              lassoSSCov0="Lasso", 
+                              elasticnetSSnoCov0="Elastic Net"))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+
@@ -110,11 +110,11 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     xlab("Method used")+
     ggtitle("False Negative Rate Distribution",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(reg="stepAIC",
+    scale_x_discrete(labels=c(reg="stepAIC\nwhith stat. test",
                               lasso="lasso\nwhithout s.s.",
                               elastinet="elastic net\nwhithout s.s.",
-                              lassoSS="Lasso",
-                              elasticnetSS="Elastic Net",
+                              lassoSS="Lasso\nwhith stat. test",
+                              elasticnetSS="Elastic Net\nwhith stat. test",
                               rlasso="Lasso with\ns.s. on replicates", 
                               relasticnet="Elastic Net with\ns.s. on replicates",   
                               lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
@@ -124,9 +124,9 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
                               relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
                               setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),   
-                              regnoCov0="stepAIC\nwhithout stat. test",     
-                              lassoSSnoCov0="Lasso\nwhithout stat. test", 
-                              elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"                               ))+
+                              regnoCov0="stepAIC",     
+                              lassoSSCov0="Lasso", 
+                              elasticnetSSnoCov0="Elastic Net"))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+
@@ -170,11 +170,11 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     xlab("Method used")+
     ggtitle("F1-score Distribution",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(reg="stepAIC",
+    scale_x_discrete(labels=c(reg="stepAIC\nwhith stat. test",
                               lasso="lasso\nwhithout s.s.",
                               elastinet="elastic net\nwhithout s.s.",
-                              lassoSS="Lasso",
-                              elasticnetSS="Elastic Net",
+                              lassoSS="Lasso\nwhith stat. test",
+                              elasticnetSS="Elastic Net\nwhith stat. test",
                               rlasso="Lasso with\ns.s. on replicates", 
                               relasticnet="Elastic Net with\ns.s. on replicates",   
                               lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
@@ -184,9 +184,9 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
                               relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
                               setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),   
-                              regnoCov0="stepAIC\nwhithout stat. test",     
-                              lassoSSCov0="Lasso\nwhithout stat. test", 
-                              elasticnetSSnoCov0="Elastic Net\nwhithout stat. test"                               ))+
+                              regnoCov0="stepAIC",     
+                              lassoSSCov0="Lasso", 
+                              elasticnetSSnoCov0="Elastic Net"))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
     theme(axis.text.x = element_text(size = 10))+

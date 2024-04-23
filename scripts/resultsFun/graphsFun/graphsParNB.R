@@ -6,7 +6,12 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   
   # Color & covariates
   gr = "#888888"
-  fill.vec = c(c("#468b97","#ef6262", "#74C385","#8e6aa0","#ee6c4d","#007194")[1:length(unlist(H1.all,use.names = F))],rep(gr,200))
+  fill.vec = c(c("#468b97", "#ef6262", "#74C385", "#8e6aa0", "#ee6c4d", 
+                 "#1e90ff", "#ffa500", "#ff69b4", "#32cd32", "#4169e1",
+                 "#ff6347", "#6a5acd", "#20b2aa", "#f08080", "#6495ed",
+                 "#9acd32", "#9370db", "#00ced1", "#ff4500", "#7b68ee",
+                 "#2e8b57", "#ba55d3", "#00bfff", "#d2691e", "#4682b4")
+[1:length(unlist(H1.all,use.names = F))],rep(gr,200))
   
   posCov = orderList[(orderList %in% Reduce(union,H1.all))]
   
@@ -77,7 +82,7 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                                distext = distextAux)
     
     # Color and fill arguments / cov Graphs
-    precious = rev(c("#468b97","#ef6262", "#74C385","#8e6aa0","#ee6c4d","#007194")[1:length(unlist(H1.all,use.names = F))])
+    precious = rev(c("#468b97", "#ef6262", "#74C385", "#8e6aa0", "#ee6c4d",                   "#1e90ff", "#ffa500", "#ff69b4", "#32cd32", "#4169e1",                  "#ff6347", "#6a5acd", "#20b2aa", "#f08080", "#6495ed",                  "#9acd32", "#9370db", "#00ced1", "#ff4500", "#7b68ee",                  "#2e8b57", "#ba55d3", "#00bfff", "#d2691e", "#4682b4")[1:length(unlist(H1.all,use.names = F))])
     cmdA = list()
     cmdC = list()
     covPast = 0

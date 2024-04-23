@@ -6,7 +6,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
 
   # Color & covariates
   gr = "#888888"
-  fill.vec = c(c("#468b97","#ef6262", "#74C385","#8e6aa0","#ee6c4d","#007194")[1:length(unlist(H1.all,use.names = F))],rep(gr,200))
+  fill.vec = c(c("#468b97", "#ef6262", "#74C385", "#8e6aa0", "#ee6c4d",                   "#1e90ff", "#ffa500", "#ff69b4", "#32cd32", "#4169e1",                  "#ff6347", "#6a5acd", "#20b2aa", "#f08080", "#6495ed",                  "#9acd32", "#9370db", "#00ced1", "#ff4500", "#7b68ee",                  "#2e8b57", "#ba55d3", "#00bfff", "#d2691e", "#4682b4")[1:length(unlist(H1.all,use.names = F))],rep(gr,200))
 
   posCov = orderList[(orderList %in% Reduce(union,H1.all))]
 
@@ -14,23 +14,23 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   newbuildMethod <- c()
   for(k in 1:length(buildMethod)){
     if(buildMethod[k]=="reg"){
-      newbuildMethod[k] <- "StepAIC"
+      newbuildMethod[k] <- "StepAIC\nwhith stat. test"
     }else if(buildMethod[k]=="lasso"){
       newbuildMethod[k] <- "Lasso without\nstability selection"
     }else if(buildMethod[k]=="elasticnet"){
       newbuildMethod[k] <- "Elastic Net without\nstability selection"
     }else if(buildMethod[k]=="lassoSS"){
-      newbuildMethod[k] <- "Lasso"
+      newbuildMethod[k] <- "Lasso\nwhith stat. test"
     }else if(buildMethod[k]=="elasticnetSS"){
-      newbuildMethod[k] <- "Elastic Net"
+      newbuildMethod[k] <- "Elastic Net\nwhith stat. test"
     }else if(stringr::str_detect(buildMethod[k],"regPEN")){
       newbuildMethod[k] <- paste0("penalized stepAIC\npen=",stringr::str_remove(buildMethod[k],"regPEN"))
     }else if(buildMethod[k]=="lassoSSnoCov0"){
-      newbuildMethod[k] <- "Lasso\nwhithout stat. test"
+      newbuildMethod[k] <- "Lasso"
     }else if(buildMethod[k]=="regnoCov0"){
-      newbuildMethod[k] <- "StepAIC\nwhithout stat. test"
+      newbuildMethod[k] <- "StepAIC"
     }else if(buildMethod[k]=="elasticnetSSnoCov0"){
-      newbuildMethod[k] <- "Elastic Net\nwhithout stat. test"
+      newbuildMethod[k] <- "Elastic Net"
     }else if(buildMethod[k]=="sharp"){
       newbuildMethod[k] <- "Lasso with sharp calibration"
     }else if(buildMethod[k]=="sharpnoCov0"){
@@ -123,7 +123,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   valueModel = cbind(resultModelParCov,Parameter=rev(t.param)[1])
 
 
-  precious = rev(rep(c("#468b97","#ef6262", "#74C385","#8e6aa0","#ee6c4d","#007194")[1:length(unlist(H1.all,use.names = F))],length(buildMethod)))
+  precious = rev(rep(c("#468b97", "#ef6262", "#74C385", "#8e6aa0", "#ee6c4d",                   "#1e90ff", "#ffa500", "#ff69b4", "#32cd32", "#4169e1",                  "#ff6347", "#6a5acd", "#20b2aa", "#f08080", "#6495ed",                  "#9acd32", "#9370db", "#00ced1", "#ff4500", "#7b68ee",                  "#2e8b57", "#ba55d3", "#00bfff", "#d2691e", "#4682b4")[1:length(unlist(H1.all,use.names = F))],length(buildMethod)))
 
   cmdA = list()
   cmdC = list()
@@ -160,7 +160,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     geom_bar(position=position_dodge(preserve = "single"),alpha=alphaScale,
              color= colorScale,
              fill = colorScale)+
-    facet_nested(factor(Method,levels=c("StepAIC","Lasso","Elastic Net","StepAIC\nwhithout stat. test","Lasso\nwhithout stat. test","Elastic Net\nwhithout stat. test","Lasso with\nmultiple thresholds","Elastic Net with\nclustering step","Elastic Net with\nmultiple thresholds",paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"penalized")],"penalized stepAIC\npen=")),"Lasso with\ns.s. on replicates","Elastic Net with\ns.s. on replicates","Lasso with mult.\nthresholds and s.s. on rep.","Elastic Net with mult.\nthresholds and s.s. on rep."))+Parameter~.,labeller=labeller(Parameter=label_parsed))+
+    facet_nested(factor(Method,levels=c("StepAIC\nwhith stat. test","Lasso\nwhith stat. test","Elastic Net\nwhith stat. test","StepAIC","Lasso","Elastic Net","Lasso with\nmultiple thresholds","Elastic Net with\nclustering step","Elastic Net with\nmultiple thresholds",paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"penalized")],"penalized stepAIC\npen=")),"Lasso with\ns.s. on replicates","Elastic Net with\ns.s. on replicates","Lasso with mult.\nthresholds and s.s. on rep.","Elastic Net with mult.\nthresholds and s.s. on rep."))+Parameter~.,labeller=labeller(Parameter=label_parsed))+
     xlab("Covariates")+
     ylab("Count")+
     ggtitle("With uncorrelated covariates, ")+
