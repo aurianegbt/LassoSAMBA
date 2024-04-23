@@ -38,7 +38,7 @@ covariateModelSelection <- function(buildMethod,
   }else if(buildMethod=="rsharp"){
     covariateModelSelection.rsharp(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0)
   }else if(buildMethod=="sharp"){
-    covariateModelSelection.sharp(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,nSS)
+    covariateModelSelection.sharp(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,nSS,covariate.model,criterion,ncrit)
   }
 }
 

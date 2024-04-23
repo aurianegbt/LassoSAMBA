@@ -1,15 +1,17 @@
 covariateModelSelection.sharp <- function(nfolds = 5,
-                                           alpha = 1,
-                                           covFix = NULL,
-                                           pen.coef=NULL,
-                                           weight=1,
-                                           paramToUse="all",
-                                           eta=NULL,
-                                           p.max=1,
-                                           sp0=NULL,
-                                           nSS=1000){
+                                          alpha = 1,
+                                          covFix = NULL,
+                                          pen.coef=NULL,
+                                          weight=1,
+                                          paramToUse="all",
+                                          eta=NULL,
+                                          p.max=1,
+                                          sp0=NULL,
+                                          nSS=1000,
+                                          covariate.model=NULL,
+                                          criterion="BIC",
+                                          ncrit=10){
   # Simulate Individual Parameters and setup parameters
-  
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
   if (is.null(sp.df$rep))
     sp.df$rep <- 1
@@ -79,14 +81,14 @@ covariateModelSelection.sharp <- function(nfolds = 5,
   
   Sigma=diag(Rsmlx:::mlx.getEstimatedPopulationParameters()[paste0("omega_",param.names[which(indvar)])]**2)
   colnames(Sigma) <- param.names[which(indvar)]
-  rownames(Sigma) <- param.names[which(indvar)]
+  rownames(Sigma) <- param.namese[which(indvar)]
   #######" FAIRE LA SELECTION ICI 
   N = length(unique(Y$id))
   
   Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
   X.mat  = covariates[,setdiff(colnames(covariates),"id")]
   
-  r.var <- setNames(lapply(names(indvar)[which(indvar)],FUN=function(p){
+  r.var = foreach(p = names(indvar)[which(indvar)],.export = c("applyMethodsharp","modelFromSelection")) %dopar% {
     applyMethodsharp(Y.mat[,stringr::str_detect(colnames(Y.mat),p),drop=F],
                      X.mat,
                      Sigma[p,p],
@@ -94,8 +96,17 @@ covariateModelSelection.sharp <- function(nfolds = 5,
                      p.name=p,
                      nfolds=nfolds,
                      alpha=alpha,
-                     nSS=nSS)
-  }),names(indvar)[which(indvar)])
+                     nSS=nSS,
+                     criterion=criterion,
+                     ncrit=ncrit,
+                     covariate.model = covariate.model[[p]],
+                     n_cores = max(floor(parallel::detectCores()/length(names(indvar)[which(indvar)])),1))
+  }
+  
+  to.cat = sapply(r.var,FUN=function(r){r$to.cat})
+  cat(to.cat)
+  
+  r.var <- lapply(r.var,FUN=function(r){r[-which(names(r)=="to.cat")]})
   
   r <- res <- r.cov0 <- list()
   for(j in 1:n.param){
