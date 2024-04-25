@@ -29,10 +29,11 @@ applyMethodLasso <- function(Y,X,omega,alpha=1,cov0,
     if(!is.null(omega)){ rootInvOmega = 1/((omega)**(1/2)) }else{ rootInvOmega = 1 }
     Ywh <- Y %*% rootInvOmega
     Xwh <- kronecker(t(rootInvOmega),Xsc)
+    colnames(Xwh) <- cov.names
     if(all(!prevSelection)){
       oldCriterion =critFUN(lm(Ywh ~ NULL))
     }else{
-      Xkeep = Xwh[,prevSelection]
+      Xkeep = Xwh[,names(prevSelection)[which(prevSelection)]]
       oldCriterion =critFUN(lm(Ywh ~ Xkeep))
     }
     cat("\nSearch of a lasso selection improving the ",criterion," criterion (max ",ncrit," searchs) for ",p.name," :\n ")

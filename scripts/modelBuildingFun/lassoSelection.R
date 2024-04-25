@@ -30,6 +30,7 @@ lassoSelection <- function(Y,X,
   if(!is.null(omega)){ rootInvOmega = 1/((omega)**(1/2)) }else{ rootInvOmega = 1 }
   Ywh <- Y %*% rootInvOmega
   Xwh <- kronecker(t(rootInvOmega),Xsc)
+  colnames(Xwh) <- cov.names
 
 
   if(is.null(cov0)){
@@ -67,6 +68,7 @@ lassoSelection <- function(Y,X,
 
         selection <- rbind(selection,tabulate(Matrix::which(res$beta != 0),ncol(Xwh)))
       }
+      colnames(selection) <- cov.names
       resSelection = colSums(selection)/nSS
 
       if(printFrequencySS){
@@ -88,7 +90,7 @@ lassoSelection <- function(Y,X,
         if(all(!as.logical(res))){
           criterion = critFUN(lm(Ywh ~ NULL))
         }else{
-          Xkeep = Xwh[,as.logical(res)]
+          Xkeep = Xwh[,names(res)[as.logical(res)]]
           criterion = critFUN(lm(Ywh~Xkeep))
         }
         return(criterion)

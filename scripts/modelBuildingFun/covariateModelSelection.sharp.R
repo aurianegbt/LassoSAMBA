@@ -81,7 +81,7 @@ covariateModelSelection.sharp <- function(nfolds = 5,
   
   Sigma=diag(Rsmlx:::mlx.getEstimatedPopulationParameters()[paste0("omega_",param.names[which(indvar)])]**2)
   colnames(Sigma) <- param.names[which(indvar)]
-  rownames(Sigma) <- param.namese[which(indvar)]
+  rownames(Sigma) <- param.names[which(indvar)]
   #######" FAIRE LA SELECTION ICI 
   N = length(unique(Y$id))
   
@@ -103,7 +103,7 @@ covariateModelSelection.sharp <- function(nfolds = 5,
                      n_cores = max(floor(parallel::detectCores()/length(names(indvar)[which(indvar)])),1))
   }
   
-  to.cat = sapply(r.var,FUN=function(r){r$to.cat})
+  to.cat = as.character(sapply(r.var,FUN=function(r){r$to.cat}))
   cat(to.cat)
   
   r.var <- lapply(r.var,FUN=function(r){r[-which(names(r)=="to.cat")]})

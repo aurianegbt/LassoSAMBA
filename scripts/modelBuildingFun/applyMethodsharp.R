@@ -42,7 +42,7 @@ applyMethodsharp <- function(Y,X,omega,cov0,
     if(all(!prevSelection)){
       oldCriterion =critFUN(lm(Ywh ~ NULL))
     }else{
-      Xkeep = Xwh[,prevSelection]
+      Xkeep = Xwh[,names(prevSelection)[which(prevSelection)]]
       oldCriterion =critFUN(lm(Ywh ~ Xkeep))
     }
     to.cat <- c(to.cat,paste0("\n Lasso selection, calibrated using sharp method, improving the ",criterion," criterion for ",p.name," :\n "))
@@ -68,12 +68,12 @@ applyMethodsharp <- function(Y,X,omega,cov0,
   if(all(!as.logical(selection))){
     newcriterion = critFUN(lm(Ywh ~ NULL))
   }else{
-    Xkeep = Xwh[,as.logical(selection)]
+    Xkeep = Xwh[,names(selection)[which(as.logical(selection))]]
     newcriterion = critFUN(lm(Ywh~Xkeep))
   }
   
-  if(newcriterion > oldCriterion){
-    to.cat <- c(to.cat,paste0("        -> New Criterion : ",round(newcriterion,digits=2)),", previous model kept.")
+  if(newcriterion >= oldCriterion){
+    to.cat <- c(to.cat,paste0("        No model improving the criterion as been find, the previous covariate model is kept."))
     selection = savedSelection
   }else{
     to.cat <- c(to.cat,paste0("        -> New Criterion : ",round(newcriterion,digits=2)))
