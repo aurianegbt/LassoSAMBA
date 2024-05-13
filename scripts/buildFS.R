@@ -13,19 +13,20 @@ buildFS <- function(pathToSim,
   suppressWarnings({
     newProject(data = list(dataFile = pathToSim,
                            headerTypes = headerTypes),
-               modelFile = paste0("data/modelFiles/Pasin.txt"))
+               modelFile = paste0("data/modelFiles/",if(stringr::str_detect(project,"Pasin")){"Pasin"}else if(project=="PK"){"PK"},".txt"))
   })
 
-  setIndividualParameterVariability(delta_S=FALSE,delta_L=FALSE)
+  if(stringr::str_detect(project,"Pasin")){
+    setIndividualParameterVariability(delta_S=FALSE,delta_L=FALSE)
     
-  setPopulationParameterInformation(
-    delta_S_pop=list(initialValue=0.23,method="FIXED"),
-    delta_L_pop=list(initialValue=0.000316,method="FIXED"))
+    setPopulationParameterInformation(
+      delta_S_pop=list(initialValue=0.23,method="FIXED"),
+      delta_L_pop=list(initialValue=0.000316,method="FIXED"))
     
-  setErrorModel(yAB_="constant")
-  
-  if(project=="CplxPasin"){
-    setCorrelationBlocks(id=list(c("phi_L","delta_AB")))
+    setErrorModel(yAB_="constant")
+  }else if(project=="PK"){
+    setErrorModel(yCc = "combined2")
+    setCorrelationBlocks(id=list(c("V","Cl")))
   }
   
   # Scenario

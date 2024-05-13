@@ -3,7 +3,7 @@ suppressWarnings(suppressMessages(library(stringr)))
 
 getResults <- function(project=c("Pasin","GaussianPasin"),
                        buildMethod="all",
-                       exclude="sharp",
+                       exclude=NULL,
                        files="all"){
   
   bM = identical(buildMethod,"all")
@@ -28,7 +28,7 @@ getResults <- function(project=c("Pasin","GaussianPasin"),
     }else{
       
       covTable = read.csv(paste0("data/simulationFiles/Files",proj,"/covTable/covTable_1.txt"))
-      orderList = colnames(covTable)[-1]
+      orderList = setdiff(colnames(covTable),"id")
       
       save(orderList,file=paste0("data/simulationFiles/orderList",proj,".RData"))
     }

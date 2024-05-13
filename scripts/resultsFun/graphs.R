@@ -14,14 +14,14 @@ suppressMessages({
 
 graphsGenerate <- function(project="Pasin",
                            buildMethod="all",
-                           exclude="sharp",
+                           exclude=NULL,
                            JPEG = T,
                            PNG = F){
   
   if(identical(buildMethod,"all")){
     buildMethod <- stringr::str_remove_all(list.dirs(paste0("outputs/buildingResults/simulation/Results",project),recursive = F),paste0("outputs/buildingResults/simulation/Results",project,"/Results_"))
     
-    buildMethod = c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit")[which( c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","rlassoCrit","relasticnetCrit") %in% buildMethod)]
+    buildMethod = c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","sharpnoCov0","rlassoCrit","relasticnetCrit")[which( c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","sharpnoCov0","rlassoCrit","relasticnetCrit") %in% buildMethod)]
     if(!is.null(exclude)){
       buildMethod = setdiff(buildMethod,exclude)
     }
