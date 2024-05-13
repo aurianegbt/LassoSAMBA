@@ -75,34 +75,16 @@ if(dir.exists(temporaryDirectory)){
 dir.create(temporaryDirectory)
 
 # Job ---------------------------------------------------------------------
-# if(!file.exists(paste0("data/applicationFiles/dataTrans_",nbCov,".txt"))){
-#   load("data/applicationFiles/DataTransD63.RData")
-#   load("data/applicationFiles/DataTrans.RData")
-# 
-#   genesKept = setdiff(names(sort(apply(genesD63,2,sd),decreasing=T)),c("age","id"))[1:(nbCov-1)]
-# 
-#   data = dataTrans %>%
-#     select(id,time,yAb,init,age,all_of(genesKept)) %>%
-#     mutate(age = age - mean(dataTrans$age)) %>%
-#     rename(cage=age) %>%
-#     filter(!is.na(init)) %>%
-#     filter(!is.na(yAb)) %>%
-#     mutate(time = as.numeric(stringr::str_remove_all(time," days"))) %>%
-#     arrange(id,time)
-# 
-#   write.csv(data,file=paste0("data/applicationFiles/dataTrans_",nbCov,".txt"),quote = F,row.names = F)
-# }
-
 data = read.csv("data/applicationFiles/arm1/dataTrans_1000.txt")
-genesNames = colnames(data)[6:1005]
+genesNames = colnames(data)[5:1004]
 sampledGenes = sample(genesNames,nbCov,replace = F)
 rankGenes = tabulate(which(genesNames %in% sampledGenes),1000)
-data = data %>% select(id,time,yAb,init,cage,all_of(sampledGenes))
+data = data %>% select(id,time,yAb,init,all_of(sampledGenes))
 write.csv(data,file=paste0(temporaryDirectory,"/data",nbBatch,".txt"),quote = F,row.names = F)
 
 newProject(modelFile = "data/modelFiles/PasinReg.txt",
            data = list(dataFile=paste0(temporaryDirectory,"/data",nbBatch,".txt"),
-                       headerTypes = c("id","time","observation","regressor",rep("contcov",nbCov+1))))
+                       headerTypes = c("id","time","observation","regressor",rep("contcov",nbCov))))
 
 setIndividualParameterVariability(delta_L=FALSE)
 setErrorModel(yAb="constant")

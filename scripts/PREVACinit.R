@@ -1,5 +1,5 @@
 library(lixoftConnectors)
-initializeLixoftConnectors()
+initializeLixoftConnectors(force=TRUE)
 library(dplyr)
 
 load(file="data/applicationFiles/arm1/antibodyData.RData")
@@ -32,9 +32,6 @@ setPopulationParameterInformation(getFixedEffectsByAutoInit())
 
 runScenario()
 
-saveProject("data/applicationFiles/ARM1_estimation_all_ind.mlxtran")
-
-getEstimatedPopulationParameters()
 setInitialEstimatesToLastEstimates()
 PopulationParameterInformation <- getPopulationParameterInformation()
 save(PopulationParameterInformation,file="data/applicationFiles/PopulationParameterInit.RData")
