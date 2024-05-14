@@ -91,12 +91,25 @@ covariateModelSelection.lasso <- function(nfolds = 5,
   Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
   X.mat  = covariates[,setdiff(colnames(covariates),"id")]
 
-  r.var <- lapply(param.names[which(indvar)],FUN=function(x){
+  if(is.list(thresholdsSS)){
+    if(!setequal(names(thresholdsSS),param.names[which(indvar)])){
+      stop(paste0("[ERROR] Please set the thresholdsSS names to the parameters related. Names should include ",paste0(param.names[which(indvar)],collapse=", ")))
+    }
+    r.var <- lapply(param.names[which(indvar)],FUN=function(x){
       applyMethodLasso(Y.mat[,stringr::str_detect(colnames(Y.mat),x),drop=F],
-                            X.mat,Sigma[x,x],alpha,cov0.list[[x]],
-                            stabilitySelection,nfolds,nSS,thresholdsSS,
-                            criterion,ncrit,covariate.model[[x]],
-                            printFrequencySS,p.name=x)})  # contient le résultat de seulement les paramètres variables donc pas dans l'ordre et pas entier
+                       X.mat,Sigma[x,x],alpha,cov0.list[[x]],
+                       stabilitySelection,nfolds,nSS,thresholdsSS[[x]],
+                       criterion,ncrit,covariate.model[[x]],
+                       printFrequencySS,p.name=x)})
+  }else{
+    r.var <- lapply(param.names[which(indvar)],FUN=function(x){
+      applyMethodLasso(Y.mat[,stringr::str_detect(colnames(Y.mat),x),drop=F],
+                       X.mat,Sigma[x,x],alpha,cov0.list[[x]],
+                       stabilitySelection,nfolds,nSS,thresholdsSS,
+                       criterion,ncrit,covariate.model[[x]],
+                       printFrequencySS,p.name=x)})
+  }
+    # contient le résultat de seulement les paramètres variables donc pas dans l'ordre et pas entier
   r <- res <- r.cov0 <- list()
   for(j in 1:n.param){
     nj=param.names[j]
