@@ -532,10 +532,10 @@ buildmlx <- function(project=NULL,
       g0 <- Rsmlx:::mlx.getIndividualParameterModel()
       covariate <- random.effect <- p.ttest <- p.lrt <- in.model <- p.value <- NULL
       r.test <-Rsmlx:::covariate.test(cov.test, covToTest, covToTransform, paramToUse)
-      r.test <- r.test %>% filter(!in.model) %>% select(-in.model)
+      r.test <- dplyr::select(dplyr::filter(r.test,!in.model),-in.model)
       if (is.weight) {
         w.cov <- weight$covariate[cbind(r.test[['parameter']], r.test[['covariate']])]
-        r.test <- r.test %>%  mutate(p.value = Rsmlx:::p.weight(p.value, w.cov, pen.coef[1]))
+        r.test <- dplyr::mutate(r.test,p.value = Rsmlx:::p.weight(p.value, w.cov, pen.coef[1]))
       }
       r.cov0 <- res.covariate$r.cov0
       for (j in 1:nrow(r.test)) {
@@ -608,8 +608,7 @@ buildmlx <- function(project=NULL,
       if (length(list.ipc) >0) {
         to.cat <- paste0(plain.short,"Remove parameters/covariates relationships:\n")
         method <- statistics <- parameter <- NULL
-        to.print <- (r.test %>% select(-c(method, statistics)) %>%
-                       rename(coefficient=parameter))[list.ipc,]
+        to.print <- (dplyr::rename(dplyr::select(r.test,-c(method, statistics)),coefficient=parameter))[list.ipc,]
         Rsmlx:::print_result(print, summary.file, to.cat=to.cat, to.print=to.print)
       }
 
@@ -682,8 +681,7 @@ buildmlx <- function(project=NULL,
       if (length(list.ipc) > 0 & !identical(g$covariateModel, g0$covariateModel) & !identical(g$covariateModel, g1$covariateModel))  {
         to.cat <- paste0(plain.short,"Remove parameters/covariates relationships:\n")
         method <- statistics <- parameter <- NULL
-        to.print <- (r.test %>% select(-c(method, statistics)) %>%
-                       rename(coefficient=parameter))[list.ipc,]
+        to.print <- (dplyr::rename(dplyr::select(r.test,-c(method, statistics)),coefficient=parameter))[list.ipc,]
         Rsmlx:::print_result(print, summary.file, to.cat=to.cat, to.print=to.print)
 
         Rsmlx:::mlx.setIndividualParameterModel(g)
@@ -726,11 +724,11 @@ buildmlx <- function(project=NULL,
         p.cortest <- NULL
         if (!Rsmlx:::mlx.getLaunchedTasks()$conditionalDistributionSampling)
           Rsmlx:::mlx.runConditionalDistributionSampling()
-        r.test <- Rsmlx:::correlationTest()$p.value %>% filter(!in.model) %>% rename(p.value=p.cortest)
+        r.test <- dplyr::rename( dplyr::filter(Rsmlx:::correlationTest()$p.value,!in.model),p.value=p.cortest)
         param1 <- gsub("eta_","",r.test$randomEffect.1)
         param2 <- gsub("eta_","",r.test$randomEffect.2)
         w.cor <- weight$correlation[cbind(param1, param2)]+weight$correlation[cbind(param2, param1)]
-        r.test <- r.test %>% mutate(p.value =Rsmlx:::p.weight(p.value, w.cor, pen.coef[1]))
+        r.test <- dplyr::mutate(r.test ,p.value =Rsmlx:::p.weight(p.value, w.cor, pen.coef[1]))
 
         i.min <- which(as.numeric(r.test$p.value) < p.min[3])
         g <- Rsmlx:::mlx.getIndividualParameterModel()
