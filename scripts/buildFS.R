@@ -24,9 +24,11 @@ buildFS <- function(pathToSim,
       delta_L_pop=list(initialValue=0.000316,method="FIXED"))
     
     setErrorModel(yAB_="constant")
+    model = "covariate"
   }else if(project=="PK"){
-    setErrorModel(yCc = "combined2")
-    setCorrelationBlocks(id=list(c("V","Cl")))
+    # setErrorModel(y = "combined2")
+    # setCorrelationBlocks(id=list(c("V","Cl")))
+    model = "all"
   }
   
   # Scenario
@@ -40,7 +42,7 @@ buildFS <- function(pathToSim,
   # Model Building
   res = buildmlx(project = paste0(temporaryDirectory,"/Build.mlxtran"),
                  buildMethod = buildMethod,
-                 model="covariate",
+                 model=model,
                  weight=if(is.null(weight)){NULL}else{list(covariate=weight)},
                  test=FALSE,
                  thresholdsSS=thresholdsSS,
