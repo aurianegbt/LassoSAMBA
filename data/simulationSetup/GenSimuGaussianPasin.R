@@ -21,32 +21,33 @@ suppressMessages({
 
 
 ## Correlation matrix
-load("data/simulationSetup/DataTransCoding.RData")
-
-aux = (dataTransCoding %>% filter(visit=="M12"))[,c(7,9:18662)] 
-genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[3:201] # keep only 200
-
-aux <- aux[,c("age",genesKept)]
-colnames(aux) <- c(1:ncol(aux))
-
-genCorMat <- cor(aux,method="spearman")
-epsilon <- 1e-10
-genCorMat <- genCorMat + epsilon * diag(ncol(genCorMat))
-genCorMat[1, 1] <- 16
-
-save(genCorMat,file="data/simulationSetup/corrMatrixPasin.RData")
-
-mu = c(35,0,0,rowMeans(t(aux[,-c(1:3)]))) # AGE, G1, G2 have already means defined in simulX
-
-## Plot
-corrplot =  ggcorrplot(genCorMat,ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain")) + theme(plot.title = element_text(size=20, face="plain"))
-
-
-annotate_figure(corrplot,
-                top = text_grob("Theoretical Correlation Matrix used.",
-                                face="bold",size=50,color="#882255"))
-ggsave("outputs/figures/explanatory/corrPasin.png",
-       height = 10000, width = 10000, units = "px", bg='transparent')
+# load("data/applicationFiles/arm1/DataTransCoding.RData")
+# 
+# aux = (dataTransCoding %>% filter(visit=="M12"))[,c(7,9:18662)] 
+# genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[3:201] # keep only 200
+# 
+# aux <- aux[,c("age",genesKept)]
+# colnames(aux) <- c(1:ncol(aux))
+# 
+# genCorMat <- cor(aux,method="spearman")
+# epsilon <- 1e-10
+# genCorMat <- genCorMat + epsilon * diag(ncol(genCorMat))
+# genCorMat[1, 1] <- 16
+# 
+# save(genCorMat,file="data/simulationSetup/corrMatrixPasin.RData")
+# 
+# mu = c(35,0,0,rowMeans(t(aux[,-c(1:3)]))) # AGE, G1, G2 have already means defined in simulX
+# 
+# ## Plot
+# corrplot =  ggcorrplot(genCorMat,ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain")) + theme(plot.title = element_text(size=20, face="plain"))
+# 
+# 
+# annotate_figure(corrplot,
+#                 top = text_grob("Theoretical Correlation Matrix used.",
+#                                 face="bold",size=50,color="#882255"))
+# ggsave("outputs/figures/explanatory/corrPasin.png",
+#        height = 10000, width = 10000, units = "px", bg='transparent')
+load("data/simulationSetup/corrMatrixPasin.RData")
 
 ## Generate 200 correlated covariates and then create 100 replicates
 loadProject("data/simulationSetup/Pasin.smlx")
