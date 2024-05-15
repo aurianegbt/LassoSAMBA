@@ -21,7 +21,7 @@ graphsGenerate <- function(project="Pasin",
   if(identical(buildMethod,"all")){
     buildMethod <- stringr::str_remove_all(list.dirs(paste0("outputs/buildingResults/simulation/Results",project),recursive = F),paste0("outputs/buildingResults/simulation/Results",project,"/Results_"))
     
-    buildMethod = c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","sharpnoCov0","rlassoCrit","relasticnetCrit")[which( c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","sharpnoCov0","rlassoCrit","relasticnetCrit") %in% buildMethod)]
+    buildMethod = c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","lassoSSCritnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","sharpnoCov0","rlassoCrit","relasticnetCrit")[which( c("reg","lasso","elasticnet","lassoSS","elasticnetSS","lassoSSCrit","elasticnetSSCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","lassoSSCritnoCov0","elasticnetnoCov0","lassoSSREP","elasticnetSSREP","lassoSSCritREP","elasticnetSSCritREP","rlasso","relasticnet","rsharp","sharp","sharpnoCov0","rlassoCrit","relasticnetCrit") %in% buildMethod)]
     if(!is.null(exclude)){
       buildMethod = setdiff(buildMethod,exclude)
     }
@@ -43,6 +43,7 @@ graphsGenerate <- function(project="Pasin",
                    lasso = "Model built with a lasso approach within SAMBA, whithout stability selection, with statistic test to exclude covariates at each iteration.",
                    elasticnet="Model built with a lasso approach within SAMBA, whithout stability selection, with statistic test to exclude covariates at each iteration..",
                    lassoSS = "Model built with a lasso approach within SAMBA, with statistic test to exclude covariates at each iteration.",
+                   lassoSSCrit = "Model built with a lasso approach within SAMBA, with statistic test to exclude covariates at each iteration.",
                    elasticnetSS = "Model built with an elastic net approach within SAMBA, with statistic test to exclude covariates at each iteration.",
                    sharp = "Model built with a lasso approach, calibrated using sharp method, with statistic test to exclude covariates at each iteration.")[union(buildMethod[which((!stringr::str_detect(buildMethod,"regPEN") & !stringr::str_detect(buildMethod,"noCov0")))],stringr::str_remove_all(buildMethod[which(stringr::str_detect(buildMethod,"noCov0"))],"noCov0"))]
   

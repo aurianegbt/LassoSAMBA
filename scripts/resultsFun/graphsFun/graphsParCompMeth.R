@@ -27,6 +27,8 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
       newbuildMethod[k] <- paste0("penalized stepAIC\npen=",stringr::str_remove(buildMethod[k],"regPEN"))
     }else if(buildMethod[k]=="lassoSSnoCov0"){
       newbuildMethod[k] <- "Lasso"
+    }else if(buildMethod[k]=="lassoSSCritnoCov0"){
+      newbuildMethod[k] <- "Lasso\nwith adapted thresholds"
     }else if(buildMethod[k]=="regnoCov0"){
       newbuildMethod[k] <- "StepAIC"
     }else if(buildMethod[k]=="elasticnetSSnoCov0"){

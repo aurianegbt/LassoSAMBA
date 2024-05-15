@@ -103,7 +103,7 @@ covariateModelSelection.sharp <- function(nfolds = 5,
                      n_cores = max(floor(parallel::detectCores()/length(names(indvar)[which(indvar)])),1))
   }
   
-  to.cat = as.character(sapply(r.var,FUN=function(r){r$to.cat}))
+  to.cat = unlist(sapply(r.var,FUN=function(r){r$to.cat}))
   cat(to.cat)
   
   r.var <- lapply(r.var,FUN=function(r){r[-which(names(r)=="to.cat")]})
