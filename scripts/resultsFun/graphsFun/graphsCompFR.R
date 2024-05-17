@@ -43,7 +43,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   valueDisplayFDR <- cbind(valueDisplayFDR,coor=1:length(buildMethod))
   
   # Cov plot
-  plotFDR = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
+  plotFDR = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","lassoSSCritnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayFDR, mapping=aes(label=text,x=coor),color="black",y=0.10,vjust=-0.2,fontface="bold",size=3)+
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
@@ -59,7 +59,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               relasticnet="Elastic Net with\ns.s. on replicates",   
                               lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
                               elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",  
-                              lassoSSCrit="Lasso with\nmultiple thresholds",   
+                              lassoSSCritnoCov0="Lasso with\nadapted initialisation",   
                               elasticnetSSCrit="Elastic Net with\nmultiple thresholds", 
                               rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
                               relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
@@ -105,7 +105,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   valueDisplayFNR <- cbind(valueDisplayFNR,coor=1:length(buildMethod))
   
   # Cov plot
-  plotFNR = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=FNR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
+  plotFNR = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=FNR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCritnoCov0","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayFNR, mapping=aes(label=text,x=coor),color="black",y=0.0010,vjust=-0.2,fontface="bold",size=3)+
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
@@ -121,7 +121,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               relasticnet="Elastic Net with\ns.s. on replicates",   
                               lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
                               elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",  
-                              lassoSSCrit="Lasso with\nmultiple thresholds",   
+                              lassoSSCritnoCov0="Lasso with\nadapted initialisation",      
                               elasticnetSSCrit="Elastic Net with\nmultiple thresholds", 
                               rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
                               relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
@@ -167,7 +167,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   valueDisplayF1_score <- cbind(valueDisplayF1_score,coor=1:length(buildMethod))
   
   # Cov plot
-  plotF1_score = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=F1_score,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
+  plotF1_score = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=F1_score,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCritnoCov0","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayF1_score, mapping=aes(label=text,x=coor),color="black",y=0.8,vjust=-0.2,fontface="bold",size=3)+
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
@@ -181,7 +181,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               elasticnetSS="Elastic Net\nwith stat. test",
                               rlasso="Lasso with\ns.s. on replicates", 
                               relasticnet="Elastic Net with\ns.s. on replicates",   
-                              lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
+                              lassoSSCritnoCov0="Lasso with\nadapted initialisation",   
                               elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",  
                               lassoSSCrit="Lasso with\nmultiple thresholds",   
                               elasticnetSSCrit="Elastic Net with\nmultiple thresholds", 
