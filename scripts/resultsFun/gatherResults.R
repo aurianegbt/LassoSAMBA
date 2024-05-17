@@ -1,6 +1,6 @@
 gatherResults <- function(project=c("Pasin","GaussianPasin"),
                           buildMethod="all",
-                          exclude=NULL,
+                          exclude=c("sharp","sharpnoCov0"),
                           numFiles=100,
                           completePrint=FALSE,
                           print=TRUE,

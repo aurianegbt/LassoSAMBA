@@ -3,7 +3,7 @@ suppressWarnings(suppressMessages(library(stringr)))
 
 getResults <- function(project=c("Pasin","GaussianPasin"),
                        buildMethod="all",
-                       exclude=NULL,
+                       exclude=c("sharp","sharpnoCov0"),
                        files="all"){
   
   bM = identical(buildMethod,"all")
@@ -26,9 +26,9 @@ getResults <- function(project=c("Pasin","GaussianPasin"),
     if(file.exists(paste0("data/simulationFiles/orderList",proj,".RData"))){
       load(paste0("data/simulationFiles/orderList",proj,".RData"))
     }else{
+      load(paste0("data/simulationFiles/Files",proj,"/headerTypes.RData"))
       
-      covTable = read.csv(paste0("data/simulationFiles/Files",proj,"/covTable/covTable_1.txt"))
-      orderList = setdiff(colnames(covTable),"id")
+      orderList = colnames(read.csv(paste0("data/simulationFiles/Files",proj,"/simulation/simulation_1.txt")))[which(stringr::str_detect(headerTypes,"cov"))]
       
       save(orderList,file=paste0("data/simulationFiles/orderList",proj,".RData"))
     }
