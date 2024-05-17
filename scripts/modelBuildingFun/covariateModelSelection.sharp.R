@@ -10,7 +10,8 @@ covariateModelSelection.sharp <- function(nfolds = 5,
                                           nSS=1000,
                                           covariate.model=NULL,
                                           criterion="BIC",
-                                          ncrit=10){
+                                          ncrit=10,
+                                          iter=1){
   # Simulate Individual Parameters and setup parameters
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
   if (is.null(sp.df$rep))
@@ -88,7 +89,7 @@ covariateModelSelection.sharp <- function(nfolds = 5,
   Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
   X.mat  = covariates[,setdiff(colnames(covariates),"id")]
   
-  r.var = foreach(p = names(indvar)[which(indvar)],.export = c("applyMethodsharp","modelFromSelection")) %dopar% {
+  r.var = foreach(p = names(indvar)[which(indvar)],.export = c("applyMethodsharp","modelFromSelection","CalibrationPlot")) %dopar% {
     applyMethodsharp(Y.mat[,stringr::str_detect(colnames(Y.mat),p),drop=F],
                      X.mat,
                      Sigma[p,p],
@@ -100,8 +101,13 @@ covariateModelSelection.sharp <- function(nfolds = 5,
                      criterion=criterion,
                      ncrit=ncrit,
                      covariate.model = covariate.model[[p]],
-                     n_cores = max(floor(parallel::detectCores()/length(names(indvar)[which(indvar)])),1))
+                     n_cores = max(floor(parallel::detectCores()/length(names(indvar)[which(indvar)])),1),
+                     iter=iter)
   }
+  
+  
+  
+  sapply(lapply(r.var,FUN=function(r){r$plot}),FUN=function(plt){ggplot2::ggsave(plot=plt$plot, filename =paste0(stringr::str_sub(lixoftConnectors::getProjectSettings()$directory,end = -7),"/sharpCalibrationPlot_",plt$p.name,"_",iter,".png"))})
   
   to.cat = unlist(sapply(r.var,FUN=function(r){r$to.cat}))
   cat(to.cat)

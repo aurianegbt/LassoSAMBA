@@ -4,7 +4,8 @@ applyMethodsharp <- function(Y,X,omega,cov0,
                              nSS=1000,
                              criterion="BIC",ncrit=20,covariate.model=NULL,
                              p.name=NULL,
-                             n_cores = 1){
+                             n_cores = 1,
+                             iter=1){
   # X et Y on juste la bonne "forme" mais pas scale encore (ça c'est fait dans la sélection en elle même !!!! )
   # Le but de cette fonction est de construit le modèle linéaire pour chaque paramètre
   
@@ -43,7 +44,7 @@ applyMethodsharp <- function(Y,X,omega,cov0,
       oldCriterion =critFUN(lm(Ywh ~ NULL))
     }else{
       Xkeep = Xwh[,names(prevSelection)[which(prevSelection)]]
-      oldCriterion =critFUN(lm(Ywh ~ Xkeep))
+      oldCriterion = critFUN(lm(Ywh ~ Xkeep))
     }
     to.cat <- c(to.cat,paste0("\n Lasso selection, calibrated using sharp method, improving the ",criterion," criterion for ",p.name," :\n "))
     to.cat <- c(to.cat,paste0("       -> Old Criterion : ",round(oldCriterion,digits=2)),"\n")
@@ -65,11 +66,17 @@ applyMethodsharp <- function(Y,X,omega,cov0,
     selection = sharp::SelectedVariables(VariableSelection.outputs)
   }
   
+  plot=CalibrationPlot(VariableSelection.outputs) + ggplot2::ggtitle(paste0("Calibration Plot at iteration ",iter," for parameters ",p.name))
+  
+  
   if(all(!as.logical(selection))){
     newcriterion = critFUN(lm(Ywh ~ NULL))
   }else{
     Xkeep = Xwh[,names(selection)[which(as.logical(selection))]]
     newcriterion = critFUN(lm(Ywh~Xkeep))
+  }
+  if(oldCriterion == -Inf){
+    oldCriterion = Inf
   }
   
   if(newcriterion >= oldCriterion){
@@ -88,5 +95,27 @@ applyMethodsharp <- function(Y,X,omega,cov0,
   
   
   to.cat <- c(to.cat,"\n")
-  return(list(model=model.list,res=selection,cov0=cov0,p.name=p.name,to.cat = to.cat))
+  return(list(model=model.list,res=selection,cov0=cov0,p.name=p.name,to.cat = to.cat,plot=list(plot=plot,p.name=p.name)))
+}
+
+CalibrationPlot <- function(VariableSelection.outputs){
+  pi_list = VariableSelection.outputs$params$pi_list
+  lambda_list = VariableSelection.outputs$Lambda
+  
+  
+  Score = VariableSelection.outputs$S_2d
+  df = data.frame()
+  for(i in 1:ncol(Score)){
+    df <- rbind(df,data.frame(lambda = signif(lambda_list,digits=2),pi = pi_list[i],Score=Score[,i]))
+  }
+  
+  plot = ggplot2::ggplot(df,ggplot2::aes(x=as.factor(lambda),y=pi,fill=Score)) +
+    ggplot2::geom_tile() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+    ggplot2::scale_fill_gradientn(colours = c("ivory", "navajowhite", "tomato","darkred"),na.value="white") + 
+    ggplot2::xlab(latex2exp::TeX("$\\lambda$"))+ggplot2::ylab(latex2exp::TeX("$\\pi$")) +
+    ggplot2::theme(axis.title=ggplot2::element_text(size=14,face="bold")) +
+    ggplot2::scale_y_continuous(breaks=c(seq(0,0.5,0.05),seq(0.6,1,0.1)))
+  
+  return(plot)
 }
