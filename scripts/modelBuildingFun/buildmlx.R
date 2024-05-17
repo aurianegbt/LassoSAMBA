@@ -31,6 +31,7 @@ buildmlx <- function(project=NULL,
                      thresholdsSS=0.80, 
                      buildMethod="lasso",
                      ncrit=20, 
+                     lambda.grid = NULL,
                      printFrequencySS=FALSE
                      )
 {
@@ -267,6 +268,9 @@ buildmlx <- function(project=NULL,
     pmax.cov <-  p.max
     # eta = e ; pen.coef = pen.coef[1] ; weight = weight.covariate ; p.max = pmax.cov 
     if (model$covariate){
+      if(iter>1){
+        lambda.grid = NULL
+      }
       ##################################################
       res.covariate <- covariateModelSelection(buildMethod = buildMethod,
                                                nfolds = nfolds,
@@ -285,6 +289,7 @@ buildmlx <- function(project=NULL,
                                                steps=steps,
                                                sp0=sp0,
                                                iter=iter,
+                                               lambda.grid = lambda.grid,
                                                printFrequencySS = printFrequencySS,
                                                correlation.model=correlation.model,
                                                covariate.model=covariate.model,

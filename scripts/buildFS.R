@@ -4,6 +4,7 @@ buildFS <- function(pathToSim,
                     buildMethod = "reg",
                     thresholdsSS = 0.90,
                     weight=NULL,
+                    lambda.grid=NULL,
                     p.max=0.1){
 
   load(paste0("data/simulationFiles/Files",project,"/headerTypes.RData"))
@@ -13,7 +14,7 @@ buildFS <- function(pathToSim,
   suppressWarnings({
     newProject(data = list(dataFile = pathToSim,
                            headerTypes = headerTypes),
-               modelFile = paste0("data/modelFiles/",if(stringr::str_detect(project,"Pasin")){"Pasin"}else if(project=="PK"){"PK"},".txt"))
+               modelFile = paste0("data/modelFiles/",if(stringr::str_detect(project,"Pasin")){"Pasin"}else{project},".txt"))
   })
 
   if(stringr::str_detect(project,"Pasin")){
@@ -23,11 +24,10 @@ buildFS <- function(pathToSim,
       delta_S_pop=list(initialValue=0.23,method="FIXED"),
       delta_L_pop=list(initialValue=0.000316,method="FIXED"))
     
-    setErrorModel(yAB_="constant")
+    obs.name=getMapping()$mapping[[1]]$model
+    eval(parse(text=paste0("setErrorModel(",obs.name,"='constant')")))
     model = "covariate"
-  }else if(project=="PK"){
-    # setErrorModel(y = "combined2")
-    # setCorrelationBlocks(id=list(c("V","Cl")))
+  }else if(project=="PKcorr"){
     model = "all"
   }
   
@@ -46,6 +46,7 @@ buildFS <- function(pathToSim,
                  weight=if(is.null(weight)){NULL}else{list(covariate=weight)},
                  test=FALSE,
                  thresholdsSS=thresholdsSS,
+                 lambda.grid = lambda.grid,
                  p.max=p.max)
 
   Model <- Rsmlx:::mlx.getIndividualParameterModel()

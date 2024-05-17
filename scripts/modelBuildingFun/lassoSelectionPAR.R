@@ -7,6 +7,7 @@ lassoSelection <- function(Y,X,
                            nSS=1000,
                            thresholdsSS=seq(0.5,0.95,0.05), # can be a vector of thresholdsSS
                            criterion="BIC",
+                           lambda.grid = NULL,
                            printFrequencySS = FALSE){
   # depends on for each 
   if(criterion %in% c("BIC","BICc")){
@@ -53,7 +54,7 @@ lassoSelection <- function(Y,X,
     thresholdsFinal = NULL
     stop=TRUE
   }else{
-    resCV = glmnet::cv.glmnet(Xwh, Ywh, alpha = alpha , nfolds=nfolds , exclude=exclude)
+    resCV = glmnet::cv.glmnet(Xwh, Ywh, alpha = alpha , nfolds=nfolds , exclude=exclude,lambda = lambda.grid)
 
     lambda=resCV$lambda.min
 

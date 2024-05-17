@@ -1,6 +1,6 @@
 applyMethodLasso <- function(Y,X,omega,alpha=1,cov0,
                              stabilitySelection=FALSE,nfolds=5,nSS=1000,thresholdsSS=0.9,
-                             criterion="BIC",ncrit=20,covariate.model=NULL,printFrequencySS = TRUE,p.name=NULL){
+                             criterion="BIC",ncrit=20,covariate.model=NULL,lambda.grid=NULL,printFrequencySS = TRUE,p.name=NULL){
   # X et Y on juste la bonne "forme" mais pas scale encore (ça c'est fait dans la sélection en elle même !!!! )
   # Le but de cette fonction est de construit le modèle linéaire pour chaque paramètr
   if(criterion %in% c("BIC","BICc")){
@@ -40,7 +40,7 @@ applyMethodLasso <- function(Y,X,omega,alpha=1,cov0,
     cat("  ▶ old Criterion ",criterion," : ",round(oldCriterion,digits=2))
   }
 
-  resSelection = lassoSelection(Y,X,omega,alpha,cov0,stabilitySelection,nfolds,nSS,thresholdsSS,criterion,printFrequencySS = printFrequencySS)
+  resSelection = lassoSelection(Y,X,omega,alpha,cov0,stabilitySelection,nfolds,nSS,thresholdsSS,criterion,lambda.grid,printFrequencySS = printFrequencySS)
   
   selection = resSelection$selection
   newCriterion = resSelection$criterion
@@ -58,7 +58,7 @@ applyMethodLasso <- function(Y,X,omega,alpha=1,cov0,
                  }),collapse=","))
     flag = newCriterion < oldCriterion
     while(tested < ncrit & !flag){
-      resSelection = lassoSelection(Y,X,omega,alpha,cov0,stabilitySelection,nfolds,nSS,thresholdsSS,criterion,printFrequencySS = printFrequencySS)
+      resSelection = lassoSelection(Y,X,omega,alpha,cov0,stabilitySelection,nfolds,nSS,thresholdsSS,criterion,lambda.grid,printFrequencySS = printFrequencySS)
       selection = resSelection$selection
       newCriterion = resSelection$criterion
 

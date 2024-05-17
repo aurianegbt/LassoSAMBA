@@ -13,6 +13,7 @@ covariateModelSelection.lasso <- function(nfolds = 5,
                                           covariate.model=NULL,
                                           criterion="BIC",
                                           ncrit=20,
+                                          lambda.grid=NULL,
                                           printFrequencySS = FALSE){
   # Simulate Individual Parameters and setup parameters
   
@@ -100,6 +101,7 @@ covariateModelSelection.lasso <- function(nfolds = 5,
                        X.mat,Sigma[x,x],alpha,cov0.list[[x]],
                        stabilitySelection,nfolds,nSS,thresholdsSS[[x]],
                        criterion,ncrit,covariate.model[[x]],
+                       lambda.grid=lambda.grid[[x]],
                        printFrequencySS,p.name=x)})
   }else{
     r.var <- lapply(param.names[which(indvar)],FUN=function(x){

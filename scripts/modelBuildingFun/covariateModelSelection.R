@@ -15,6 +15,7 @@ covariateModelSelection <- function(buildMethod,
                                     steps=1000,
                                     sp0=NULL,
                                     iter=1,
+                                    lambda.grid = NULL,
                                     printFrequencySS=TRUE,
                                     correlation.model=NULL,
                                     covariate.model=NULL,
@@ -23,9 +24,9 @@ covariateModelSelection <- function(buildMethod,
   if(buildMethod %in% c("reg")){
     covariateModelSelection.reg(covFix,pen.coef,weight,n.full,nb.model,direction,paramToUse,eta,p.max,steps,sp0,iter,correlation.model)
   }else if(buildMethod=="lasso"){
-    covariateModelSelection.lasso(nfolds,alpha,stabilitySelection=FALSE,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS)
+    covariateModelSelection.lasso(nfolds,alpha,stabilitySelection=FALSE,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,lambda.grid=NULL,printFrequencySS)
   }else if(buildMethod=="lassoSS"){
-    covariateModelSelection.lasso(nfolds,alpha,stabilitySelection=TRUE,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS=FALSE)
+    covariateModelSelection.lasso(nfolds,alpha,stabilitySelection=TRUE,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,lambda.grid,printFrequencySS=FALSE)
   }else if(buildMethod=="elasticnet"){
     covariateModelSelection.elasticnet(nfolds,stabilitySelection=FALSE,nSS,thresholdsSS,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,ncrit,printFrequencySS)
   }else if(buildMethod=="elasticnetSS"){
@@ -38,7 +39,7 @@ covariateModelSelection <- function(buildMethod,
   }else if(buildMethod=="rsharp"){
     covariateModelSelection.rsharp(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0)
   }else if(buildMethod=="sharp"){
-    covariateModelSelection.sharp(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,nSS,covariate.model,criterion,ncrit)
+    covariateModelSelection.sharp(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,nSS,covariate.model,criterion,ncrit,iter)
   }
 }
 
