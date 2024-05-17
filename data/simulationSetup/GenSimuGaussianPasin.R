@@ -23,8 +23,8 @@ suppressMessages({
 ## Correlation matrix
 # load("data/applicationFiles/arm1/DataTransCoding.RData")
 # 
-# aux = (dataTransCoding %>% filter(visit=="M12"))[,c(7,9:18662)] 
-# genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[3:201] # keep only 200
+# aux = (dataTransCoding %>% filter(visit=="M12"))[,c(6,8:18661)]
+# genesKept = names(sort(apply(aux[,-1],2,sd),decreasing = TRUE))[3:201] # keep only 199 - age left aside 
 # 
 # aux <- aux[,c("age",genesKept)]
 # colnames(aux) <- c(1:ncol(aux))
@@ -33,11 +33,10 @@ suppressMessages({
 # epsilon <- 1e-10
 # genCorMat <- genCorMat + epsilon * diag(ncol(genCorMat))
 # genCorMat[1, 1] <- 16
-# 
-# save(genCorMat,file="data/simulationSetup/corrMatrixPasin.RData")
-# 
 # mu = c(35,0,0,rowMeans(t(aux[,-c(1:3)]))) # AGE, G1, G2 have already means defined in simulX
 # 
+# save(mu,genCorMat,file="data/simulationSetup/corrMatrixPasin.RData")
+#
 # ## Plot
 # corrplot =  ggcorrplot(genCorMat,ggtheme=theme_riri, colors= c("#446494","#eeeeee","#882255"))  + theme(plot.title = element_text(size=20, face="plain")) + theme(plot.title = element_text(size=20, face="plain"))
 # 
@@ -93,10 +92,10 @@ for(i in 1:100){
   dataset = dataset %>% arrange(id,time)
   
   dir("data/simulationFiles/FilesGaussianPasin")
-  dir("data/simulationFiles/FilesGaussianPasin/covTable")
+  # dir("data/simulationFiles/FilesGaussianPasin/covTable")
   dir("data/simulationFiles/FilesGaussianPasin/simulation")
   
-  write.csv(covTable,file=paste0("data/simulationFiles/FilesGaussianPasin/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(covTable,file=paste0("data/simulationFiles/FilesGaussianPasin/covTable/covTable_",i,".txt"),quote = F,row.names = F)
   write.csv(dataset,file=paste0("data/simulationFiles/FilesGaussianPasin/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   unlink(paste0("tmpfile",i,".txt"))

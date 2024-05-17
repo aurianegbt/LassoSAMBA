@@ -1,9 +1,9 @@
-H1.all = list(ka=character(),
-              V="C1",
+H1.all = list(V="C1",
+              ka=character(),
               Cl=c("C1","C2"))
 
-param = c("ka","V","Cl")
+param = c("V","ka","Cl")
 
-t.param = c(ka = latex2exp::TeX(r"($ka$)",output="character"),
-            V = latex2exp::TeX(r"($V$)",output="character"),
+t.param = c(V = latex2exp::TeX(r"($V$)",output="character"),
+            ka = latex2exp::TeX(r"($ka$)",output="character"),
             Cl  = latex2exp::TeX(r"($Cl$)",output="character"))

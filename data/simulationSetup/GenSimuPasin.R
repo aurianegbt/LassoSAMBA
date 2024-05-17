@@ -93,10 +93,10 @@ for(i in 1:100){
   dataset = dataset %>% arrange(id,time)
   
   dir("data/simulationFiles/FilesPasin")
-  dir("data/simulationFiles/FilesPasin/covTable")
+  # dir("data/simulationFiles/FilesPasin/covTable")
   dir("data/simulationFiles/FilesPasin/simulation")
   
-  write.csv(covTable,file=paste0("data/simulationFiles/FilesPasin/covTable/covTable_",i,".txt"),quote = F,row.names = F)
+  # write.csv(covTable,file=paste0("data/simulationFiles/FilesPasin/covTable/covTable_",i,".txt"),quote = F,row.names = F)
   write.csv(dataset,file=paste0("data/simulationFiles/FilesPasin/simulation/simulation_",i,".txt"),quote = F,row.names = F)
   
   unlink(paste0("tmpfile",i,".txt"))
