@@ -93,7 +93,29 @@ tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
 
   # Data Processing
   df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"),F1_score_CB=CB(df,"F1_score"))
-  methname=c(reg="stepAIC with stat. test",lasso="Lasso without s.s.",elastinet="Elastic net without s.s.",lassoSS="Lasso with stat. test",elasticnetSS="Elastic Net with stat. test",rlasso="Lasso with s.s. on replicates",relasticnet="Elastic Net with s.s. on replicates",lassoCrit = "Lasso with multiple thresholds and no s.s.",elasticnetCrit="Elastic Net with multiple thresholds and no s.s.",lassoSSCrit="Lasso with multiple thresholds",elasticnetSSCrit="Elastic Net with multiple thresholds",rlassoCrit="Lasso with mult. thresholds and s.s. on rep.",relasticnetCrit="Elastic Net with mult. thresholds and s.s. on rep.",setNames(paste0("penalized stepAIC pen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC",lassoSSnoCov0="Lasso",lassoSSCritnoCov0="Lasso",elasticnetSSnoCov0="Elastic Net",sharpnoCov0="Lasso calibrated using sharp",sharp="Lasso calibrated using sharp\nwith stat. test")
+  methname=c(reg="stepAIC with stat. test",
+             lasso="Lasso without s.s.",
+             elastinet="Elastic net without s.s.",
+             lassoSS="Lasso with stat. test",
+             elasticnetSS="Elastic Net with stat. test",
+             rlasso="Lasso with s.s. on replicates",
+             relasticnet="Elastic Net with s.s. on replicates",
+             lassoCrit = "Lasso with multiple thresholds and no s.s.",
+             elasticnetCrit="Elastic Net with multiple thresholds and no s.s.",
+             lassoSSCrit="Lasso with multiple thresholds",
+             elasticnetSSCrit="Elastic Net with multiple thresholds",
+             rlassoCrit="Lasso with mult. thresholds and s.s. on rep.",
+             relasticnetCrit="Elastic Net with mult. thresholds and s.s. on rep.",
+             setNames(paste0("penalized stepAIC pen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),
+             regnoCov0="stepAIC",
+             lassoSSnoCov0="Lasso",
+             lassoSSCritnoCov0="Lasso",
+             setNames(paste0("Lasso ",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],"sharpnoCov0"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))]),
+             setNames(paste0("Lasso : FDP<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+             setNames(paste0("Lasso ",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))]),
+             elasticnetSSnoCov0="Elastic Net",
+             sharpnoCov0="Lasso calibrated using sharp",
+             sharp="Lasso calibrated using sharp with stat. test")
 
   table = data.frame(Rate = c(paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
                                  paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),

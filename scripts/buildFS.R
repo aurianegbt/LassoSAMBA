@@ -5,7 +5,8 @@ buildFS <- function(pathToSim,
                     thresholdsSS = 0.90,
                     weight=NULL,
                     lambda.grid=NULL,
-                    p.max=0.1){
+                    p.max=0.1,
+                    FDP_thr=0.05){
 
   load(paste0("data/simulationFiles/Files",project,"/headerTypes.RData"))
 
@@ -47,7 +48,8 @@ buildFS <- function(pathToSim,
                  test=FALSE,
                  thresholdsSS=thresholdsSS,
                  lambda.grid = lambda.grid,
-                 p.max=p.max)
+                 p.max=p.max,
+                 FDP_thr=FDP_thr)
 
   Model <- Rsmlx:::mlx.getIndividualParameterModel()
   return(list(Model=Model,time=res$time,iter=res$iter))

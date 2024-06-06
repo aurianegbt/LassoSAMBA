@@ -43,7 +43,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   valueDisplayFDR <- cbind(valueDisplayFDR,coor=1:length(buildMethod))
   
   # Cov plot
-  plotFDR = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","lassoSSCritnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
+  plotFDR = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=FDR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit","regnoCov0","lassoSSnoCov0","lassoSSCritnoCov0","elasticnetSSnoCov0",buildMethod[stringr::str_detect(buildMethod,"regPEN")],buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp","sharpnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayFDR, mapping=aes(label=text,x=coor),color="black",y=0.10,vjust=-0.2,fontface="bold",size=3)+
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
@@ -62,10 +62,14 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               lassoSSCritnoCov0="Lasso with\nadapted initialisation",   
                               elasticnetSSCrit="Elastic Net with\nmultiple thresholds", 
                               rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
-                              relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
-                              setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),   
+                              relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",   
                               regnoCov0="stepAIC",     
                               lassoSSnoCov0="Lasso", 
+                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],"sharpnoCov0"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))]),
+                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))]),
+                              
+                              setNames(paste0("Lasso\nFDP<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+                              setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),
                               elasticnetSSnoCov0="Elastic Net",
                               sharp = "Lasso calibrated using sharp\nwith stat. test",
                               sharpnoCov0 = "Lasso calibrated using sharp"))+
@@ -105,7 +109,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   valueDisplayFNR <- cbind(valueDisplayFNR,coor=1:length(buildMethod))
   
   # Cov plot
-  plotFNR = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=FNR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCritnoCov0","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
+  plotFNR = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=FNR,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit","regnoCov0","lassoSSnoCov0","lassoSSCritnoCov0","elasticnetSSnoCov0",buildMethod[stringr::str_detect(buildMethod,"regPEN")],buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp","sharpnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayFNR, mapping=aes(label=text,x=coor),color="black",y=0.0010,vjust=-0.2,fontface="bold",size=3)+
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
@@ -121,13 +125,17 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               relasticnet="Elastic Net with\ns.s. on replicates",   
                               lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
                               elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",  
-                              lassoSSCritnoCov0="Lasso with\nadapted initialisation",      
+                              lassoSSCritnoCov0="Lasso with\nadapted initialisation",   
                               elasticnetSSCrit="Elastic Net with\nmultiple thresholds", 
                               rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
-                              relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
-                              setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),   
+                              relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",   
                               regnoCov0="stepAIC",     
                               lassoSSnoCov0="Lasso", 
+                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],"sharpnoCov0"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))]),
+                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))]),
+                              
+                              setNames(paste0("Lasso\nFDP<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+                              setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),
                               elasticnetSSnoCov0="Elastic Net",
                               sharp = "Lasso calibrated using sharp\nwith stat. test",
                               sharpnoCov0 = "Lasso calibrated using sharp"))+
@@ -167,7 +175,7 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   valueDisplayF1_score <- cbind(valueDisplayF1_score,coor=1:length(buildMethod))
   
   # Cov plot
-  plotF1_score = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=F1_score,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCritnoCov0","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit",buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regnoCov0","lassoSSnoCov0","elasticnetSSnoCov0","sharp","sharpnoCov0"))))+
+  plotF1_score = ggplot(errorStatsParCov,aes(color=Method,fill=Method,y=F1_score,x=factor(Method,levels=c("reg","lasso","elasticnet","lassoSS","elasticnetSS","rlasso","relasticnet","lassoCrit","elasticnetCrit","lassoSSCrit","elasticnetSSCrit","rlassoCrit","reslaticnetCrit","regnoCov0","lassoSSnoCov0","lassoSSCritnoCov0","elasticnetSSnoCov0",buildMethod[stringr::str_detect(buildMethod,"regPEN")],buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp","sharpnoCov0"))))+
     geom_violin(lwd=0.5,alpha=0.6)+
     geom_text(data=valueDisplayF1_score, mapping=aes(label=text,x=coor),color="black",y=0.8,vjust=-0.2,fontface="bold",size=3)+
     guides(fill = guide_legend(title = "Method Used :"), color= guide_legend(title = "Method Used :")) +
@@ -181,15 +189,18 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               elasticnetSS="Elastic Net\nwith stat. test",
                               rlasso="Lasso with\ns.s. on replicates", 
                               relasticnet="Elastic Net with\ns.s. on replicates",   
-                              lassoSSCritnoCov0="Lasso with\nadapted initialisation",   
+                              lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",  
                               elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",  
-                              lassoSSCrit="Lasso with\nmultiple thresholds",   
+                              lassoSSCritnoCov0="Lasso with\nadapted initialisation",   
                               elasticnetSSCrit="Elastic Net with\nmultiple thresholds", 
                               rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",
-                              relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.", 
-                              setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),   
+                              relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",   
                               regnoCov0="stepAIC",     
                               lassoSSnoCov0="Lasso", 
+                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],"sharpnoCov0"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))]),
+                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))]),
+                              setNames(paste0("Lasso\nFDP<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+                              setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),
                               elasticnetSSnoCov0="Elastic Net",
                               sharp = "Lasso calibrated using sharp\nwith stat. test",
                               sharpnoCov0 = "Lasso calibrated using sharp"))+

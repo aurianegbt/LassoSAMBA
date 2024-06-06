@@ -32,7 +32,8 @@ buildmlx <- function(project=NULL,
                      buildMethod="lasso",
                      ncrit=20, 
                      lambda.grid = NULL,
-                     printFrequencySS=FALSE
+                     printFrequencySS=FALSE,
+                     FDP_thr=0.05
                      )
 {
   if(is.null(nSS)){
@@ -294,7 +295,13 @@ buildmlx <- function(project=NULL,
                                                correlation.model=correlation.model,
                                                covariate.model=covariate.model,
                                                criterion = criterion,
-                                               ncrit=ncrit)
+                                               ncrit=ncrit,
+                                               FDP_thr=FDP_thr)
+      
+      if(iter==1){
+        thresholdsSS=res.covariate$thresholdsSS
+      }
+      
       ##################################
       res.covariate$res <- Rsmlx:::sortCov(res.covariate$res, cov.ini)
       if (iter>explor.iter) sp0 <- res.covariate$sp

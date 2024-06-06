@@ -33,7 +33,29 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     ylab("Computation time (s)")+
     ggtitle("Computation Time Comparison",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(reg="stepAIC\nwith stat. test",lasso="lasso\nwithout s.s.",elastinet="elastic net\nwithout s.s.",lassoSS="Lasso\nwith stat. test",sharp="Lasso calibrated using sharp\nwith stat. test",elasticnetSS="Elastic Net\nwith stat. test",rlasso="Lasso with\ns.s. on replicates",relasticnet="Elastic Net with\ns.s. on replicates",lassoCrit = "Lasso with\nmultiple thresholds and no s.s.",elasticnetCrit="Elastic Net with\nmultiple thresholds and no s.s.",lassoSSCrit="Lasso with\nmultiple thresholds",elasticnetSSCrit="Elastic Net with\nmultiple thresholds",rlassoCrit="Lasso with mult.\nthresholds and s.s. on rep.",relasticnetCrit="Elastic Net with mult.\nthresholds and s.s. on rep.",setNames(paste0("penalized stepAIC\npen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),regnoCov0="stepAIC",lassoSSnoCov0="Lasso",elasticnetSSnoCov0="Elastic Net",sharpnoCov0="Lasso calibrated using sharp"))+
+    scale_x_discrete(labels=c(reg="stepAIC with stat. test",
+                              lasso="Lasso without s.s.",
+                              elastinet="Elastic net without s.s.",
+                              lassoSS="Lasso with stat. test",
+                              elasticnetSS="Elastic Net with stat. test",
+                              rlasso="Lasso with s.s. on replicates",
+                              relasticnet="Elastic Net with s.s. on replicates",
+                              lassoCrit = "Lasso with multiple thresholds and no s.s.",
+                              elasticnetCrit="Elastic Net with multiple thresholds and no s.s.",
+                              lassoSSCrit="Lasso with multiple thresholds",
+                              elasticnetSSCrit="Elastic Net with multiple thresholds",
+                              rlassoCrit="Lasso with mult. thresholds and s.s. on rep.",
+                              relasticnetCrit="Elastic Net with mult. thresholds and s.s. on rep.",
+                              setNames(paste0("penalized stepAIC pen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),
+                              regnoCov0="stepAIC",
+                              lassoSSnoCov0="Lasso",
+                              lassoSSCritnoCov0="Lasso",
+                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],"sharpnoCov0"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))]),
+                              setNames(paste0("Lasso\nFDP<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))]),
+                              elasticnetSSnoCov0="Elastic Net",
+                              sharpnoCov0="Lasso calibrated using sharp",
+                              sharp="Lasso calibrated using sharp\nwith stat. test"))+
     # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+

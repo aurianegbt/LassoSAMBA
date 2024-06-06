@@ -5,7 +5,8 @@ applyMethodsharp <- function(Y,X,omega,cov0,
                              criterion="BIC",ncrit=20,covariate.model=NULL,
                              p.name=NULL,
                              n_cores = 1,
-                             iter=1){
+                             iter=1,
+                             FDP_thr=0.05){
   # X et Y on juste la bonne "forme" mais pas scale encore (ça c'est fait dans la sélection en elle même !!!! )
   # Le but de cette fonction est de construit le modèle linéaire pour chaque paramètre
   
@@ -58,25 +59,112 @@ applyMethodsharp <- function(Y,X,omega,cov0,
   
   if(!is.null(exclude) && ncol(Xwh)-length(exclude)==0){
     selection = rep(0,ncol(Xwh))
+    
+    to.cat.here = ""
   }else if(!is.null(exclude) && ncol(Xwh)-length(exclude)==1){ 
     selection = rep(0,ncol(Xwh))
     selection[-exclude] <- 1
+    if(all(!as.logical(selection))){
+      newcriterion = critFUN(lm(Ywh ~ NULL))
+    }else{
+      Xkeep = Xwh[,names(selection)[which(as.logical(selection))]]
+      newcriterion = critFUN(lm(Ywh~Xkeep))
+    }
+    
+    to.cat.here = ""
   }else{
-    VariableSelection.outputs = sharp::VariableSelection(Xwh,Ywh,exclude=exclude,nfolds=nfolds,alpha=alpha,K=nSS,n_cores=n_cores)
-    selection = sharp::SelectedVariables(VariableSelection.outputs)
-  }
-  
-  plot=CalibrationPlot(VariableSelection.outputs) + ggplot2::ggtitle(paste0("Calibration Plot at iteration ",iter," for parameters ",p.name))
-  
-  
-  if(all(!as.logical(selection))){
-    newcriterion = critFUN(lm(Ywh ~ NULL))
-  }else{
-    Xkeep = Xwh[,names(selection)[which(as.logical(selection))]]
-    newcriterion = critFUN(lm(Ywh~Xkeep))
-  }
-  if(oldCriterion == -Inf){
-    oldCriterion = Inf
+    VariableSelection.outputs = sharp::VariableSelection(Xwh,Ywh,exclude=exclude,nfolds=nfolds,alpha=alpha,K=nSS,n_cores=n_cores,FDP_thr = FDP_thr)
+    
+    pi_list = VariableSelection.outputs$params$pi_list
+    lambda_list = VariableSelection.outputs$Lambda
+    
+    
+    Score = VariableSelection.outputs$S_2d
+    # argmax_id = which(Score>=quantile(as.numeric(Score),1-FDP_thr,na.rm=T),arr.ind = T)
+    argmax_id = which(!is.na(Score),arr.ind=T)
+    if(nrow(argmax_id)!=0){
+      resSharp = lapply(split(argmax_id,1:nrow(argmax_id)),FUN=function(arg_id){
+        selection = sharp::SelectedVariables(VariableSelection.outputs,argmax_id = arg_id)
+        if(all(!as.logical(selection))){
+          newcriterion = critFUN(lm(Ywh ~ NULL))
+        }else{
+          Xkeep = Xwh[,names(selection)[which(as.logical(selection))]]
+          newcriterion = critFUN(lm(Ywh~Xkeep))
+        }
+        
+        if(newcriterion==-Inf){
+          newcriterion = oldCriterion + 1
+        }
+        
+        return(list(selection=selection,criterion=newcriterion))
+      })
+      
+      indMax = which.min(sapply(resSharp,FUN=function(r){r$criterion}))
+      selection = resSharp[[indMax]]$selection
+      newcriterion = resSharp[[indMax]]$criterion
+      
+      df = data.frame()
+      for(i in 1:ncol(Score)){
+        df <- rbind(df,data.frame(lambda = signif(lambda_list,digits=2),pi = pi_list[i],Score=Score[,i]))
+      }
+      
+      plot1 =
+        ggplot2::ggplot(df,ggplot2::aes(x=as.factor(lambda),y=pi,fill=Score)) +
+        ggplot2::geom_tile() + 
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+        ggplot2::scale_fill_gradientn(colors = c("ivory", "navajowhite", "tomato","darkred","black"),na.value="white") + 
+        ggplot2::xlab(latex2exp::TeX("$\\lambda$"))+
+        ggplot2::ylab(latex2exp::TeX("$t_{SS}$")) +
+        ggplot2::theme(axis.title=ggplot2::element_text(size=14,face="bold")) +
+        ggplot2::theme(axis.text.x=ggplot2::element_text(size=8)) +
+        ggplot2::scale_y_continuous(breaks=c(seq(0,0.5,0.05),seq(0.6,1,0.1)))  + 
+        ggplot2::ggtitle(latex2exp::TeX(r"(Heatmap of the constrained stability score S$(t_{SS},\lambda)$ )")) + 
+        ggplot2::theme(plot.subtitle = ggplot2::element_text(size=10)) + 
+        ggplot2::theme(legend.position = "bottom") + 
+        ggplot2::theme(legend.text = ggplot2::element_text(face="plain"))  +
+        ggplot2::theme(legend.title = ggplot2::element_text(size=10))
+      
+      to.cat.here =  paste0("\n              > parameter values : ",
+                            paste0(c("lambda","thresholds"),"=",c(signif(lambda_list[argmax_id[indMax,1]],3),signif(pi_list[argmax_id[indMax,2]],2)),collapse=", "))
+    }else{
+      selection = savedSelection
+      newcriterion = oldCriterion
+      
+      plot1=NULL
+    }
+    
+    # plot2 =
+    #   ggplot2::ggplot(df,ggplot2::aes(x=as.factor(lambda),y=pi,fill=Score)) +
+    #   ggplot2::geom_tile() + 
+    #   gghighlight::gghighlight(Score >= quantile(df$Score,1-FDP_thr,na.rm=T),unhighlighted_params = list(fill="grey")) +
+    #   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+    #   ggplot2::scale_fill_gradientn(colors = c("ivory", "navajowhite", "tomato","darkred","black"),na.value="white") + 
+    #   ggplot2::xlab(latex2exp::TeX("$\\lambda$"))+
+    #   ggplot2::ylab(latex2exp::TeX("$t_{SS}$")) +
+    #   ggplot2::theme(axis.title=ggplot2::element_text(size=14,face="bold")) +
+    #   ggplot2::theme(axis.text.x=ggplot2::element_text(size=8)) +
+    #   ggplot2::scale_y_continuous(breaks=c(seq(0,0.5,0.05),seq(0.6,1,0.1)))  + 
+    #   ggplot2::ggtitle(latex2exp::TeX(r"(Heatmap of the stability score S$(t_{SS},\lambda)$)"),subtitle=paste0("With",(1-FDP_thr)*100,"% higher score highlighted")) + 
+    #   ggplot2::theme(plot.subtitle = ggplot2::element_text(size=10)) + 
+    #   ggplot2::theme(legend.position = "bottom") + 
+    #   ggplot2::theme(legend.text = ggplot2::element_text(face="plain"))  +
+    #   ggplot2::theme(legend.title = ggplot2::element_text(size=10))
+    
+    # plot3 =
+    #   ggplot(df,aes(x=as.factor(lambda),y=pi,fill=Score)) +
+    #   geom_tile() + 
+    #   gghighlight(Score >= quantile(df$Score,0.95,na.rm=T),unhighlighted_params = list(fill="grey")) +
+    #   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+    #   scale_fill_gradientn(colors = c("ivory", "navajowhite", "tomato","darkred","black"),na.value="white") + 
+    #   xlab(latex2exp::TeX("$\\lambda$"))+ylab(latex2exp::TeX("$t_{SS}$")) +
+    #   theme(axis.title=element_text(size=14,face="bold")) +
+    #   theme(axis.text.x=element_text(size=8)) +
+    #   scale_y_continuous(breaks=c(seq(0,0.5,0.05),seq(0.6,1,0.1)))  + 
+    #   ggtitle(latex2exp::TeX(r"(Heatmap of the stability score S$(t_{SS},\lambda)$)"),subtitle="With 5% higher score highlighted") + 
+    #   theme(plot.subtitle = element_text(size=10)) + 
+    #   theme(legend.position = "bottom") + 
+    #   theme(legend.text = element_text(face="plain"))  +
+    #   theme(legend.title = element_text(size=10))
   }
   
   if(newcriterion >= oldCriterion){
@@ -84,38 +172,12 @@ applyMethodsharp <- function(Y,X,omega,cov0,
     selection = savedSelection
   }else{
     to.cat <- c(to.cat,paste0("        -> New Criterion : ",round(newcriterion,digits=2)))
-    to.cat <- c(to.cat,paste0("\n              > parameter values : ",
-        paste0(c("lambda","thresholds"),"=",c("","0."),
-               sapply(sharp::ArgmaxId(VariableSelection.outputs),function(x){
-                 10**floor(log10(x))*round(x/(10**floor(log10(x))),digits=2)
-               }),collapse=", ")))
+    to.cat <- c(to.cat,to.cat.here)
   }
   
   model.list = modelFromSelection(Y,X,selection)
   
   
   to.cat <- c(to.cat,"\n")
-  return(list(model=model.list,res=selection,cov0=cov0,p.name=p.name,to.cat = to.cat,plot=list(plot=plot,p.name=p.name)))
-}
-
-CalibrationPlot <- function(VariableSelection.outputs){
-  pi_list = VariableSelection.outputs$params$pi_list
-  lambda_list = VariableSelection.outputs$Lambda
-  
-  
-  Score = VariableSelection.outputs$S_2d
-  df = data.frame()
-  for(i in 1:ncol(Score)){
-    df <- rbind(df,data.frame(lambda = signif(lambda_list,digits=2),pi = pi_list[i],Score=Score[,i]))
-  }
-  
-  plot = ggplot2::ggplot(df,ggplot2::aes(x=as.factor(lambda),y=pi,fill=Score)) +
-    ggplot2::geom_tile() +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust=1)) + 
-    ggplot2::scale_fill_gradientn(colours = c("ivory", "navajowhite", "tomato","darkred"),na.value="white") + 
-    ggplot2::xlab(latex2exp::TeX("$\\lambda$"))+ggplot2::ylab(latex2exp::TeX("$\\pi$")) +
-    ggplot2::theme(axis.title=ggplot2::element_text(size=14,face="bold")) +
-    ggplot2::scale_y_continuous(breaks=c(seq(0,0.5,0.05),seq(0.6,1,0.1)))
-  
-  return(plot)
+  return(list(model=model.list,res=selection,cov0=cov0,p.name=p.name,to.cat = to.cat,plot=list(plot1=plot1)))
 }
