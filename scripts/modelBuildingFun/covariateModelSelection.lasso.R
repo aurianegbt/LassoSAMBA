@@ -14,7 +14,8 @@ covariateModelSelection.lasso <- function(nfolds = 5,
                                           criterion="BIC",
                                           ncrit=20,
                                           lambda.grid=NULL,
-                                          printFrequencySS = FALSE){
+                                          printFrequencySS = FALSE,
+                                          iter=1){
   # Simulate Individual Parameters and setup parameters
   
   sp.df <- Rsmlx:::mlx.getSimulatedIndividualParameters()
