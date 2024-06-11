@@ -6,7 +6,7 @@ buildFS <- function(pathToSim,
                     weight=NULL,
                     lambda.grid=NULL,
                     p.max=0.1,
-                    FDP_thr=0.05){
+                    FDP_thr=0.2){
 
   load(paste0("data/simulationFiles/Files",project,"/headerTypes.RData"))
 

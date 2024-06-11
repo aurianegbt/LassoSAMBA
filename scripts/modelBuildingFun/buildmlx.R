@@ -33,7 +33,7 @@ buildmlx <- function(project=NULL,
                      ncrit=20, 
                      lambda.grid = NULL,
                      printFrequencySS=FALSE,
-                     FDP_thr=0.05
+                     FDP_thr=0.2
                      )
 {
   if(is.null(nSS)){
