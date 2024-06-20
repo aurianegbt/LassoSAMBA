@@ -31,7 +31,7 @@ source("~/Travail/00_Theme.R")
 # 
 # genCorMat <- cor(aux,method="spearman")
 # mu = c(35,0,0,apply(aux[,-c(1:3)],2,mean)) # AGE, G1, G2 have already means defined in simulX
-# sd = diag(c(4,1,1,apply(aux[,-c(1:3)],2,sd)))
+# sd = diag(c(4,rep(1,ncol(genCorMat)-1)))
 # 
 # genCovMat = sd %*% genCorMat %*% sd
 # 
