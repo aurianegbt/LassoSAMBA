@@ -1,0 +1,12 @@
+[LONGITUDINAL]
+input = {delta_S,delta_L,phi_S,phi_L,delta_AB}
+
+EQUATION:
+t_0 = 0
+AB_0 = 1000
+
+ddt_AB = phi_S * exp( - delta_S * t ) + phi_L * exp( -delta_L * t) - delta_AB * AB
+tAB = log10(AB)
+
+OUTPUT:
+output ={tAB} 

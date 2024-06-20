@@ -1,0 +1,30 @@
+[COVARIATE]
+input = {AGE,G1,G2}
+
+EQUATION:
+tAGE=(AGE-35)
+
+[INDIVIDUAL]
+input = {phi_S_pop,phi_L_pop,delta_AB_pop,omega_S,omega_L,omega_AB,G1,G2,tAGE,beta_AGE,beta_G1,beta_G2}
+
+DEFINITION:
+phi_S = {distribution=lognormal,typical=phi_S_pop,covariate=tAGE,coefficient=beta_AGE,sd=omega_S}
+phi_L = {distribution=lognormal,typical=phi_L_pop,covariate=G1,coefficient=beta_G1,sd=omega_L}
+delta_AB = {distribution=lognormal,typical=delta_AB_pop,covariate=G2,coefficient=beta_G2,sd=omega_AB}
+
+[LONGITUDINAL]
+input = {delta_S,delta_L,phi_S,phi_L,delta_AB,sigma_AB}
+
+EQUATION:
+t_0 = 0
+AB_0 = 1000
+
+ddt_AB = phi_S * exp( - delta_S * t ) + phi_L * exp( -delta_L * t) - delta_AB * AB
+tAB = log10(AB)
+
+OUTPUT:
+output ={tAB} 
+
+
+DEFINITION:
+yAB = {distribution=normal, prediction=tAB, errorModel=constant(sigma_AB)}
