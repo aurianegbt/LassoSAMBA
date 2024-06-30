@@ -38,11 +38,11 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     }else if(buildMethod[k]=="sharpnoCov0"){
       newbuildMethod[k] <- "Lasso calibrated using sharp"
     }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0FDP")){
-      newbuildMethod[k] <- paste0("Lasso using stability score\nFDP<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
+      newbuildMethod[k] <- paste0("Lasso using stability score\nE[FDR]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
     }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0")){
       newbuildMethod[k] <- paste0("Lasso using stability score\n",stringr::str_remove(buildMethod[k],"sharpnoCov0"),"% higher score")
     }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0FDP")){
-      newbuildMethod[k] <- paste0("Lasso using stability score\nFDP<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
+      newbuildMethod[k] <- paste0("Lasso using stability score\nE[FDR]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
     }else if(stringr::str_detect(buildMethod[k],"sharp")){
       newbuildMethod[k] <- paste0("Lasso using stability score\n",stringr::str_remove(buildMethod[k],"sharp"),"% higher score\nwith stat. test")
     }

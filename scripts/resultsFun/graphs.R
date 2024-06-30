@@ -41,7 +41,7 @@ graphsGenerate <- function(project="Pasin",
   
   for(k in 1:length(buildMethod)){
     if(stringr::str_detect(buildMethod[k],"lassonoCov0FDP") && grepl("^[0-9]+$", stringr::str_remove(buildMethod[k],"lassonoCov0FDP"))){
-      Titlelist <- append(Titlelist, paste0(stringr::str_remove(Titlelist["lasso"],", with statistic test to exclude covariates at each iteration.")," and constrained FDP under",stringr::str_remove(buildMethod[k],"lassonoCov0FDP"),"%."))
+      Titlelist <- append(Titlelist, paste0(stringr::str_remove(Titlelist["lasso"],", with statistic test to exclude covariates at each iteration.")," and constrained E[FDR] under",stringr::str_remove(buildMethod[k],"lassonoCov0FDP"),"%."))
       names(Titlelist)[length(Titlelist)] <- buildMethod[k]
     
   }
