@@ -32,6 +32,8 @@ covariateModelSelection.lasso <- function(nfolds = 5,
   cov.types <- cov.info$type
   tcov.names <- NULL
   covariates <- cov.info$covariate
+  if(any(apply(covariates,2,sd)==0))
+    covariates <- covariates[-which(apply(covariates,2,sd)==0)]
   cov.cat <- cov.names[cov.types == "categorical"]
   covariates[cov.cat] <- lapply(covariates[cov.cat], as.factor)
   indvar <- Rsmlx:::mlx.getIndividualParameterModel()$variability$id
@@ -80,13 +82,17 @@ covariateModelSelection.lasso <- function(nfolds = 5,
   cov0.list <- updateCov0(Y, eta.list, covariates, p.max, covFix,
                           pen.coef, pweight.list, cov0.list)
   
-  Sigma=diag(Rsmlx:::mlx.getEstimatedPopulationParameters()[paste0("omega_",param.names[which(indvar)])]**2)
+  if(length(param.names[which(indvar)])>1){
+    Sigma=diag(Rsmlx:::mlx.getEstimatedPopulationParameters()[paste0("omega_",param.names[which(indvar)])]**2)
+  }else{
+    Sigma = matrix(Rsmlx:::mlx.getEstimatedPopulationParameters()[paste0("omega_",param.names[which(indvar)])]**2,ncol=1,nrow=1)
+  }
   colnames(Sigma) <- param.names[which(indvar)]
   rownames(Sigma) <- param.names[which(indvar)]
   
   N = length(unique(Y$id))
   
-  Y.mat = sapply(Y[,-c(1,2)],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
+  Y.mat = sapply(Y[,-c(1,2),drop=F],function(x){rowMeans(matrix(x,nrow=N))}) #1 : rep 2 : id
   X.mat  = covariates[,setdiff(colnames(covariates),"id")]
   
   pathToSavePlot = paste0(dirname(lixoftConnectors::getProjectSettings()$directory),"/CalibrationPlot")
