@@ -1,0 +1,134 @@
+---
+title: "Generation of simulated datasets for Logistic Growth model framework with standard gaussian  covariates, completely based on Naveau et al., 2023"
+output:
+  html_document: default
+  pdf_document: default
+date: "2024-10-07"
+---
+
+*This simulation setup is extracted from Marion Naveau et al. work, available on her github \url{https://github.com/Marion-Naveau/Supp_Information_SAEMVS}.*
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We adapt here the simulation framework from Naveau et al. for simulx software. 
+
+```{r}
+dir <- function(path){if(!dir.exists(path)){dir.create(path)}}
+
+## Load the library required 
+suppressMessages({
+  library(dplyr)
+  library(lixoftConnectors)
+  library(data.table)
+  library(RsSimulx)
+  
+  initializeLixoftConnectors("simulx")
+})
+
+data.dir<- "data/simulationFiles/FilesNAVEAU"
+dir(data.dir)
+data.dir<- "data/simulationFiles/FilesNAVEAU/simulation"
+dir(data.dir)
+data.dir.cov <- "data/simulationFiles/FilesNAVEAU/covTable"
+dir(data.dir.cov)
+
+#Simulation settings
+M <- 100 #number replicates
+seed0 <- 12345
+
+N <- 200 #Number of individuals
+ncov <- 500 #Number of covariates
+```
+
+For the growth model, we utilize the dataset simulation setup provided in the article by Naveau et al.~\cite{Naveau_2023}. The logistic growth function used is defined as 
+$$ y= \dfrac{\psi_1}{1+\exp\left(-\dfrac{t-\varphi}{\psi_2}\right)} $$ This model uses three population parameters: $\varphi$, $\psi_1$, and $\psi_2$. Parameter $\varphi$ has individual variability,  normally distributed around the population parameters, which means $\forall i\leq N$:
+\[
+\varphi_i = \varphi_{pop} + \beta_1C_1+\beta_2C_2+\beta_3C_3 + \eta_i
+\]
+where $(\eta_i)_{i\leq N}\overset{iid}{\sim} \mathcal{N}(0,\omega^2)$. We simulated 500 standard gaussian covariates, with $C_1$, $C_2$ and $C_3$ being the only significant ones. 
+Finally, the error model is a constant model, which means:
+\[
+Y_{ij} = y_{ij} + \varepsilon_{ij} = \dfrac{\psi_1}{1+\exp\left(-\dfrac{t_{ij}-\varphi_i}{\psi_2}\right)} + \varepsilon_{ij}
+\]
+with $(\varepsilon_{ij})_{i\leq N, j \leq n_i}\overset{iid}{\sim}\mathcal{N}(0,\sigma^2)$.
+```{r}
+model <- inlineModel("
+[COVARIATE]
+input = {C1, C2, C3}
+
+[INDIVIDUAL]
+input = {phi_pop,omega_phi,C1,C2,C3,beta_C1,beta_C2,beta_C3}
+
+DEFINITION:
+phi = {distribution=normal, typical=phi_pop, covariate={C1,C2,C3}, coefficient={beta_C1,beta_C2,beta_C3}, sd=omega_phi}
+
+[LONGITUDINAL]
+input = {phi,psi1,psi2,a}
+
+EQUATION:
+Y = psi1 /(1+exp(-(t-phi)/psi2))
+
+DEFINITION:
+yY = {distribution=normal, prediction=Y, sd=a}
+")
+```
+
+
+We then simulated the data from this model for 200 individuals and 10 timepoints uniformely sampled between $t_0=150$ and $t_{10}=3000$. 
+```{r}
+## Generate 200 correlated covariates and then create 100 replicates
+t.y <- seq(150, 3000,length=10) #observation times
+
+# Model specification
+lib <- 'naveau_simulation.txt'
+parm <- c(phi_pop=1200,
+            psi1=200,
+            psi2=300,
+            omega_phi=sqrt(200),
+            beta_C1=100,
+            beta_C2=50,
+            beta_C3=20,
+            a=sqrt(30))
+
+
+p.pop <- parm[1:3]
+p.name <- c("phi", "psi1", "psi2")
+structural.model <- lib
+model <- model
+
+nparam <- length(p.name)
+cov.name <- paste0("C",1:ncov)
+
+data.files <- paste0("simulation_",1:M,".txt")
+```
+
+We generated replicates of the same trial :
+
+```{r}
+# ------------------------------------------------
+# Data generation
+for (m in 1:M) {
+  print(m)
+  set.seed(seed[m])
+  covariate <- data.frame(id=factor(1:N), mvtnorm::rmvnorm(N,mean=rep(0,ncov)))
+  names(covariate)[-1] <- cov.name
+  if(m==1){
+    write.csv(covariate, file=paste0(data.dir.cov,"/covTable_1.txt"),quote = F,row.names = F)
+  } # kept for graphs 
+  
+  
+  r <- simulx(model     = model, 
+              parameter = parm,
+              covariate = covariate[c('id','C1', 'C2','C3')],
+              output    = list(name="yY", time=t.y),
+              settings  = list(seed=seed[m]))
+  
+  d <- r$yY
+  d <- left_join(d, covariate, by="id")
+  d[is.na(d)] <- "."
+  write.csv(d, file=file.path(data.dir,data.files[m]), quote=F, row.names=F)
+}
+```
+
