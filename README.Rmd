@@ -1,5 +1,5 @@
 ---
-title: "Application of SAEMVS on a detailed example"
+title: "lasso-SAMBA"
 output:
   md_document:
     variant: markdown_github
@@ -10,7 +10,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Supporting information for the SAEMVS procedure
+# Supporting information
 
 <!-- badges: start -->
 <!-- badges: end -->
