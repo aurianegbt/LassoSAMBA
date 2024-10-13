@@ -1,1 +1,57 @@
+---
+title: "Application of SAEMVS on a detailed example"
+output:
+  md_document:
+    variant: markdown_github
+    toc: true
+---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Supporting information for the SAEMVS procedure
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+<!--ts-->
+<!--te-->
+
+This repository contains....
+
+# Generation of a example
+
+```{r}
+rm(list = ls())
+...
+```
+
+Explication du modèles
+
+## Model simulation
+
+## Visualisation 
+id <- as.matrix(Id)^
+
+
+
+# lasso-SAMBA algorithm for a replicates 
+
+## launch 
+
+```
+
+We import the functions we will need:
+```{r}
+source()
+```
+
+This file contains:
+...
+
+# Run on every replicates 
+
+## Results graphs for a method 
+
+## Comparison 
