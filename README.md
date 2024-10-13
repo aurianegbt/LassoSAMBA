@@ -1,15 +1,3 @@
----
-title: "lasso-SAMBA"
-output:
-  md_document:
-    variant: markdown_github
-    toc: true
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 # Supporting information
 
 <!-- badges: start -->
@@ -22,7 +10,7 @@ This repository contains....
 
 # Generation of a example
 
-```{r}
+``` r
 rm(list = ls())
 ...
 ```
@@ -43,7 +31,7 @@ id <- as.matrix(Id)^
 ```
 
 We import the functions we will need:
-```{r}
+``` r
 source()
 ```
 
