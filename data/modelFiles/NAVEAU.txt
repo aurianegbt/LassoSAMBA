@@ -1,8 +1,8 @@
 [LONGITUDINAL]
-input = {phi,psi1,psi2}
+input = {D,V,phi1,phi2}
 
 EQUATION:
-Y = psi1 /(1+exp(-(t-phi)/psi2))
+Y = (D*phi1/(V*phi1 -phi2))*(exp(-phi2*t/V)-exp(-phi1*t))
 
 OUTPUT:
 output = {Y}
