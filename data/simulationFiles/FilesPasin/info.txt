@@ -1,0 +1,4 @@
+nInd = 100
+nbCov = 200
+
+dataType = "humoral immune response to prime-boost of Ad26.ZEBOV/MVA-BN-FILO vaccine against Ebola"
