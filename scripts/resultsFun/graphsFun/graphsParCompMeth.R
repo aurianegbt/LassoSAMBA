@@ -14,7 +14,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   newbuildMethod <- c()
   for(k in 1:length(buildMethod)){
     if(buildMethod[k]=="reg"){
-      newbuildMethod[k] <- "StepAIC\nwith stat. test"
+      newbuildMethod[k] <- "StepAIC"
     }else if(buildMethod[k]=="lasso"){
       newbuildMethod[k] <- "Lasso without\nstability selection"
     }else if(buildMethod[k]=="elasticnet"){
@@ -35,16 +35,18 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
       newbuildMethod[k] <- "Elastic Net"
     }else if(buildMethod[k]=="sharp"){
       newbuildMethod[k] <- "Lasso calibrated using sharp\nwith stat. test"
+    }else if(buildMethod[k]=="SAEMVS"){
+      newbuildMethod[k] <- "SAEMVS"
     }else if(buildMethod[k]=="sharpnoCov0"){
       newbuildMethod[k] <- "Lasso calibrated using sharp"
     }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0FDP")){
-      newbuildMethod[k] <- paste0("Lasso using stability score\nE[FDR]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
+      newbuildMethod[k] <- paste0("Lasso\nE[FDP]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
     }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0")){
-      newbuildMethod[k] <- paste0("Lasso using stability score\n",stringr::str_remove(buildMethod[k],"sharpnoCov0"),"% higher score")
+      newbuildMethod[k] <- paste0("Lasso\n",stringr::str_remove(buildMethod[k],"sharpnoCov0"),"% higher score")
     }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0FDP")){
-      newbuildMethod[k] <- paste0("Lasso using stability score\nE[FDR]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
+      newbuildMethod[k] <- paste0("Lasso\nE[FDP]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
     }else if(stringr::str_detect(buildMethod[k],"sharp")){
-      newbuildMethod[k] <- paste0("Lasso using stability score\n",stringr::str_remove(buildMethod[k],"sharp"),"% higher score\nwith stat. test")
+      newbuildMethod[k] <- paste0("Lasso\n",stringr::str_remove(buildMethod[k],"sharp"),"% higher score\nwith stat. test")
     }
   }
   
@@ -62,6 +64,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   resultModelParCov <- resultModelPar[resultModelPar$Method %in% buildMethod,]
   
   resultModelParCov <- cbind(resultModelParCov,text=paste0("Model without False Negatives : ",resultModelParCov$NoFNModel*100,"%"))
+  
   
   for(meth in buildMethod){       
     CovariateModelSelectionCov[CovariateModelSelectionCov$Method==meth,"Method"] <- newbuildMethod[buildMethod==meth]
@@ -91,7 +94,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
 
   # Value to Display
   lim = length(unique(unlist(covariate)))
-
+  
   valueDisplay = data.frame()
   for(meth in buildMethod){
     value=setNames(lapply(names(t.param),
@@ -116,9 +119,15 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                                 stringr::str_c(unlist(value,use.names = F),"%"))
     coorAux = setNames(rep(0,length(covAux)),covAux)
     coorAux[names(coorAux)=="meanSelFP"] <- valuemax
-    coorAux[names(coorAux)!="meanSelFP"] <- sapply(covAux[covAux!="meanSelFP"],function(x){which(posCov==x)},USE.NAMES=F)+0.6
+    coorAux[names(coorAux)!="meanSelFP"] <-  sapply(names(value),function(p){
+      1:length(H1.all[[p]])+0.5
+    },USE.NAMES=F)
     covAux[covAux!="meanSelFP"] <-"cov"
     
+    coor2Aux <- coorAux
+    coor2Aux[names(coorAux)!="meanSelFP"] <-  sapply(names(value),FUN=function(p){
+      rep(which(posCov==H1.all[[p]][length(H1.all[[p]])]),length(H1.all[[p]]))+0.5
+    })
     
     repAuxPar = setNames(rep(1,length(names(t.param))),names(t.param))
     repAuxPar[names(H1.all)] <- sapply(H1.all,length)+1
@@ -127,12 +136,11 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                                                   value= unlist(value,use.names = F),
                                                   Method=meth,
                                                   coor = unname(coorAux),
+                                                  coor2 = unname(coor2Aux),
                                                   Parameter= unname(rep(t.param,unname(repAuxPar))),
                                                   distext = distextAux))
   }
-  valueDisplay$coor2 <- rep(max(valueDisplay[valueDisplay$cov=="cov",'coor']),nrow(valueDisplay[valueDisplay$cov=="cov",] ))
   valueModel = cbind(resultModelParCov,Parameter=rev(t.param)[1])
-
 
   precious = rev(rep(c("#468b97", "#ef6262", "#74C385", "#8e6aa0", "#ee6c4d",                   "#1e90ff", "#ffa500", "#ff69b4", "#32cd32", "#4169e1",                  "#ff6347", "#6a5acd", "#20b2aa", "#f08080", "#6495ed",                  "#9acd32", "#9370db", "#00ced1", "#ff4500", "#7b68ee",                  "#2e8b57", "#ba55d3", "#00bfff", "#d2691e", "#4682b4")[1:length(unlist(H1.all,use.names = F))],length(buildMethod)))
 
@@ -175,41 +183,44 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     xlab("Covariates")+
     ylab("Count")+
     theme(axis.text.x = element_text(size = 8, angle = 90))+
-    theme(axis.text.y = element_text(size = 10))+
-    ylim(c(0,lim))+
-    theme(axis.title = element_text(size=20))+
-    theme(strip.text = element_text(size = 16))+
+    theme(axis.text.y = element_text(size = 8))+
+    # ylim(c(0,lim))+
+    # theme(axis.title = element_text(size=20))+
+    # theme(strip.text = element_text(size = 16))+
     theme(legend.key.size = unit(1, 'cm'))+
     theme(legend.text = element_text(size=14))+
     theme(legend.title = element_text(size=12))+
     theme(plot.title = element_text(size=25,color="#ee6c4d"))+
-    theme(plot.subtitle = element_text(size=12))+
-    geom_text(data=valueDisplay[ valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor2,y=if(project=="Pasin" | project=="GaussianPasin"){max(resultCovariateParCov[,"NumberofModel"])*0.9}else{max(resultCovariateParCov[,"NumberofModel"])*(0.80-(coor-2)*0.4)},hjust=0,vjust=1),color=rev(colDisplay),size=7)+
-    geom_text(data=valueDisplay[ valueDisplay=="meanSelFP",],mapping=aes(label=distext,x=+Inf,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=7)+
-    coord_cartesian(ylim=c(0,max(resultCovariateParCov[,"NumberofModel"])),clip="off")
+    # theme(plot.subtitle = element_text(size=12))+
+    geom_text(data=valueDisplay[ valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor2,y=if(project=="Pasin" | project=="GaussianPasin"){max(resultCovariateParCov[,"NumberofModel"])*0.9}else{max(resultCovariateParCov[,"NumberofModel"])*(0.80-(coor-2)*0.3)},hjust=0,vjust=1),color=rev(colDisplay),size=5)+
+    geom_text(data=valueDisplay[ valueDisplay=="meanSelFP",],mapping=aes(label=distext,x=+Inf,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5)+
+    coord_cartesian(ylim=c(0,max(resultCovariateParCov[,"NumberofModel"])),clip="off")+
+    theme(axis.title.x=element_blank(),
+          axis.text.x=element_blank(),
+          axis.ticks.x=element_blank())
   
   
   # Save plot
-  annotate_figure(plot,
-                  top=text_grob(stringr::str_wrap(subtitle,120),size=18),
-  ) %>%
-    annotate_figure(
-      top=text_grob("covariates presence in final model with parameters link",
-                    face="italic",size=20,color="#9c9c9c")
-    )%>%
-    annotate_figure(
-      top=text_grob("Covariate Selection Frequency",
-                    face="bold",size=25,color="#862B0D")
-    )
+  # annotate_figure(plot,
+  #                 top=text_grob(stringr::str_wrap(subtitle,120),size=18),
+  # ) %>%
+  #   annotate_figure(
+  #     top=text_grob("covariates presence in final model with parameters link",
+  #                   face="italic",size=20,color="#9c9c9c")
+  #   )%>%
+  #   annotate_figure(
+  #     top=text_grob("Covariate Selection Frequency",
+  #                   face="bold",size=25,color="#862B0D")
+  #   )
 
 
 
   if(PNG){
     ggsave(paste0(Folder,"/NumberSelectionParameter.png"),
-           height = length(buildMethod)*1000, width = 5000, units="px",limitsize =   FALSE, bg='transparent',device=grDevices::png)
+           height = length(buildMethod)*500, width = 2000, units="px",limitsize =   FALSE, bg='transparent',device=grDevices::png)
   }
   if(JPEG){
     ggsave(paste0(Folder,"/NumberSelectionParameter.jpeg"),
-            height = length(buildMethod)*1000, width = 5000, units="px",limitsize =   FALSE,device=grDevices::jpeg)
+            height = length(buildMethod)*500, width = 2000, units="px",limitsize =   FALSE,device=grDevices::jpeg)
   }
 }

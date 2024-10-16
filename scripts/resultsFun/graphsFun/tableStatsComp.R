@@ -1,5 +1,5 @@
 tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
-
+  
   # Load data
   load(paste0("outputs/finalResults/BuildResults_",project,".RData"))
   source(paste0("data/simulationFiles/Files",project,"/H1.all.R"))
@@ -110,8 +110,9 @@ tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
              regnoCov0="stepAIC",
              lassoSSnoCov0="Lasso",
              lassoSSCritnoCov0="Lasso",
+             SAEMVS="SAEMVS",
              setNames(paste0("Lasso ",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],"sharpnoCov0"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))]),
-             setNames(paste0("Lasso : FDP<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+             setNames(paste0("Lasso : E[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
              setNames(paste0("Lasso ",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))]),
              elasticnetSSnoCov0="Elastic Net",
              sharpnoCov0="Lasso calibrated using sharp",
@@ -135,6 +136,8 @@ tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   
   table <-  tibble::as_tibble(table)
 
+  writeLines(c(paste0(unlist(strsplit(table$Median,"\n")),"  ",unlist(strsplit(table$`Confidence Interval\n(quantiles 95%)`,"\n"))),"  ",unname(sapply(split(resultModelParCov$NoFNModel,resultModelParCov$Method)[buildMethod],FUN=function(x){percent(x,digits=0)})),"  ",unname(sapply(split(resultModelParCov$TrueModel,resultModelParCov$Method)[buildMethod],FUN=function(x){percent(x,digits=0)}))),con=paste0(Folder,"/ErrorTable.txt"))
+  
   # Table with stats info
   ft <- flextable(table) %>%
     merge_at(i=4,j=1:3) %>%

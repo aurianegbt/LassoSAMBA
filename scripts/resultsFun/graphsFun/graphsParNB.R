@@ -68,9 +68,15 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                                 stringr::str_c(unlist(value,use.names = F),"%"))
     coorAux = setNames(rep(0,length(covAux)),covAux)
     coorAux[names(coorAux)=="meanSelFP"] <- valuemax
-    coorAux[names(coorAux)!="meanSelFP"] <- sapply(covAux[covAux!="meanSelFP"],function(x){which(posCov==x)},USE.NAMES=F)+0.5
+    coorAux[names(coorAux)!="meanSelFP"] <- sapply(names(value),function(p){
+      rev(1:length(H1.all[[p]]))+0.5
+    },USE.NAMES=F)
     covAux[covAux!="meanSelFP"] <- "cov"
     
+    coor2Aux <- coorAux
+    coor2Aux[names(coorAux)!="meanSelFP"] <- sapply(names(value),FUN=function(p){
+      rep(which(posCov==H1.all[[p]][length(H1.all[[p]])]),length(H1.all[[p]]))+0.5
+    })
     
     repAuxPar = setNames(rep(1,length(names(t.param))),names(t.param))
     repAuxPar[names(H1.all)] <- sapply(H1.all,length)+1
@@ -78,6 +84,7 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     valueDisplay <- data.frame(cov= covAux,
                                value= unlist(value,use.names = F),
                                coor = unname(coorAux),
+                               coor2 = unname(coor2Aux),
                                Parameter= unname(rep(t.param,unname(repAuxPar))),
                                distext = distextAux)
     
@@ -112,7 +119,6 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     eval(parse(text=paste0('alphaScale = c(',paste0(cmdA,collapse=","),')')))
     eval(parse(text=paste0('colorScale = c(',paste0(cmdC,collapse=","),')')))
     
-    
     plot =
       ggplot(CovariateModelSelectionCov,aes(x=factor(Covariate,levels=orderList)))+
       geom_bar(position=position_dodge(preserve = "single"), alpha=alphaScale,color=colorScale, fill =colorScale)+
@@ -134,7 +140,7 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
       theme(plot.subtitle = element_text(size=12))+
       geom_text(data=valueDisplay[ valueDisplay$cov=="meanSelFP",],mapping=aes(label=distext,x=+Inf,y=coor+10,hjust=1,vjust=0),color="#9E9FA5",fontface = 'italic',size=5)+
       coord_cartesian(ylim=c(0,unique(resultCovariateParCov[,"NumberofModel"])),clip="off")+
-      geom_text(data=valueDisplay[ valueDisplay$cov=="cov",],mapping=aes(label=distext,x=coor,y=if(project=="Pasin"){unique(resultCovariateParCov[,"NumberofModel"])}else{rev(unique(resultCovariateParCov[,"NumberofModel"])*(0.90-(coor-2)*0.1)-2)},hjust=0,vjust=1),color=rev(colDisplay),size=5)
+      geom_text(data=valueDisplay[ valueDisplay$cov=="cov",],mapping=aes(x=coor2,label=distext,y=if(project=="Pasin"){unique(resultCovariateParCov[,"NumberofModel"])}else{rev(unique(resultCovariateParCov[,"NumberofModel"])*(0.80-(coor-2)*0.3))},hjust=0,vjust=1),color=rev(colDisplay),size=5)
     
     # Save plot
     gp <- 

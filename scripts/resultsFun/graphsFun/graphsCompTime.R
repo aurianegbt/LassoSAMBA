@@ -1,9 +1,9 @@
 graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
-
+  
   # Load data
   load(paste0("outputs/finalResults/BuildResults_",project,".RData"))
   source(paste0("data/simulationFiles/Files",project,"/H1.all.R"))
-
+  
   # Color
   colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(buildMethod)]
   col = c("#a6c46a","#8e6aa0","#ee6c4d","#007194","#9D8F80","#FFD447")[1:length(buildMethod)]
@@ -25,15 +25,15 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                                                          StandardDeviation = sd(aux$time)))
   }
   valueDisplayTime <- cbind(valueDisplayTime,coor=1:length(buildMethod))
-
-# graphs
+  
+  # graphs
   plot <- ggplot(computationStatsCov,aes(color=Method,fill=Method,x=factor(Method,levels=buildMethod),y=time))+
     geom_boxplot(lwd=0.5,alpha=0.6,width=0.5)+
-    geom_text(data=valueDisplayTime, mapping=aes(label=textMean,y=Median,x=coor-0.25),vjust=-0.2,hjust=1,fontface="bold",size=6)+
+    geom_text(data=valueDisplayTime, mapping=aes(label=textMean,y=Median,x=coor-0.25),vjust=-0.2,hjust=1,fontface="bold",size=4)+
     xlab("Method used")+
     ylab("Computation time (s)")+
-    ggtitle("Computation Time Comparison",
-            subtitle=stringr::str_wrap(subtitle,60))+
+    # ggtitle("Computation Time Comparison",
+    #         subtitle=stringr::str_wrap(subtitle,60))+
     scale_x_discrete(labels=c(reg="stepAIC with stat. test",
                               lasso="Lasso without s.s.",
                               elastinet="Elastic net without s.s.",
@@ -67,28 +67,28 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     theme(plot.subtitle = element_text(size=12))+
     theme(plot.title = element_text(size=16,color="#ee6c4d"))+
     theme(legend.position = "none")
-
+  
   for(k in 1:length(buildMethod)){
     plot <- plot + geom_segment(lwd=1,x=valueDisplayTime[valueDisplayTime$Method==buildMethod[k],"coor"]-0.45,xend=valueDisplayTime[valueDisplayTime$Method==buildMethod[k],"coor"],y=valueDisplayTime[valueDisplayTime$Method==buildMethod[k],"Median"],yend=valueDisplayTime[valueDisplayTime$Method==buildMethod[k],"Median"],color=colFonce[k])
   }
-
+  
   
   if(PNG){
     ggsave(paste0(Folder,"/ComputationTime.png"),
-            height = 1700, width =   1200+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
+           height = 800, width =   500+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   }
-
+  
   if(JPEG){
     ggsave(paste0(Folder,"/ComputationTime.jpeg"),
-            height = 1700, width =   1200+300*length(buildMethod), units = "px",device=grDevices::jpeg)
+           height = 800, width =   500+300*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
   
   ggplot(computationStatsCov,aes(color=Method,fill=Method,x=factor(Method,levels=buildMethod),y=iteration))+
     geom_boxplot(lwd=0.5,alpha=0.6)+
     xlab("Method used")+
-    ylab("Computation time (s)")+
-    ggtitle("Computation Time Comparison",
-            subtitle=stringr::str_wrap(subtitle,60))+
+    ylab("Iteration")+
+    # ggtitle("Computation Time Comparison",
+            # subtitle=stringr::str_wrap(subtitle,60))+
     scale_x_discrete(labels=c(reg="stepAIC with stat. test",
                               lasso="Lasso without s.s.",
                               elastinet="Elastic net without s.s.",
@@ -125,11 +125,11 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   
   if(PNG){
     ggsave(paste0(Folder,"/Iter.png"),
-           height = 1700, width =   1200+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
+           height = 800, width =   500+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   }
   
   if(JPEG){
     ggsave(paste0(Folder,"/Iter.jpeg"),
-           height = 1700, width =   1200+300*length(buildMethod), units = "px",device=grDevices::jpeg)
+           height = 800, width =   500+300*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
 }

@@ -84,6 +84,8 @@ tableStats <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
 
 
   # Table for stats info
+  
+  writeLines(paste0(table$Median,"  ",table$`Confidence Interval\n(quantiles 95%)`),con=paste0(Folder,"/ErrorTable.txt"))
 
   ft <- flextable(table) %>%
     merge_at(i=4,j=1:3) %>%
