@@ -1,0 +1,8 @@
+[LONGITUDINAL]
+input = {phi,psi}
+
+EQUATION:
+  Y = 100/(1+exp(-(t-phi)/psi))
+
+OUTPUT:
+  output = {Y}
