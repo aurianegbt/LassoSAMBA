@@ -36,7 +36,12 @@ applyMethodLasso <- function(Y,X,omega,cov0,
   colnames(Xwh) <- cov.names
 
   if(!is.null(covariate.model)){
-    savedSelection = setNames(as.numeric(covariate.model),names(covariate.model))
+    if(any(!(cov.names %in% names(covariate.model)))){
+      savedSelection <- setNames(rep(0,length(cov.names)),cov.names)
+      savedSelection[names(covariate.model)] <- as.numeric(covariate.model)
+    }else{
+      savedSelection = setNames(as.numeric(covariate.model),names(covariate.model))
+    }
     prevSelection = covariate.model
     
     if(all(!prevSelection)){
