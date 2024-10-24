@@ -1,5 +1,6 @@
 buildmlx <- function(project=NULL,
                      final.project=NULL,
+                     summaryInFinalDir=FALSE,
                      model="all",
                      prior=NULL,
                      weight=NULL,
@@ -83,7 +84,11 @@ buildmlx <- function(project=NULL,
     unlink(buildmlx.dir, recursive = TRUE)
   Sys.sleep(0.1)
   dir.create(buildmlx.dir)
-  summary.file = file.path(buildmlx.dir, "summary.txt")
+  if(!summaryInFinalDir){
+    summary.file = file.path(buildmlx.dir, "summary.txt")
+  }else{
+    summary.file=file.path(final.dir,"summary_buildmlx.txt")
+  }
   Sys.sleep(0.1)
   if (!dir.exists(final.dir))
     dir.create(final.dir, recursive = T)
