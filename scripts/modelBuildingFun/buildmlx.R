@@ -1,6 +1,5 @@
 buildmlx <- function(project=NULL,
                      final.project=NULL,
-                     summaryInFinalDir=FALSE,
                      model="all",
                      prior=NULL,
                      weight=NULL,
@@ -84,14 +83,10 @@ buildmlx <- function(project=NULL,
     unlink(buildmlx.dir, recursive = TRUE)
   Sys.sleep(0.1)
   dir.create(buildmlx.dir)
-  if(!summaryInFinalDir){
-    summary.file = file.path(buildmlx.dir, "summary.txt")
-  }else{
-    summary.file=file.path(final.dir,"summary_buildmlx.txt")
-  }
   Sys.sleep(0.1)
   if (!dir.exists(final.dir))
     dir.create(final.dir, recursive = T)
+  summary.file = file.path(buildmlx.dir, "summary.txt")
   to.cat <- paste0("\n", dashed.line, "\nBuilding:\n")
   if (model$covariate)
     to.cat <- c(to.cat, "  -  The covariate model\n")
@@ -986,6 +981,8 @@ buildmlx <- function(project=NULL,
   res$weight <- weight
   res$covToTest <- covToTest
   options(op.original)
+  
+  file.copy(from = summary.file,to = file.path(final.dir,"summary_buildmlx.txt"))
   
   #################################
   return(list(res=res,time=ttime,iter=iter))
