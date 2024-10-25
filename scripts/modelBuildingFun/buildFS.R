@@ -1,7 +1,8 @@
 buildFS <- function(pathToSim,
                     project,
                     temporaryDirectory = NULL,
-                    buildMethod = "stepAIC"){
+                    buildMethod = "stepAIC",
+                    FDP_thr=0.1){
   
   load(paste0("data/simulationFiles/Files",project,"/headerTypes.RData"))
   
@@ -41,9 +42,10 @@ buildFS <- function(pathToSim,
   
   # Model Building
   res = buildmlx(project = paste0(temporaryDirectory,"/Build.mlxtran"),
-                 buildMethod = buildMethod,
+                 buildMethod = if(buildMethod=="reg"){"stepAIC"}else{"lasso"},
                  model=model,
-                 test=FALSE)
+                 test=FALSE,
+                 FDP_thr=FDP_thr)
   
   Model <- Rsmlx:::mlx.getIndividualParameterModel()
   LL <- Rsmlx:::mlx.getEstimatedLogLikelihood()
