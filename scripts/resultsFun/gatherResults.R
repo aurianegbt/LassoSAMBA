@@ -65,6 +65,7 @@ gatherResults <- function(project=c("Pasin","GaussianPasin","Naveau"),
           Models = list()
           computationTime = numeric(0)
           iterationCount = numeric(0)
+          likelihood = list()
           missingFile = numeric(0)
           
           for(i in 1:numFiles){
@@ -76,15 +77,16 @@ gatherResults <- function(project=c("Pasin","GaussianPasin","Naveau"),
               Models <- append(Models,list(model))
               computationTime <- c(computationTime,time[[1]])
               iterationCount <- c(iterationCount,iter)
+              likelihood <- append(likelihood,LL)
               
-              names(Models)[length(Models)] <-  names(computationTime)[length(computationTime)] <- names(iterationCount)[length(iterationCount)] <- name
+              names(likelihood)[length(likelihood)] <- names(Models)[length(Models)] <-  names(computationTime)[length(computationTime)] <- names(iterationCount)[length(iterationCount)] <- name
             }else{missingFile = c(missingFile,i)
             miss[[proj]] = c(miss[[proj]],i)}
           }
           
           # Print information and save data
           if(length(missingFile)!=numFiles){
-            save(Models,computationTime,iterationCount,file=paste0(pathToSave,nameToGive))
+            save(Models,computationTime,iterationCount,likelihood,file=paste0(pathToSave,nameToGive))
             
             if(print){
               if( (length(missingFile)==0 && completePrint) || length(missingFile)!=0){
