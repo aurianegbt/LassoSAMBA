@@ -1,71 +1,28 @@
-suppressWarnings(suppressMessages(library(dplyr)))
-suppressWarnings(suppressMessages(library(stringr)))
-
-getResults <- function(project=c("Pasin","GaussianPasin"),
+getResults <- function(project=c("Pasin","GaussianPasin","Naveau"),
                        buildMethod="all",
-                       exclude=c("sharp","sharpnoCov0"),
-                       files="all"){
+                       files=1:100){
   
-  bM = identical(buildMethod,"all")
+  bM=identical(buildMethod,"all")
+  TP <- function(sel,H0,H1){length(unique(intersect(sel,H1)))}
+  TN <- function(sel,H0,H1){length(unique(setdiff(H0,sel)))}
+  FP <- function(sel,H0,H1){length(unique(intersect(sel,H0)))}
+  FN <- function(sel,H0,H1){length(unique(setdiff(H1,sel)))}
+  
+  FDR <- function(sel,H0,H1){round(FP(sel,H0,H1)/(max(FP(sel,H0,H1)+TP(sel,H0,H1),1)),digits=3)}
+  FNR <- function(sel,H0,H1){round(FN(sel,H0,H1)/(max(FN(sel,H0,H1)+TN(sel,H0,H1),1)),digits=3)}
+  
   
   for(proj in project){
-    source(paste0("data/simulationFiles/Files",proj,"/H1.all.R"))
     if(bM){
-      buildMethod <- stringr::str_remove_all(list.dirs(paste0("outputs/buildingResults/simulation/Results",proj),recursive = F),paste0("outputs/buildingResults/simulation/Results",proj,"/Results_"))
-      buildMethod = c("reg",
-                      buildMethod[stringr::str_detect(buildMethod,"lassonoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove_all(buildMethod,"lassonoCov0FDP"))])[which(c("reg", buildMethod[stringr::str_detect(buildMethod,"lassonoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove_all(buildMethod,"lassonoCov0FDP"))]) %in% buildMethod)]
-      if(!is.null(exclude)){
-        buildMethod = setdiff(buildMethod,exclude)
-      }
-      
-      
+      buildMethod <- setdiff(stringr::str_remove_all(list.dirs(paste0("outputs/buildingResults/simulation/Results",proj),recursive = F),paste0("outputs/buildingResults/simulation/Results",proj,"/Results_")),paste0("outputs/buildingResults/simulation/Results",proj,"/gatheredResults"))
     }
+    source(paste0("data/simulationFiles/Files",proj,"/H1.all.R"))
     cat("For ",proj," project, build method are ",paste0(buildMethod,collapse = ", "),"\n")
+    load(paste0("data/simulationFiles/orderList",proj,".RData"))
     
-    
-    if(file.exists(paste0("data/simulationFiles/orderList",proj,".RData"))){
-      load(paste0("data/simulationFiles/orderList",proj,".RData"))
-    }else{
-      load(paste0("data/simulationFiles/Files",proj,"/headerTypes.RData"))
-      
-      orderList = colnames(read.csv(paste0("data/simulationFiles/Files",proj,"/simulation/simulation_1.txt")))[which(stringr::str_detect(headerTypes,"cov"))]
-      
-      save(orderList,file=paste0("data/simulationFiles/orderList",proj,".RData"))
-    }
-    if(identical(files,"all")){files=1:100}
-    if(identical(files,"all.computed")){
-      files.list=list()
-      for(meth in buildMethod){
-        pathToRes = paste0("outputs/buildingResults/simulation/Results",proj,"/finalResults.RData")
-        
-        if(file.exists(pathToRes)){
-          load(pathToRes)
-          files.list = append(files.list,list(as.numeric(stringr::str_remove(names(Models),"estim_"))))
-          names(files.list)[length(files.list)] <- paste0(meth)
-        }
-      }
-      files = 1:100
-      for(l in files.list){
-        files = intersect(files,l)
-      }
-      if(length(files)<100){
-        warning("Less than 100 files !")
-      }
-    }
-    
-    TP <- function(sel,H0,H1){length(unique(intersect(sel,H1)))}
-    TN <- function(sel,H0,H1){length(unique(setdiff(H0,sel)))}
-    FP <- function(sel,H0,H1){length(unique(intersect(sel,H0)))}
-    FN <- function(sel,H0,H1){length(unique(setdiff(H1,sel)))}
-    
-    FDR <- function(sel,H0,H1){round(FP(sel,H0,H1)/(max(FP(sel,H0,H1)+TP(sel,H0,H1),1)),digits=3)}
-    FNR <- function(sel,H0,H1){round(FN(sel,H0,H1)/(max(FN(sel,H0,H1)+TN(sel,H0,H1),1)),digits=3)}
-    
-        
     CovariateModelSelection <- data.frame()
     TotalNumberofModel=c()
     computationStats <- data.frame()
-    errorStats <- data.frame()
     errorStatsPar <- data.frame()
     
     for(meth in buildMethod){
@@ -98,20 +55,10 @@ getResults <- function(project=c("Pasin","GaussianPasin"),
           }
           
           selectionPar = lapply(Model$covariateModel,function(x){names(which(x))})
-          selection = Reduce(union,selectionPar)
-          
-          H1 = Reduce(union,H1.all)
-          H0 = setdiff(orderList,H1)
-          
-          
-          errorStats <- rbind(errorStats,data.frame(Model = num,
-                                                    Method = meth,
-                                                    FP = FP(selection,H0,H1),
-                                                    TP = TP(selection,H0,H1),
-                                                    FDR = FDR(selection,H0,H1),
-                                                    FN = FN(selection,H0,H1),
-                                                    TN = TN(selection,H0,H1),
-                                                    FNR = FNR(selection,H0,H1)))
+          # selection = Reduce(union,selectionPar)
+          # 
+          # H1 = Reduce(union,H1.all)
+          # H0 = setdiff(orderList,H1)
           
           H0.all = lapply(H1.all,FUN = function(x){setdiff(orderList,x)})
           
@@ -134,10 +81,8 @@ getResults <- function(project=c("Pasin","GaussianPasin"),
       }
     }
         
-    resultCovariate <- data.frame()
     resultCovariatePar <- data.frame()
     resultModelPar <- data.frame()
-    resultModel <- data.frame()
     
     for(i in 1:length(orderList)){
       covariate = orderList[i]
@@ -145,12 +90,6 @@ getResults <- function(project=c("Pasin","GaussianPasin"),
       for(meth in buildMethod){
         if(meth %in% names(TotalNumberofModel)){
           NumberofModel = TotalNumberofModel[[meth]]
-          aux = df[df$Method==meth,]
-          SelectedInDistinctModel = length(unique(aux$Model))
-          resultCovariate <- rbind(resultCovariate,data.frame(Covariate = covariate,
-                                                              Method = meth,
-                                                              NumberofModel=NumberofModel,
-                                                              SelectedInDistinctModel=SelectedInDistinctModel/NumberofModel))
           ## Par
           for(par in unname(t.param)){
             aux = df[df$Method==meth & df$Parameter==par,]
@@ -168,16 +107,6 @@ getResults <- function(project=c("Pasin","GaussianPasin"),
       
     for(meth in buildMethod){
       if(meth %in% names(TotalNumberofModel)){
-        
-        NoFNModel = length(unique(errorStats[errorStats$FN==0 &
-                                               errorStats$Method==meth,"Model"]))
-        TrueModel = length(unique(errorStats[errorStats$FN==0 &
-                                               errorStats$FP==0 &
-                                               errorStats$Method==meth,"Model"]))
-        
-        resultModel <- rbind(resultModel,data.frame(Method = meth,
-                                                    TrueModel = TrueModel/TotalNumberofModel[[meth]],
-                                                    NoFNModel = NoFNModel/TotalNumberofModel[[meth]]))
         
         errorStatsParTrans = suppressMessages(errorStatsPar %>%
                                                 group_by(Model,Method) %>%
@@ -205,6 +134,6 @@ getResults <- function(project=c("Pasin","GaussianPasin"),
       }
     }
     
-    save(computationStats,errorStats,errorStatsPar,resultCovariate,orderList,CovariateModelSelection,resultCovariatePar,resultModel,resultModelPar,file=paste0("outputs/finalResults/BuildResults_",proj,".RData"))
+    save(computationStats,errorStatsPar,orderList,CovariateModelSelection,resultCovariatePar,resultModelPar,file=paste0("outputs/finalResults/BuildResults_",proj,".RData"))
   }
 } 
