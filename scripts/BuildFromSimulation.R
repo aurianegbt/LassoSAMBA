@@ -3,7 +3,7 @@ rm(list=ls())
 dir <- function(x){if(!dir.exists(x)){dir.create(x)}}
 
 # Load Functions and softwares
-ibrary(lixoftConnectors)
+library(lixoftConnectors)
 library(foreach)
 initializeLixoftConnectors(software = "monolix")
 
@@ -13,15 +13,13 @@ source("scripts/modelBuildingFun/buildFS.R")
 # Function just modified
 source("scripts/modelBuildingFun/buildmlx.R")
 source("scripts/modelBuildingFun/covariateModelSelection.R")
-source("scripts/modelBuildingFun/covariateModelSelection.reg.R")
+source("scripts/modelBuildingFun/covariateModelSelection.stepAIC.R")
 
 # Function implemented
 source("scripts/modelBuildingFun/modelFromSelection.R")
 source("scripts/modelBuildingFun/updateCov0.R")
 source("scripts/modelBuildingFun/covariateModelSelection.lasso.R")
 source("scripts/modelBuildingFun/applyMethodLasso.R")
-
-
 
 # Arguments of batch
 # For sbatch use
@@ -31,7 +29,7 @@ args = commandArgs(trailingOnly=TRUE)
 # project,  method 
 # args=c("GaussianPasin","lasso")
 project = args[1]     # "Pasin", "GaussianPasin" or "Naveau" 
-buildMethod = args[2] # "lasso" or "reg"
+buildMethod = args[2] # "lasso" or "stepAIC"
 FDP_thr = as.numeric(args[3])
 
 ## Presentation of work :
