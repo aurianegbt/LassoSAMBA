@@ -29,7 +29,7 @@ buildmlx <- function(project=NULL,
                      alpha=1,
                      nSS=1000, 
                      buildMethod="lasso",
-                     FDR_thr=0.2
+                     FDR_thr=0.1
                      )
 {
   
