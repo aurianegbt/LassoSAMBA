@@ -24,17 +24,18 @@ getResults <- function(project=c("Pasin","GaussianPasin","Naveau"),
     TotalNumberofModel=c()
     computationStats <- data.frame()
     errorStatsPar <- data.frame()
+    likelihoodStats <- data.frame()
     
     for(meth in buildMethod){
       pathToRes = paste0("outputs/buildingResults/simulation/Results",proj,"/gatheredResults/",meth,"_finalResults.RData")
       if(file.exists(pathToRes)){
-        load(pathToRes) #Models, computationTime, iterationCount
+        load(pathToRes) #Models, computationTime, iterationCount, likelihood
+        
         
         n = length(Models)
         to.consider = intersect(paste0("estim_",files),names(Models))
         ind.consider = which(names(Models) %in% to.consider)
-        
-        
+      
         TotalNumberofModel=c(TotalNumberofModel,length(to.consider))
         names(TotalNumberofModel)[length(TotalNumberofModel)] <- paste0(meth)
         
@@ -73,11 +74,19 @@ getResults <- function(project=c("Pasin","GaussianPasin","Naveau"),
                                                                   FNR = FNR(selectionPar[[x]],H0.all[[x]],H1.all[[x]]))})
           
           errorStatsPar <- do.call("rbind",append(list(errorStatsPar),aux))
+          
+          
+          likelihoodStats <- rbind(likelihoodStats,
+                                   data.frame(Criterion=c("OFV","AIC","BIC","BICc"),
+                                              Value = unname(likelihood[[j]][c("OFV","AIC","BIC","BICc")]),
+                                              Method=meth,
+                                              Model = j))
         }
         computationStats <-rbind(computationStats,data.frame(time = computationTime[ind.consider],
                                                              iteration = iterationCount[ind.consider],
                                                              Model = stringr::str_replace(names(computationTime),"estim_","")[ind.consider],
                                                              Method = meth))
+        
       }
     }
         
@@ -134,6 +143,6 @@ getResults <- function(project=c("Pasin","GaussianPasin","Naveau"),
       }
     }
     
-    save(computationStats,errorStatsPar,orderList,CovariateModelSelection,resultCovariatePar,resultModelPar,file=paste0("outputs/finalResults/BuildResults_",proj,".RData"))
+    save(likelihoodStats,computationStats,errorStatsPar,orderList,CovariateModelSelection,resultCovariatePar,resultModelPar,file=paste0("outputs/finalResults/BuildResults_",proj,".RData"))
   }
 } 
