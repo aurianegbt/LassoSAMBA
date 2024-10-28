@@ -4,10 +4,8 @@
 <!-- badges: end -->
 <!--ts-->
 * [Generation of an example](#sgeneration-of-an-example)
-* [Application of SAEMVS on a detailed example](#application-of-saemvs-on-a-detailed-example)
-   * [Model simulation](#model-simulation)
-   * [Convergence of the MCMC-SAEM algorithm](#convergence-of-the-mcmc-saem-algorithm)
-   * [Spike-and-slab regularisation plot and model selection](#spike-and-slab-regularisation-plot-and-model-selection)
+* [lasso-SAMBA algorithm for a replicate](#lasso-SAMBA-algorithm-for-a-replicate)
+* [Results for every replicates](#results-for-every-replicates)
 <!--te-->
 
 This repository contains....
@@ -118,7 +116,7 @@ headerTypes = c("id","time","observation",rep("contcov",nb_cov))
 save(headerTypes,file="data/simulationFiles/FilesGaussianPasin/headerTypes.RData")
 ```
 
-# lasso-SAMBA algorithm for a replicates 
+# lasso-SAMBA algorithm for a replicate
 
 To build the model, we will use Monolix software [[5]](#5) and the Rsmlx package [[6]](#6) (containing implemented SAMBA algorithm [[7]](#7)) from which we had several other function to enable our lasso approach. 
 ``` r
@@ -193,7 +191,7 @@ res = buildmlx(project = paste0(temporaryDirectory,"/Build.mlxtran"),
 getIndividualParameterModel()                 
 ```
 
-# Run on every replicates 
+# Results for every replicates 
 
 The results for the model building process over 100 replicates for either the stepAIC method or the lasso one (with FDP<0.05, 0.10 or 0.20) is summarize in the following object.
 
@@ -222,8 +220,6 @@ We also use two objects added in the simulationFiles folder to retrieve informat
 ```r
 cat(paste0(readLines("data/simulationFiles/FilesGaussianPasin/info.txt"),collapse="\n"))
 ```
-
-## Results graphs
 
 ```r
 library(ggplot2)
