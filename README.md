@@ -93,7 +93,12 @@ setGroupElement(group=paste0("simulationGroup1"), elements = c(paste0("covTable"
 runSimulation()
 sim <- getSimulationResults()
 head(sim$res$yAB)
-ggplot(sim$res$yAB,aes(x=time,group=as.factor(id),color=as.factor(id),y=yAB))+geom_line()+theme(legend.position="none") + ggtitle("Simulation of humoral immune response to ad26/MVA vaccine from 7 days after boost",subtitle="for 100 individuals.")+ylab("log10(Ab)")+xlab("time (days)")
+ggplot(sim$res$yAB,aes(x=time,group=as.factor(id),color=as.factor(id),y=yAB))+
+     geom_line()+
+     theme(legend.position="none") +
+     ggtitle("Simulation of humoral immune response to ad26/MVA vaccine from 7 days after boost",
+             subtitle="for 100 individuals.")+
+     ylab("log10(Ab)")+xlab("time (days)")
 ```
 
 Once the simulation launch, data files are saved for further analyzis. As it is usually done before analyzis, the age of participants is centered.
