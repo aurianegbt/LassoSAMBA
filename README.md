@@ -40,9 +40,9 @@ $$\displaystyle\left\{
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
          \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
     \end{array}\right.$$
-where $\eta^{\varphi_S}_i\simiid\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\simiid\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\simiid\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
+where $\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\overset{iid}{\sim}\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\overset{iid}{\sim}\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
 $$ Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}$$
-where $\varepsilon_i\simiid\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i}) $.
+where $\varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i}) $.
 
 We then add to the dataset noisy genes in order to have finally 200 covariates. These covariates are correlated gaussian covariates. To generate the correlation, we use the estimate of the covariance matrix of genomics measurement from Prevac-UP trial [[3]](#3) at D63 using Spearman method, in order to have realistic correlation between our covariates (including the significant one). This covariance matrix as well as the correlation matrix is saved in the `distribPasin.RData` object. 
 
@@ -187,13 +187,93 @@ load("outputs/finalResults/BuildResults_GaussianPasin.RData")
 ```
 
 This object contain :
+
 * `computationStats` : for each method (stepAIC, lasso0.05, lasso0.10, lasso0.20) and each replicates, the time of computation and number of iteration ; 
+
 * `CovariateModelSelection` : the relationship between parameters and covariates for each method and replicates. 
-* `errorStatsPar` : 
 
-## Results graphs for a method 
+* `errorStatsPar` : FP, FN, TP, TN, FDR and FNR score computed for each parameter model, replicates and method. 
 
-## Comparison 
+* `likelihoodSats` : OFV, AIC, BIC, BICc computed for each replicates and method tested.
+
+* `resultCovariatePar` : for each parameter-covariate relationship, the number of times selected through the replicates for each method. 
+
+* `resultModelPar` : for each method tested, the number of exact model and overselected model found over the replicates. 
+
+* `orderList` : (for graphical purpose) the order of the covariates to display in a x-axis if necessary (this is used in order to constrain the significative covariates in first place).
+
+We also use two objects added in the simulationFiles folder to retrieve information from the simulation setup (such as the number of individuals, the number of covariates, the true relationship and information about the simulation framework)
+
+```r
+cat(paste0(readLines("data/simulationFiles/FilesGaussianPasin/info.txt"),collapse="\n"))
+```
+
+## Results graphs
+
+```r
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(ggpattern)
+library(webshot2)
+library(ggh4x)
+library(flextable)
+library(grid)
+library(gtable)
+library(gridExtra)
+library(scales)
+sapply(list.files("scripts/resultsFun/graphsFun",full.names = T),FUN=function(d){source(d,echo=F)})
+```
+
+Function loaded are : 
+* `graphsParNB` : for description of a single method, display the proportion of selection of each covariates with each parameters over the replicates.
+
+<div style="text-align: center;">
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/SOLO/lassoFDP10/NumberSelectionParameter.png" alt="Proportion selection of each covariates, with each parameters, for lasso method" width="600" />
+</div>
+
+* `tableStats` : for description of a single method, resume in a table the scores measure (FDR, FNR and F1_score) for the method, with number of exact and overselective model.
+
+<div style="text-align: center;">
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/SOLO/lassoFDP10/ErrorTable.png" alt="Scores for lasso method" width="500" />
+</div>
+
+* `graphsCompTime` : display the distribution of the computation time and iteration for several methods.
+
+<div style="text-align: center;">
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ComputationTime.png" alt="Computation time comparison" width="300" /> <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/Iter.png" alt="Iteration number comparison" width="300" />
+</div>
+
+* `graphsLL` : display the distribution of OFV, AIC, BIC and BICc for several methods.
+
+<div style="text-align: center;">
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ICcomparison.png" alt="Information criterion comparison" width="400" />
+</div>
+
+* `graphsParCompMethod` : display the proportion of selection of each covariates with each parameters over the replicates, for several methods.
+
+<div style="text-align: center;">
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/NumberSelectionParameter.png" alt="Proportion selection of each covariates, with each parameters comparison" width="800" />
+</div>
+
+* `graphsStatsComp` : display the proportion of exact and overselective model over the replicates for several methods.
+
+<div style="text-align: center;">
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ComparisonStats.png" alt="Proportion of exact and overselective model comparison" width="200" />
+</div>
+
+* `tableStatsComp` : resume in a table the scores measure (FDR, FNR and F1_score) for the method, with number of exact and overselective model, for several methods.
+
+<div style="text-align: center;">
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ErrorTable.png" alt="Scores comparison table" width="400" />
+</div>
+
+
+All of these functions are use in the single function `graphsGenerate` that take into argument the simulation framework name (either "Pasin", "GaussianPasin" or "Naveau", here "GaussianPasin"), the method, and if the pictures should be saved in PNG or JPEG format (or both). These graphs have been generated doing : 
+```r 
+graphsGenerate(project="GaussianPasin",buildMethod = c("stepAIC","lassoFDP10"),JPEG = F,PNG=T)
+```
+
 
 ## References
 <a id="1">[1]</a> 
