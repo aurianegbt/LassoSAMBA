@@ -44,10 +44,21 @@ with
          \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
     \end{array}\right. 
 ```
-where $\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\overset{iid}{\sim}\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\overset{iid}{\sim}\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
+where
+```math
+\displaystyle\left\{
+\begin{array}{rcl}
+\eta^{\varphi_S}_i&\overset{iid}{\sim}&\mathcal N(0,\omega_{\varphi_S}^2) \\
+\eta^L_i&\overset{iid}{\sim}&\mathcal N(0,\omega_L^2) \\
+\eta^{Ab}_i&\overset{iid}{\sim}&\mathcal N(0,\omega_{Ab}^2)
+    \end{array}\right. 
+```
+The observation are the defined as 
 $Y_{ij} = log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}$
-where $\varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
-
+where 
+```math 
+\varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})
+```.
 We then add to the dataset noisy genes in order to have finally 200 covariates. These covariates are correlated gaussian covariates. To generate the correlation, we use the estimate of the covariance matrix of genomics measurement from Prevac-UP trial [[3]](#3) at D63 using Spearman method, in order to have realistic correlation between our covariates (including the significant one). This covariance matrix as well as the correlation matrix is saved in the `distribPasin.RData` object. 
 
 ``` r
