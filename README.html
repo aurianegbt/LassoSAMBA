@@ -392,13 +392,15 @@ considering two Antibodies secreting cells (ASC), denoted by S -- and L
 their half-life (<span class="math inline">\(\delta_S\)</span> and <span class="math inline">\(\delta_L\)</span> resp.). Antibodies are supposed
 to decay at rate <span class="math inline">\(\delta_{Ab}\)</span>. We
 add significant covariates on <span class="math inline">\(\varphi_S\)</span>, <span class="math inline">\(\varphi_L\)</span> and <span class="math inline">\(\delta_{Ab}\)</span> parameters. The mechanistic
-model is then : <span class="math display">\[\forall i\leq N,j\leq
-n_i,   \left\{\begin{array}{rcl}
+model is then : <span class="math display">\[
+\forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
     \frac{d}{dt} Ab_i(t_{ij}) &amp;=&amp; {\varphi_S}_i e^{-\delta_S
 t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}}_i
 Ab_i(t_{ij}) \\
     Ab_i(t_{i0}=0) &amp;=&amp; {Ab_0}
-\end{array}\right.\]</span> with <span class="math display">\[\displaystyle\left\{
+\end{array}\right.
+\]</span> with <span class="math display">\[
+\displaystyle\left\{
 \begin{array}{rcl}
          \log({\varphi_S}_i) &amp;=&amp; \log({\varphi_S}_{pop}) +
 \eta^{\varphi_S}_i \\
@@ -406,12 +408,13 @@ Ab_i(t_{ij}) \\
 \eta^L_i \\
          \log({\delta_{Ab}}_i) &amp;=&amp;
 \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
-    \end{array}\right.\]</span> where <span class="math inline">\(\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal
+    \end{array}\right.
+    \]</span> where <span class="math inline">\(\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal
 N(0,\omega_{\varphi_S}^2)\)</span>, <span class="math inline">\(\eta^L_i\overset{iid}{\sim}\mathcal
 N(0,\omega_L^2)\)</span>, <span class="math inline">\(\eta^{Ab}_i\overset{iid}{\sim}\mathcal
-N(0,\omega_{Ab}^2)\)</span>. The observation are the defined as <span class="math display">\[ Y_{ij} =
-\log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}\]</span> where
-$<em>iN(0,=^2</em>{Ab}I_{n_i}) $.</p>
+N(0,\omega_{Ab}^2)\)</span>. The observation are the defined as <span class="math display">\[
+Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
+\]</span> where $<em>iN(0,=^2</em>{Ab}I_{n_i}) $.</p>
 <p>We then add to the dataset noisy genes in order to have finally 200
 covariates. These covariates are correlated gaussian covariates. To
 generate the correlation, we use the estimate of the covariance matrix
