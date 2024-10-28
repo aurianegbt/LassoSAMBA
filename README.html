@@ -387,31 +387,41 @@ initializeLixoftConnectors(&quot;simulx&quot;)</code></pre>
 boost of vaccine against Ebola, using Pasin et al. <a href="#id_1">[1]</a> model and Alexandre et al. <a href="#id_2">[2]</a>
 values parameters estimated from Ebovac clinical trial.</p>
 <p>We simulate for 100 individuals the antibody production by
-considering two Antibodies secreting cells (ASC), denoted by S -- and L
--- (at rates <span class="math inline">\(\varphi_S\)</span> and <span class="math inline">\(\varphi_L\)</span> resp.) and characterized by
+considering two Antibodies secreting cells (ASC), denoted by S <em>for
+short-live</em> and L <em>for long-live</em> (at rates <span class="math inline">\(\varphi_S\)</span> and <span class="math inline">\(\varphi_L\)</span> resp.) and characterized by
 their half-life (<span class="math inline">\(\delta_S\)</span> and <span class="math inline">\(\delta_L\)</span> resp.). Antibodies are supposed
 to decay at rate <span class="math inline">\(\delta_{Ab}\)</span>. We
-add significant covariates on <span class="math inline">\(\varphi_S\)</span>, <span class="math inline">\(\varphi_L\)</span> and <span class="math inline">\(\delta_{Ab}\)</span> parameters. The mechanistic
-model is then : <span class="math display">\[\forall i\leq N,j\leq
-n_i,   \left(\begin{array}{rcl}
-    \frac{d}{dt} Ab_i(t_{ij}) &amp;=&amp; {\varphi_S}_i e^{-\delta_S
-t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}}_i
-Ab_i(t_{ij}) \\
-    Ab_i(t_{i0}=0) &amp;=&amp; {Ab_0}
-\end{array}\right.\]</span> with <span class="math display">\[\left(
-\begin{array}{rcl}
-         \log({\varphi_S}_i) &amp;=&amp; \log({\varphi_S}_{pop}) +
-\eta^{\varphi_S}_i \\
-         \log({\varphi_L}_i) &amp;=&amp; \log({\varphi_L}_{pop})  +
-\eta^L_i \\
-         \log({\delta_{Ab}}_i) &amp;=&amp;
-\log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
-    \end{array}\right.\]</span> where <span class="math inline">\(\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal
-N(0,\omega_{\varphi_S}^2)\)</span>, <span class="math inline">\(\eta^L_i\overset{iid}{\sim}\mathcal
-N(0,\omega_L^2)\)</span>, <span class="math inline">\(\eta^{Ab}_i\overset{iid}{\sim}\mathcal
-N(0,\omega_{Ab}^2)\)</span>. The observation are the defined as <span class="math inline">\(Y_{ij} =
-log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}\)</span> where <span class="math inline">\(\varepsilon_i\overset{iid}{\sim}\mathcal
-N(0,\Sigma=\sigma^2_{Ab}I_{n_i})\)</span>.</p>
+add significant covariates on <span class="math inline">\(\varphi_S\)</span>, <span class="math inline">\(\varphi_L\)</span>, and <span class="math inline">\(\delta_{Ab}\)</span> parameters. The mechanistic
+model is then:</p>
+<p><span class="math display">\[
+\forall i\leq N,j\leq n_i,\quad
+\begin{aligned}
+    \frac{d}{dt} Ab_i(t_{ij}) &amp;= {\varphi_S}_i e^{-\delta_S t_{ij}}
++ {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}}_i Ab_i(t_{ij}), \\
+    Ab_i(t_{i0}=0) &amp;= Ab_0.
+\end{aligned}
+\]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+\begin{aligned}
+    \log({\varphi_S}_i) &amp;= \log({\varphi_S}_{pop}) +
+\eta^{\varphi_S}_i, \\
+    \log({\varphi_L}_i) &amp;= \log({\varphi_L}_{pop}) + \eta^L_i, \\
+    \log({\delta_{Ab}}_i) &amp;= \log({\delta_{Ab}}_{pop}) +
+\eta^{Ab}_i,
+\end{aligned}
+\]</span></p>
+<p>where <span class="math inline">\(\eta^{\varphi_S}_i
+\overset{iid}{\sim} \mathcal{N}(0,\omega_{\varphi_S}^2)\)</span>, <span class="math inline">\(\eta^L_i \overset{iid}{\sim}
+\mathcal{N}(0,\omega_L^2)\)</span>, <span class="math inline">\(\eta^{Ab}_i \overset{iid}{\sim}
+\mathcal{N}(0,\omega_{Ab}^2)\)</span>.</p>
+<p>The observations are then defined as:</p>
+<p><span class="math display">\[
+Y_{ij} = \log_{10}(Ab_i(t_{ij})) + \varepsilon_{ij},
+\]</span></p>
+<p>where <span class="math inline">\(\varepsilon_{ij}
+\overset{iid}{\sim} \mathcal{N}(0, \Sigma = \sigma^2_{Ab}
+I_{n_i})\)</span>.</p>
 <p>We then add to the dataset noisy genes in order to have finally 200
 covariates. These covariates are correlated gaussian covariates. To
 generate the correlation, we use the estimate of the covariance matrix
