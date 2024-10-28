@@ -1,4 +1,4 @@
 nInd = 200
 nbCov = 500
 
-dataType = "a plant growth model model, from Naveau and al. 2023"
+dataType = "a pharmacokinetic model, from Naveau and al. 2023"

@@ -12,15 +12,15 @@ graphsStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   resultModelParCov <- resultModelPar[resultModelPar$Method %in% buildMethod, ]
   errorStatsParCov <- errorStatsPar[errorStatsPar$Method %in% buildMethod,]
   errorStatsParCov <-  suppressMessages(errorStatsParCov %>%
-    group_by(Model,Method) %>%
-    summarise(
-      FP = sum(FP),
-      TP = sum(TP), 
-      FN = sum(FN),
-      TN = sum(TN)
-    )) %>%
+                                          group_by(Model,Method) %>%
+                                          summarise(
+                                            FP = sum(FP),
+                                            TP = sum(TP), 
+                                            FN = sum(FN),
+                                            TN = sum(TN)
+                                          )) %>%
     as.data.frame()
-
+  
   errorStatsParCov <- errorStatsParCov  %>% 
     mutate(FDR = (FP/sapply(FP+TP,FUN=function(x){max(x,1)})),.after = "TP") %>%
     mutate(FNR = (FN/sapply(FN+TN,FUN=function(x){max(x,1)})),.after="TN") %>%
@@ -37,33 +37,11 @@ graphsStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     geom_col(data=value[value$Type=="Overselection",], aes(group = Method), width = 0.7, position = position_dodge(width = 0.7),color="black")  +
     geom_bar_pattern(data=value[value$Type=="Exact",], position="dodge",width=0.7,color="black",pattern_fill="black",pattern_density=0.05,pattern_spacing=0.025,stat='identity') +
     labs(x="Method", y = "Proportion (in %)") +
-    scale_fill_manual(values=setNames(RColorBrewer::brewer.pal(length(buildMethod), "Set2"),buildMethod))+ 
+    scale_fill_manual(values=setNames(colpas,buildMethod))+ 
     scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+ 
-    scale_x_discrete(labels=c(reg="stepAIC\nwith stat. test",
-                              SAEMVS="SAEMVS",
-                              lasso="Lasso without s.s.",
-                              elastinet="Elastic net without s.s.",
-                              lassoSS="Lasso with stat. test",
-                              elasticnetSS="Elastic Net with stat. test",
-                              rlasso="Lasso with s.s. on replicates",
-                              relasticnet="Elastic Net with s.s. on replicates",
-                              lassoCrit = "Lasso with multiple thresholds and no s.s.",
-                              elasticnetCrit="Elastic Net with multiple thresholds and no s.s.",
-                              lassoSSCrit="Lasso with multiple thresholds",
-                              elasticnetSSCrit="Elastic Net with multiple thresholds",
-                              rlassoCrit="Lasso with mult. thresholds and s.s. on rep.",
-                              relasticnetCrit="Elastic Net with mult. thresholds and s.s. on rep.",
-                              setNames(paste0("penalized stepAIC pen=",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"regPEN")],"regPEN")),buildMethod[stringr::str_detect(buildMethod,"regPEN")]),
-                              regnoCov0="stepAIC",
-                              lassoSSnoCov0="Lasso",
-                              lassoSSCritnoCov0="Lasso",
-                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))],"sharpnoCov0"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0"))]),
-                              setNames(paste0("Lasso\nE[FDP]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))])[order(as.numeric(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP")))],
-                              setNames(paste0("Lasso\n",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))],"sharp"),"% higher score"),buildMethod[stringr::str_detect(buildMethod,"sharp") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharp"))]),
-                              elasticnetSSnoCov0="Elastic Net",
-                              sharpnoCov0="Lasso calibrated using sharp",
-                              sharp="Lasso calibrated using sharp\nwith stat. test")) +
-    scale_pattern_manual(values = c(Exact="stripe","Overselection"="none"))+
+    scale_x_discrete(labels=c(stepAIC="stepAIC\nwith stat. test",
+                              setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
+                              SAEMVS="SAEMVS"))+
     theme(axis.text.x = element_text(size = 10))+
     theme(axis.text.y = element_text(size = 8))+
     theme(axis.title = element_text(size=12))+
@@ -75,12 +53,12 @@ graphsStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   
   if(PNG){
     ggsave(paste0(Folder,"/ComparisonStats.png"),
-           height = 1200, width =   1400, units = "px", bg='transparent',device=grDevices::png)
+           height = 1200, width =   1000, units = "px", bg='transparent',device=grDevices::png)
   }
   
   if(JPEG){
     ggsave(paste0(Folder,"/ComparisonStats.jpeg"),
-           height = 1200, width =   1400, units = "px",device=grDevices::jpeg)
+           height = 1200, width =   1000, units = "px",device=grDevices::jpeg)
   }
   
 }

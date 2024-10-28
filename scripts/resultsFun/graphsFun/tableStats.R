@@ -5,11 +5,7 @@ tableStats <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   source(paste0("data/simulationFiles/Files",project,"/H1.all.R"))
 
   # Data.frame to use
-  resultModelCov <- resultModel[resultModel$Method==buildMethod, ]
-  
   resultModelParCov <- resultModelPar[resultModelPar$Method==buildMethod, ]
-
-  errorStatsCov <- errorStats[ errorStats$Method==buildMethod,]
   errorStatsParCov <- errorStatsPar[errorStatsPar$Method==buildMethod,]
   
   errorStatsParCov <-  suppressMessages(errorStatsParCov %>%
@@ -85,7 +81,7 @@ tableStats <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
 
   # Table for stats info
   
-  writeLines(paste0(table$Median,"  ",table$`Confidence Interval\n(quantiles 95%)`),con=paste0(Folder,"/ErrorTable.txt"))
+  # writeLines(paste0(table$Median,"  ",table$`Confidence Interval\n(quantiles 95%)`),con=paste0(Folder,"/ErrorTable.txt"))
 
   ft <- flextable(table) %>%
     merge_at(i=4,j=1:3) %>%
