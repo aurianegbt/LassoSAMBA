@@ -22,11 +22,9 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     return(NULL)
   }else{
     
-    resultCovariateCov <- resultCovariate[resultCovariate$Method==buildMethod,]
-    
     resultCovariateParCov <- resultCovariatePar[resultCovariatePar$Method==buildMethod,]
     
-    resultModelCov <- resultModel[resultModel$Method==buildMethod,]
+    resultModelParCov <- resultModelPar[resultModelPar$Method==buildMethod,]
     
     errorStatsParCov <- errorStatsPar[errorStatsPar$Method==buildMethod,]
     
@@ -126,8 +124,8 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
       xlab("Covariates")+
       ylab("Count")+
       ggtitle(" ",
-              subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelCov[,"NoFNModel"]*100,"%","\n",
-                               "   • Final model is the true one  : ",resultModelCov[,"TrueModel"]*100,"%"))+
+              subtitle= paste0("   • Final Final model without any False Negatives : ",resultModelParCov[,"NoFNModel"]*100,"%","\n",
+                               "   • Final model is the true one  : ",resultModelParCov[,"TrueModel"]*100,"%"))+
       scale_fill_manual(values=cbPalette)+
       theme(axis.text.x = element_text(size = 6, angle = 90))+
       theme(axis.text.y = element_text(size = 8))+

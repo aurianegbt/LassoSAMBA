@@ -13,53 +13,19 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   # Change name to display
   newbuildMethod <- c()
   for(k in 1:length(buildMethod)){
-    if(buildMethod[k]=="reg"){
+    if(buildMethod[k]=="stepAIC"){
       newbuildMethod[k] <- "StepAIC"
-    }else if(buildMethod[k]=="lasso"){
-      newbuildMethod[k] <- "Lasso without\nstability selection"
-    }else if(buildMethod[k]=="elasticnet"){
-      newbuildMethod[k] <- "Elastic Net without\nstability selection"
-    }else if(buildMethod[k]=="lassoSS"){
-      newbuildMethod[k] <- "Lasso\nwith stat. test"
-    }else if(buildMethod[k]=="elasticnetSS"){
-      newbuildMethod[k] <- "Elastic Net\nwith stat. test"
-    }else if(stringr::str_detect(buildMethod[k],"regPEN")){
-      newbuildMethod[k] <- paste0("penalized stepAIC\npen=",stringr::str_remove(buildMethod[k],"regPEN"))
-    }else if(buildMethod[k]=="lassoSSnoCov0"){
-      newbuildMethod[k] <- "Lasso"
-    }else if(buildMethod[k]=="lassoSSCritnoCov0"){
-      newbuildMethod[k] <- "Lasso\nwith adapted thresholds"
-    }else if(buildMethod[k]=="regnoCov0"){
-      newbuildMethod[k] <- "StepAIC"
-    }else if(buildMethod[k]=="elasticnetSSnoCov0"){
-      newbuildMethod[k] <- "Elastic Net"
-    }else if(buildMethod[k]=="sharp"){
-      newbuildMethod[k] <- "Lasso calibrated using sharp\nwith stat. test"
+    }else if(stringr::str_detect(buildMethod[k],"lassoFDP")){
+      newbuildMethod[k] <- paste0("Lasso\nE[FDP]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
     }else if(buildMethod[k]=="SAEMVS"){
       newbuildMethod[k] <- "SAEMVS"
-    }else if(buildMethod[k]=="sharpnoCov0"){
-      newbuildMethod[k] <- "Lasso calibrated using sharp"
-    }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0FDP")){
-      newbuildMethod[k] <- paste0("Lasso\nE[FDP]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
-    }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0")){
-      newbuildMethod[k] <- paste0("Lasso\n",stringr::str_remove(buildMethod[k],"sharpnoCov0"),"% higher score")
-    }else if(stringr::str_detect(buildMethod[k],"sharpnoCov0FDP")){
-      newbuildMethod[k] <- paste0("Lasso\nE[FDP]<",stringr::str_remove(buildMethod[k],"sharpnoCov0FDP"),"%")
-    }else if(stringr::str_detect(buildMethod[k],"sharp")){
-      newbuildMethod[k] <- paste0("Lasso\n",stringr::str_remove(buildMethod[k],"sharp"),"% higher score\nwith stat. test")
     }
   }
   
   # Data to use (and change name)
   CovariateModelSelectionCov <- CovariateModelSelection[CovariateModelSelection$Method %in% buildMethod,]
-
-  resultCovariateCov <- resultCovariate[resultCovariate$Method %in% buildMethod,]
   
   resultCovariateParCov <- resultCovariatePar[resultCovariatePar$Method %in% buildMethod,]
-  
-  resultModelCov <- resultModel[resultModel$Method %in% buildMethod,]
-
-  resultModelCov <- cbind(resultModelCov,text=paste0("Model without False Negatives : ",resultModelCov$NoFNModel*100,"%"))
   
   resultModelParCov <- resultModelPar[resultModelPar$Method %in% buildMethod,]
   
@@ -68,9 +34,7 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   
   for(meth in buildMethod){       
     CovariateModelSelectionCov[CovariateModelSelectionCov$Method==meth,"Method"] <- newbuildMethod[buildMethod==meth]
-   resultCovariateCov[resultCovariateCov$Method==meth,"Method"] <- newbuildMethod[buildMethod==meth]
    resultCovariateParCov[resultCovariateParCov$Method==meth,"Method"] <- newbuildMethod[buildMethod==meth]
-   resultModelCov[resultModelCov$Method==meth,"Method"] <- newbuildMethod[buildMethod==meth]
    resultModelParCov[resultModelParCov$Method==meth,"Method"] <- newbuildMethod[buildMethod==meth]
   }
 
