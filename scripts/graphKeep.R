@@ -1,0 +1,28 @@
+library(ggplot2)
+library(ggpubr)
+library(dplyr)
+library(ggpattern)
+library(webshot2)
+library(ggh4x)
+library(flextable)
+library(grid)
+library(gtable)
+library(gridExtra)
+library(scales)
+sapply(list.files("scripts/resultsFun/graphsFun",full.names = T),FUN=function(d){source(d,echo=F)})
+source("scripts/resultsFun/gatherResults.R")
+source("scripts/resultsFun/getResults.R")
+source("scripts/resultsFun/graphs.R")
+
+gatherResults(project=c("Pasin","GaussianPasin","Naveau"))
+getResults(project=c("Pasin","GaussianPasin","Naveau"))
+
+graphsGenerate(project="Naveau",buildMethod = c("stepAIC","lassoFDP10"),JPEG = F,PNG=T)
+graphsGenerate(project="Pasin",buildMethod = c("stepAIC","lassoFDP10"),JPEG = F,PNG=T)
+graphsGenerate(project="GaussianPasin",buildMethod = c("stepAIC","lassoFDP10"),JPEG = F,PNG=T)
+
+graphsGenerate(project=c("Naveau"),buildMethod = c("stepAIC","lassoFDP10","SAEMVS"),JPEG = F,PNG=T)
+
+graphsGenerate(project="Naveau",buildMethod = c("stepAIC","lassoFDP5","lassoFDP10","lassoFDP20"),JPEG = F,PNG=T)
+graphsGenerate(project="Pasin",buildMethod = c("stepAIC","lassoFDP5","lassoFDP10","lassoFDP20"),JPEG = F,PNG=T)
+graphsGenerate(project="GaussianPasin",buildMethod = c("stepAIC","lassoFDP5","lassoFDP10","lassoFDP20"),JPEG = F,PNG=T)
