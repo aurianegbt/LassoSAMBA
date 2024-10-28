@@ -29,19 +29,25 @@ initializeLixoftConnectors("simulx")
 As an example, we simulate the humoral immune response 7 days after a boost of vaccine against Ebola, using Pasin et al. [[1]](#1) model and Alexandre et al. [[2]](#2) values parameters estimated from Ebovac clinical trial.
 
 We simulate for 100 individuals the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -\textit{for short-live}- and L -\textit{for long-live}- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. We add significant covariates on $\varphi_S$, $\varphi_L$ and $\delta_{Ab}$ parameters. The mechanistic model is then : 
-\( \forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
+
+$\forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
     \frac{d}{dt} Ab_i(t_{ij}) &=& {\varphi_S}_i e^{-\delta_S t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}}_i Ab_i(t_{ij}) \\
     Ab_i(t_{i0}=0) &=& {Ab_0}
-\end{array}\right.\)
+\end{array}\right.$
+
 with 
-\(\displaystyle\left\{
+
+$\displaystyle\left\{
 \begin{array}{rcl}
          \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
          \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
-    \end{array}\right.\)
+    \end{array}\right.$
+    
 where $\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\overset{iid}{\sim}\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\overset{iid}{\sim}\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
-\( Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}\)
+
+$ Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}$
+
 where $\varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i}) $.
 
 We then add to the dataset noisy genes in order to have finally 200 covariates. These covariates are correlated gaussian covariates. To generate the correlation, we use the estimate of the covariance matrix of genomics measurement from Prevac-UP trial [[3]](#3) at D63 using Spearman method, in order to have realistic correlation between our covariates (including the significant one). This covariance matrix as well as the correlation matrix is saved in the `distribPasin.RData` object. 
