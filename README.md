@@ -1,5 +1,7 @@
 # Supporting information
 
+**For lasso, categorical covariates need to be numerical and no missing values in the covariates table.**
+
 <!-- badges: start -->
 <!-- badges: end -->
 <!--ts-->
