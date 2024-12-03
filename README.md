@@ -186,7 +186,7 @@ newProject(data = list(dataFile = pathToSim,
                modelFile = "data/modelFiles/Pasin.txt")
 ```
 
-For identifiability issue, we fixe parameter $delta_S$ and $delta_L$ to their value, and set the error model to constant. 
+For identifiability issue, we fixe parameter $\delta_S$ and $\delta_L$ to their value, and set the error model to constant. 
 
 ```r
 obs.name=getMapping()$mapping[[1]]$model
