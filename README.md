@@ -6,12 +6,23 @@
 <!-- badges: start -->
 <!-- badges: end -->
 <!--ts-->
-* [Generation of an example](#sgeneration-of-an-example)
+* [Generation of an example](#generation-of-an-example)
 * [lasso-SAMBA algorithm for a replicate](#lasso-SAMBA-algorithm-for-a-replicate)
 * [Results for every replicates](#results-for-every-replicates)
 <!--te-->
 
-This repository contains [TO DO].
+This repository contains :
+* the [data folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/data) contains
+- the model files used to create the monolix project of both simulation framework ;
+- an extract of the simulation files, with the first replicates of each simulation framework with additional information files used for the plots ;
+- the code to simulate all the datasets for each simulation framework, with the simulX project used.
+* the [outputs folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/outputs) contains :
+- all the final figures generated resuming all the results ;
+- each individual figures used for the previously mentionned final results and additional one for each simulation framework ;
+* the [scripts folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/scripts) contains:
+- the model building function, with modified function from _Rsmlx_ package [[2]](#2), and added function for the lasso selection ([detailed bellow](#lasso-SAMBA-algorithm-for-a-replicate)) ;
+- the function to generate the graphs and results table ([detailed bellow](#results-for-every-replicates)) ;
+- the function used to generate the simulation ([detailed bellow](#generation-of-an-example))
 
 ``` r
 rm(list = ls())
