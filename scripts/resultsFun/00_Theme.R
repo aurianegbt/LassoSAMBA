@@ -1,3 +1,4 @@
+## from  https://benjaminlouis-stat.fr/en/blog/2020-05-21-astuces-ggplot-rmarkdown/
 '%+replace%' <- ggplot2::'%+replace%'
 
 theme_riri <- function(base_size = 14){
