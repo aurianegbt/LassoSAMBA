@@ -1,14 +1,28 @@
 # Supporting information
 
+**Implementation of lasso in SAMBA relies on _sharp_ package [[1]](#1), containing lasso enhanced by stability selection algorithm, and _Rsmlx_ package [[2]](#2), containing SAMBA algorithm [[3]](#3).**
+**For lasso, categorical covariates need to be numerical and no missing values in the covariates table.**
+
 <!-- badges: start -->
 <!-- badges: end -->
 <!--ts-->
-* [Generation of an example](#sgeneration-of-an-example)
+* [Generation of an example](#generation-of-an-example)
 * [lasso-SAMBA algorithm for a replicate](#lasso-SAMBA-algorithm-for-a-replicate)
 * [Results for every replicates](#results-for-every-replicates)
 <!--te-->
 
-This repository contains....
+This repository contains :
+* the [data folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/data) contains
+  - the model files used to create the monolix project of both simulation framework ;
+  - an extract of the simulation files, with the first replicates of each simulation framework with additional information files used for the plots ;
+  - the code to simulate all the datasets for each simulation framework, with the simulX project used.
+* the [outputs folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/outputs) contains :
+  - all the final figures generated resuming all the results ;
+  - each individual figures used for the previously mentionned final results and additional one for each simulation framework ;
+* the [scripts folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/scripts) contains:
+  - the model building function, with modified function from _Rsmlx_ package [[2]](#2), and added function for the lasso selection ([detailed bellow](#lasso-SAMBA-algorithm-for-a-replicate)) ;
+  - the function to generate the graphs and results table ([detailed bellow](#results-for-every-replicates)) ;
+  - the function used to generate the simulation ([detailed bellow](#generation-of-an-example))
 
 ``` r
 rm(list = ls())
@@ -24,7 +38,7 @@ initializeLixoftConnectors("simulx")
 
 # Generation of an example
 
-As an example, we simulate the humoral immune response 7 days after a boost of vaccine against Ebola, using Pasin et al. [[1]](#1) model and Alexandre et al. [[2]](#2) values parameters estimated from Ebovac clinical trial.
+As an example, we simulate the humoral immune response 7 days after a boost of vaccine against Ebola, using Pasin et al. [[4]](#4) model and Alexandre et al. [[5]](#5) values parameters estimated from Ebovac clinical trial.
 
 We simulate for 100 individuals the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -\textit{for short-live}- and L -\textit{for long-live}- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. We add significant covariates on $\varphi_S$, $\varphi_L$ and $\delta_{Ab}$ parameters. The mechanistic model is then : 
 ```math 
@@ -57,7 +71,7 @@ where
 ```math 
 \varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})
 ```
-We then add to the dataset noisy genes in order to have finally 200 covariates. These covariates are correlated gaussian covariates. To generate the correlation, we use the estimate of the covariance matrix of genomics measurement from Prevac-UP trial [[3]](#3) at D63 using Spearman method, in order to have realistic correlation between our covariates (including the significant one). This covariance matrix as well as the correlation matrix is saved in the `distribPasin.RData` object. 
+We then add to the dataset noisy genes in order to have finally 200 covariates. These covariates are correlated gaussian covariates. To generate the correlation, we use the estimate of the covariance matrix of genomics measurement from Prevac-UP trial [[6]](#6) at D63 using Spearman method, in order to have realistic correlation between our covariates (including the significant one). This covariance matrix as well as the correlation matrix is saved in the `distribPasin.RData` object. 
 
 ``` r
 nb_ind <- 100
@@ -67,7 +81,7 @@ load("data/simulationSetup/distribPasin.RData")
 loadProject("data/simulationSetup/Pasin.smlx")
 ```
 
-The project based of this mechanistic model has been created in the Simulx software [[4]](#4), with the values parameter from Alexandre et al.
+The project based of this mechanistic model has been created in the Simulx software [[7]](#7), with the values parameter from Alexandre et al.
 
 ``` r
 getPopulationElements()$PopParameters$data
@@ -123,7 +137,7 @@ save(headerTypes,file="data/simulationFiles/FilesGaussianPasin/headerTypes.RData
 
 # lasso-SAMBA algorithm for a replicate
 
-To build the model, we will use Monolix software [[5]](#5) and the Rsmlx package [[6]](#6) (containing implemented SAMBA algorithm [[7]](#7)) from which we had several other function to enable our lasso approach. 
+To build the model, we will use Monolix software [[8]](#8) and the Rsmlx package [[2]](#2) (containing implemented SAMBA algorithm [[3]](#3)) from which we had several other function to enable our lasso approach. 
 ``` r
 library(lixoftConnectors)
 library(foreach)
@@ -172,7 +186,7 @@ newProject(data = list(dataFile = pathToSim,
                modelFile = "data/modelFiles/Pasin.txt")
 ```
 
-For identifiability issue, we fixe parameter $delta_S$ and $delta_L$ to their value, and set the error model to constant. 
+For identifiability issue, we fixe parameter $\delta_S$ and $\delta_L$ to their value, and set the error model to constant. 
 
 ```r
 obs.name=getMapping()$mapping[[1]]$model
@@ -244,43 +258,43 @@ sapply(list.files("scripts/resultsFun/graphsFun",full.names = T),FUN=function(d)
 Function loaded are : 
 * `graphsParNB` : for description of a single method, display the proportion of selection of each covariates with each parameters over the replicates.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="outputs/figures/simulationResults/PlotGaussianPasin/SOLO/lassoFDP10/NumberSelectionParameter.png" alt="Proportion selection of each covariates, with each parameters, for lasso method" width="600" />
-</div>
+</p>
 
 * `tableStats` : for description of a single method, resume in a table the scores measure (FDR, FNR and F1_score) for the method, with number of exact and overselective model.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="outputs/figures/simulationResults/PlotGaussianPasin/SOLO/lassoFDP10/ErrorTable.png" alt="Scores for lasso method" width="500" />
 </div>
 
 * `graphsCompTime` : display the distribution of the computation time and iteration for several methods.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ComputationTime.png" alt="Computation time comparison" width="300" /> <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/Iter.png" alt="Iteration number comparison" width="300" />
 </div>
 
 * `graphsLL` : display the distribution of OFV, AIC, BIC and BICc for several methods.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ICcomparison.png" alt="Information criterion comparison" width="400" />
 </div>
 
 * `graphsParCompMethod` : display the proportion of selection of each covariates with each parameters over the replicates, for several methods.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/NumberSelectionParameter.png" alt="Proportion selection of each covariates, with each parameters comparison" width="800" />
 </div>
 
 * `graphsStatsComp` : display the proportion of exact and overselective model over the replicates for several methods.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ComparisonStats.png" alt="Proportion of exact and overselective model comparison" width="200" />
 </div>
 
 * `tableStatsComp` : resume in a table the scores measure (FDR, FNR and F1_score) for the method, with number of exact and overselective model, for several methods.
 
-<div style="text-align: center;">
+<p align="center">
   <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ErrorTable.png" alt="Scores comparison table" width="400" />
 </div>
 
@@ -292,32 +306,38 @@ graphsGenerate(project="GaussianPasin",buildMethod = c("stepAIC","lassoFDP10"),J
 
 
 ## References
-<a id="1">[1]</a> 
+<a id="1">[1]</a>
+Bodinier B (2024).
+sharp: Stability-enHanced Approaches using Resampling Procedures. R package version 1.4.6,
+<https://CRAN.R-project.org/package=sharp>.
+
+<a id="2">[2]</a>
+Mihaljevic F (2023). 
+Rsmlx: R Speaks 'Monolix'. R package version2023.1.5,
+<https://CRAN.R-project.org/package=Rsmlx>.
+
+<a id="3">[3]</a> 
+Prague M, Lavielle M. 
+SAMBA: A novel method for fast automatic model building in nonlinear mixed-effects models. 
+CPT Pharmacometrics Syst Pharmacol. 2022; 11: 161-172. doi:10.1002/psp4.12742
+
+<a id="4">[4]</a> 
 Pasin CBalelli IVan Effelterre T, Bockstal V, Solforosi L, Prague MDouoguih M, Thiébaut R2019.
 Dynamics of the Humoral Immune Response to a Prime-Boost Ebola Vaccine: Quantification and Sources of Variation. 
 J Virol93:10.1128/jvi.00579-19.https://doi.org/10.1128/jvi.00579-19
 
-<a id="2">[2]</a>
+<a id="5">[5]</a>
 Alexandre M, Prague M, McLean C, Bockstal V, Douoguih M, Thiébaut R; EBOVAC 1 and EBOVAC 2 Consortia.
 Prediction of long-term humoral response induced by the two-dose heterologous Ad26.ZEBOV, MVA-BN-Filo vaccine against Ebola.
 NPJ Vaccines. 2023 Nov 8;8(1):174. doi: 10.1038/s41541-023-00767-y. PMID: 37940656; PMCID: PMC10632397.
 
-<a id="3">[3]</a>
+<a id="6">[6]</a>
 Badio, M., Lhomme, E., Kieh, M. et al.
 Partnership for Research on Ebola VACcination (PREVAC): protocol of a randomized, double-blind, placebo-controlled phase 2 clinical trial evaluating three vaccine strategies against Ebola in healthy volunteers in four West African countries.
 Trials 22, 86 (2021). https://doi.org/10.1186/s13063-021-05035-9
 
-<a id="4">[4]</a>
+<a id="7">[7]</a>
 Simulx, Lixoft SAS, a Simulations Plus company, Version 2023R1, https://lixoft.com/products/simulx/
 
-<a id="5">[5]</a>
+<a id="8">[8]</a>
 Monolix, Lixoft SAS, a Simulations Plus company, Version 2023R1, https://lixoft.com/products/monolix/
-
-<a id="6">[6]</a>
-Mihaljevic F (2023). Rsmlx: R Speaks 'Monolix'. R package version
-2023.1.5, <https://CRAN.R-project.org/package=Rsmlx>.
-
-<a id="7">[7]</a> 
-rague M, Lavielle M. 
-SAMBA: A novel method for fast automatic model building in nonlinear mixed-effects models. 
-CPT Pharmacometrics Syst Pharmacol. 2022; 11: 161-172. doi:10.1002/psp4.12742

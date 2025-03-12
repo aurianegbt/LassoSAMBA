@@ -32,8 +32,6 @@ covariateModelSelection.lasso <- function(nfolds = 5,
   cov.types <- cov.info$type
   tcov.names <- NULL
   covariates <- cov.info$covariate
-  if(any(apply(covariates,2,sd)==0))
-    covariates <- covariates[-which(apply(covariates,2,sd)==0)]
   cov.cat <- cov.names[cov.types == "categorical"]
   covariates[cov.cat] <- lapply(covariates[cov.cat], as.factor)
   indvar <- Rsmlx:::mlx.getIndividualParameterModel()$variability$id
