@@ -16,11 +16,11 @@ with
          \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
     \end{array}\right.
 ```
-where $\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\overset{iid}{\sim}\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\overset{iid}{\sim}\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
+where $\eta_i^{\varphi_S}\sim^{iid}\mathcal{N}(0,\omega^2_{\varphi_S})$, $\eta^L_i\sim^{iid}\mathcal{N}(0,\omega_L^2)$, $\eta_i^{Ab}\sim^{iid}\mathcal{N}(0,\omega^2_{Ab})$. The observation are the defined as 
 ```math
 Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 ```
-where $\varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i}) $.
+where $\varepsilon_i\sim^{iid}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i}) $.
 
 The value used for the parameter are the one estimated from the EBOVAC trial (Eurosurveil-lance editorial team, 2014;Alexandre et al., 2023;Pasin et al., 2019). We then add up to 200 correlated covariates.
 
