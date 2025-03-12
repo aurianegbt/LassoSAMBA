@@ -1,13 +1,6 @@
----
-title: "Application to ZOSTAVAX data from the ImmuneSpace"
-output:
-  html_document: default
-  pdf_document: default
-date: "2025-03-12"
----
+# Application to ZOSTAVAX data from the ImmuneSpace
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```r
 library(ggplot2)
 library(dplyr)
 library(plyr)
@@ -32,30 +25,36 @@ gen <- exprs(data)
 genes = rownames(gen)
 ```
 
-We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -\textit{Zoster vaccine in young and elderly}-, %, and vaccines against Meningococcal virus, under the study accession number SDY1260 -\textit{Correlation between human innate and adaptive immune responses to T-cell independent or dependent meningococcal vaccines}. 
+We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -Zoster vaccine in young and elderly-, %, and vaccines against Meningococcal virus, under the study accession number SDY1260 -Correlation between human innate and adaptive immune responses to T-cell independent or dependent meningococcal vaccines. 
 with all data are available and dowloaded from the ImmPort platform.  
 
-We modelise the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -\textit{for short-live}- and L -\textit{for long-live}- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. The mechanistic model is then : 
-$$\forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
+We modelise the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -for short-live- and L -for long-live- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. The mechanistic model is then : 
+```math
+\forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
     \frac{d}{dt} Ab_i(t_{ij}) &=& {\varphi_S}_i e^{-\delta_S t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}}_i Ab_i(t_{ij}) \\
     Ab_i(t_{i0}=0) &=& {Ab_0}
-\end{array}\right.$$
+\end{array}\right.
+```
 with 
-$$\displaystyle\left\{
+```math
+\displaystyle\left\{
 \begin{array}{rcl}
          \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
          \log({\delta_{S}}_i) &=& \log({\delta_{S}}_{pop})   +\eta^\delta}_i
-    \end{array}\right.$$
-where $\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\overset{iid}{\sim}\mathcal N(0,\omega_L^2)$, $\eta^{\delta}_i\overset{iid}{\sim}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as 
-$$ Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}$$
-where $\varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
+    \end{array}\right.
+    ```
+where $\eta^{\varphi_S}_i\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta^{\delta}_i\sim^{iid}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as 
+```math
+Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
+```
+where $\varepsilon_i\sim^{iid}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
 
 To conduct the selection, we focus on genes protein coding genes link to B cells, T cells, Interferon or Type 1 Interferon pathway according to Chaussabel classification and the BioBase database. 
 
 Note that the code here are time consumming, and presented for lasso selection. To conduct the original stepAIC-SAMBA, p.max need to be set to his default value 0.1 and buildMethod to stepAIC. 
 
-```{r}
+```r
 ensembl <- useEnsembl(biomart = "genes")
 ensembl <- useDataset(dataset = "hsapiens_gene_ensembl", mart = ensembl)
 
@@ -152,7 +151,7 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
 
 
 
-```{r}
+```r
 source("scripts/MBFun.R")
 pathToResults = paste0("outputs/buildingResults/application")
 dir(pathToResults)
@@ -189,7 +188,7 @@ newProject(modelFile = "data/modelFiles/PasinApp.txt",
 
 We also conduct the selection over 500 bootstrap to test the stability of selected and non selected genes. 
 
-```{r}
+```r
 set.seed(1710)
 seed = floor(runif(1000)*100000)
 nb_bootstrap <- 500
@@ -215,7 +214,7 @@ for(i in 1:nb_bootstrap){
 }
 ```
 
-```{r}
+```r
 arr = 1
 
 pathToResults = paste0("outputs/buildingResults/application/bootstrap")
@@ -247,9 +246,17 @@ iter=res$iter
 save(res,Model,covModel,time,iter,file=pathToResults)
 ```
 
-Results from the bootstraped selection can be visualized by codes bellow. 
+Results from the bootstraped selection can be visualized by codes bellow, which render the following plots.
 
-```{r}
+<p align="center">
+  <img src="outputs/figures/applicationResults/propModel.png" alt="Proportion of empty model built by the lasso-SAMBA procedure among the 500 bootstraps." width="400" />
+</div>
+
+<p align="center">
+  <img src="outputs/figures/applicationResults/countModel.png" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="400" />
+</div>
+
+```r
 results <- data.frame()
 NB_mod <- 0
 for(i in 1:500){
