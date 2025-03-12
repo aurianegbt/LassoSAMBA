@@ -1,6 +1,6 @@
 # Generation of simulated datasets for Logistic Growth model framework with standard gaussian  covariates, completely based on Naveau et al., 2023
 
-*This simulation setup is extracted from Marion Naveau et al. work, available on her github \url{https://github.com/Marion-Naveau/Supp_Information_SAEMVS}.*
+*This simulation setup is extracted from Marion Naveau et al. work, available on her github https://github.com/Marion-Naveau/Supp_Information_SAEMVS.*
 
 This simulation are simply dowloaded from Marion Naveau github (see Saves folder form V_simul and data_comp Rdata object that contain respectively the covariates and the individual observations of this simulation framework).
 
