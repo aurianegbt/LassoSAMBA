@@ -1,40 +1,31 @@
-We simulate for 100 individuals the antibody production by considering
-two Antibodies secreting cells (ASC), denoted by S -- and L -- (at rates
-*φ*<sub>*S*</sub> and *φ*<sub>*L*</sub> resp.) and characterized by
-their half-life (*δ*<sub>*S*</sub> and *δ*<sub>*L*</sub> resp.).
-Antibodies are supposed to decay at rate *δ*<sub>*A**b*</sub>. We add
-significant covariates on *φ*<sub>*S*</sub>, *φ*<sub>*L*</sub> and
-*δ*<sub>*A**b*</sub> parameters, and then add noisy genes in order to
-have finally 200 covariates. We create two scnearios, one with only
-standard gaussian covariates and one with randomly choose distribution,
-with a mix of categorical, and continuous covariates for sake of
-validity. For these two scenarios, the covariates are correlated. The
-generation process for these covariates is detailed later. The
-mechanistic model is then :
-$$\forall i\leq N,j\leq n_i,   \left\\\begin{array}{rcl}
-    \frac{d}{dt} Ab_i(t\_{ij}) &=& {\varphi_S}\_i e^{-\delta_S t\_{ij}} + {\varphi_L}\_i e^{-\delta_L t\_{ij}} - {\delta\_{Ab}}\_i Ab_i(t\_{ij}) \\
-    Ab_i(t\_{i0}=0) &=& {Ab_0}
-\end{array}\right.$$
-with
-$$\displaystyle\left\\
+# Generation of simulated datasets for Vaccinology framework with gaussian correlated covariates (Pasin et al., 2019)
+
+We simulate for 100 individuals the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -\textit{for short-live}- and L -\textit{for long-live}- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. We add significant covariates on $\varphi_S$, $\varphi_L$ and $\delta_{Ab}$ parameters, and then add noisy genes in order to have finally 200 covariates. We create two scnearios, one with only standard gaussian covariates and one with randomly choose distribution, with a mix of categorical, and continuous covariates for sake of validity. For these two scenarios, the covariates are correlated. The generation process for these covariates is detailed later. The mechanistic model is then : 
+```math
+\forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
+    \frac{d}{dt} Ab_i(t_{ij}) &=& {\varphi_S}_i e^{-\delta_S t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}}_i Ab_i(t_{ij}) \\
+    Ab_i(t_{i0}=0) &=& {Ab_0}
+\end{array}\right.
+```
+with 
+```math
+\displaystyle\left\{
 \begin{array}{rcl}
-         \log({\varphi_S}\_i) &=& \log({\varphi_S}\_{pop}) + \eta^{\varphi_S}\_i \\
-         \log({\varphi_L}\_i) &=& \log({\varphi_L}\_{pop})  + \eta^L_i \\
-         \log({\delta\_{Ab}}\_i) &=& \log({\delta\_{Ab}}\_{pop})   +\eta^{Ab}\_i
-    \end{array}\right.$$
-where
-$\eta^{\varphi_S}\_i\overset{iid}{\sim}\mathcal N(0,\omega\_{\varphi_S}^2)$,
-$\eta^L_i\overset{iid}{\sim}\mathcal N(0,\omega_L^2)$,
-$\eta^{Ab}\_i\overset{iid}{\sim}\mathcal N(0,\omega\_{Ab}^2)$. The
-observation are the defined as
-*Y*<sub>*i**j*</sub> = log<sub>10</sub>(*A**b*<sub>*i*</sub>(*t*<sub>*i**j*</sub>)) + *ε*<sub>*i**j*</sub>
-where $*iN(0,=^2*{Ab}I\_{n_i}) $.
+         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
+         \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
+         \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
+    \end{array}\right.
+```
+where $\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\overset{iid}{\sim}\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\overset{iid}{\sim}\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
+```math
+Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
+```
+where $\varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i}) $.
 
-The value used for the parameter are the one estimated from the EBOVAC
-trial (Eurosurveil-lance editorial team, 2014;Alexandre et al.,
-2023;Pasin et al., 2019). We then add up to 200 correlated covariates.
+The value used for the parameter are the one estimated from the EBOVAC trial (Eurosurveil-lance editorial team, 2014;Alexandre et al., 2023;Pasin et al., 2019). We then add up to 200 correlated covariates.
 
-``` r
+
+```r
 set.seed(1710)
 dir <- function(path){if(!dir.exists(path)){dir.create(path)}}
 
@@ -55,24 +46,16 @@ nb_ind <- 100
 nb_cov <- 200
 ```
 
-The correlation matrix used for the vaccinology simulation is based on
-correlation estimation of the genetic expression of Prevac-UP immuno
-substudy participants~. We estimated correlation from the clinical trial
-data using the Spearman method~. This allows to have realistic
-correlation among our simulated genes. The following file contains
-covariance, correlation matrix and the mean value vector of covariates.
-We can also load the Simulx project created, with parameters values and
-mechanistic model already set.
+The correlation matrix used for the vaccinology simulation is based on correlation estimation of the genetic expression of Prevac-UP immuno substudy participants (Badio et al., 2021). We estimated correlation from the clinical trial data using the Spearman method (Spearman, 1904). This allows to have realistic correlation among our simulated genes. The following file contains covariance, correlation matrix and the mean value vector of covariates. We can also load the Simulx project created, with parameters values and mechanistic model already set. 
 
-``` r
+```r
 load("data/simulationSetup/distribPasin.RData")
 loadProject("data/simulationSetup/Pasin.smlx")
 ```
 
-The covariates are simulated for the number of replicates desired and
-add to the simulx project.
+The covariates are simulated for the number of replicates desired and add to the simulx project.
 
-``` r
+```r
 covTableALL = as.data.frame(mvtnorm::rmvnorm(n=nb_replicates*nb_ind,mean=mu,sigma = genCovMat))
 colnames(covTableALL) <- c("AGE","G1","G2",paste0("Gen",1:(nb_cov-3)))
 
@@ -97,10 +80,9 @@ runSimulation()
 sim <- getSimulationResults()
 ```
 
-Once the simulation launch, data files are saved. As it is usually done
-before analyzis, the age of participants is centered.
+Once the simulation launch, data files are saved. As it is usually done before analyzis, the age of participants is centered.
 
-``` r
+```r
 for(i in 1:nb_replicates){
   dataset = sim$res$yAB[sim$res$yAB$group==paste0("simulationGroup",i),c("original_id","time","yAB")] %>%
     rename(id=original_id)
