@@ -1,34 +1,31 @@
----
-title: "Generation of simulated datasets for Vaccinology framework with non gaussian correlated covariates (Pasin et al., 2019)"
-output:
-  html_document: default
-  pdf_document: default
-date: "2024-10-07"
----
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Generation of simulated datasets for Vaccinology framework with non gaussian correlated covariates (Pasin et al., 2019)
 
 We simulate for 100 individuals the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -\textit{for short-live}- and L -\textit{for long-live}- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. We add significant covariates on $\varphi_S$, $\varphi_L$ and $\delta_{Ab}$ parameters, and then add noisy genes in order to have finally 200 covariates. We create two scnearios, one with only standard gaussian covariates and one with randomly choose distribution, with a mix of categorical, and continuous covariates for sake of validity. For these two scenarios, the covariates are correlated. The generation process for these covariates is detailed later. The mechanistic model is then : 
-$$\forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
+```math
+\forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
     \frac{d}{dt} Ab_i(t_{ij}) &=& {\varphi_S}_i e^{-\delta_S t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}}_i Ab_i(t_{ij}) \\
     Ab_i(t_{i0}=0) &=& {Ab_0}
-\end{array}\right.$$
+\end{array}\right.
+```
 with 
-$$\displaystyle\left\{
+```math
+\displaystyle\left\{
 \begin{array}{rcl}
          \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
          \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
-    \end{array}\right.$$
-where $\eta^{\varphi_S}_i\overset{iid}{\sim}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\overset{iid}{\sim}\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\overset{iid}{\sim}\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
-$$ Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}$$
-where $\varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
+    \end{array}\right.
+```
+where $\eta^{\varphi_S}_i\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\sim^{iid}\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
+```math
+Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
+```
+where $\varepsilon_i\sim^{iid}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
 
 The value used for the parameter are the one estimated from the EBOVAC trial (Eurosurveillance editorial team, 2014;Alexandre et al., 2023;Pasin et al., 2019). We then add up to 200 correlated covariates from a various range of distribution.
 
 
-```{r}
+```r
 set.seed(81511807)
 dir <- function(path){if(!dir.exists(path)){dir.create(path)}}
 
@@ -52,7 +49,7 @@ nb_cov <- 200
 
 ```
 
-For this scenario  with random distribution, we implemente a function \texttt{randomCovariate} providing a random distribution. If  This function outputs a list containing the name of the distribution and the necessary elements for sampling it in R~\cite{R}. For example, if the distribution is ``unif'', for a uniform distribution, the elements will be ``min'' and ``max'' for the interval bounds. Table~\ref{tab:generation} summarizes the process of generating each of the distributions. To generate a distribution for a random variable $X$, the function call allows for a uniform draw from the possible distributions mentioned in table~\ref{tab:generation}, and then it draws the parameters according to the specified distributions, and the correlation matrix provided with the package \texttt{simstudy}~\cite{simstudy}.PK The covariates for each individual are consequently drawn according to this distribution.
+For this scenario  with random distribution, we implemente a function \texttt{randomCovariate} providing a random distribution. If  This function outputs a list containing the name of the distribution and the necessary elements for sampling it in R~\citer. For example, if the distribution is ``unif'', for a uniform distribution, the elements will be ``min'' and ``max'' for the interval bounds. Table~\ref{tab:generation} summarizes the process of generating each of the distributions. To generate a distribution for a random variable $X$, the function call allows for a uniform draw from the possible distributions mentioned in table~\ref{tab:generation}, and then it draws the parameters according to the specified distributions, and the correlation matrix provided with the package \texttt{simstudy}~\cite{simstudy}.PK The covariates for each individual are consequently drawn according to this distribution.
 
 | Distribution | Elements    | Generation                   |
 |--------------|-------------|------------------------------|
@@ -69,7 +66,7 @@ For this scenario  with random distribution, we implemente a function \texttt{ra
 
 Using this process, we generate the other covariate distribution. 
 
-```{r}
+```r
 ## Generate distribution 
 distribution = randomCovariate(n=nb_cov -3)
 
@@ -103,7 +100,7 @@ covTableALL = genCorFlex(nb_replicates*nb_ind,def,corMatrix=genCorMat)
 
 The simulated covariates are then add to the simulX project to generate the individual dynamics. 
 
-```{r}
+```r
 for(i in 1:nb_replicates){
   covTable = covTableALL[(1+(i-1)*nb_ind):(i*nb_ind),] %>% mutate(id = (id-1)%%nb_ind+1)
 
@@ -127,7 +124,7 @@ sim <- getSimulationResults()
 
 Once the simulation launch, data files are saved. As it is usually done before analyzis, the age of participants is centered.
 
-```{r}
+```r
 for(i in 1:nb_replicates){
   dataset = sim$res$yAB[sim$res$yAB$group==paste0("simulationGroup",i),c("original_id","time","yAB")] %>%
     rename(id=original_id)

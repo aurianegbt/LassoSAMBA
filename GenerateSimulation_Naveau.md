@@ -1,20 +1,10 @@
----
-title: "Generation of simulated datasets for Logistic Growth model framework with standard gaussian  covariates, completely based on Naveau et al., 2023"
-output:
-  html_document: default
-  pdf_document: default
-date: "2024-10-07"
----
+# Generation of simulated datasets for Logistic Growth model framework with standard gaussian  covariates, completely based on Naveau et al., 2023
 
 *This simulation setup is extracted from Marion Naveau et al. work, available on her github \url{https://github.com/Marion-Naveau/Supp_Information_SAEMVS}.*
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 This simulation are simply dowloaded from Marion Naveau github (see Saves folder form V_simul and data_comp Rdata object that contain respectively the covariates and the individual observations of this simulation framework).
 
-```{r}
+```r
 dir <- function(path){if(!dir.exists(path)){dir.create(path)}}
 
 load("data/simulationSetup/data_comp.Rdata")
