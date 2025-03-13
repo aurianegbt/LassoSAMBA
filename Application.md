@@ -37,12 +37,12 @@ with
 ```math
 \displaystyle\left\{
 \begin{array}{rcl}
-         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
+         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^S_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
-         \log({\delta_{S}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
+         \log({\delta_{S}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{\delta}_i
     \end{array}\right.
 ```
-where $\eta_i^{\varphi_S}\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as 
+where $\eta_i^S\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_{\varphi_L}^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta_S}^2)$. The observation are the defined as 
 ```math
 Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 ```
@@ -150,7 +150,7 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
 ```
 
 <p align="center">
-  <img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="300" /> 
+  <img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="600" /> 
 
 <strong>Figure 1:</strong> Observed Data. 
 </div>
@@ -226,6 +226,7 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 ```
 
 <p align="center">
+    
 | Parameter             | Value     | Confidence bounds (95%)  |
 |-----------------------|-----------|--------------------------|
 | FIXED EFFECTS                                                |
@@ -249,24 +250,24 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 | -216.08 | -202.08 | -191.19 | -184.06 |
 
 
-<strong>Table 2:<s/trong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
+<strong>Table 2:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
 
-  <img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="300" /> 
+  <img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="900" /> 
 
 <strong>Figure 2:</strong> Individual Fits.  
 
 
-  <img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="300" /> 
+  <img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="900" /> 
 
 
 <strong>Figure 3:</strong> Visual Predictive Check. 
 
-  <img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="300" /> 
+  <img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="1000" /> 
 
 <strong>Figure 4:</strong> Convergence Assessment plot. 
 
-</div>
+</p>
 
 ```r
 source("scripts/MBFun.R")
@@ -305,9 +306,9 @@ Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ an
 ```math
 \displaystyle\left\{
 \begin{array}{rcl}
-         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) +\beta_{\varphi_S,LEP}LEP_i+ \eta^{\varphi_S}_i \\
+         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) +\beta_{\varphi_S,LEP}LEP_i+ \eta^S_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop}) +\beta_{\varphi_L,KIFC1}KIFC1_i + \eta^L_i \\
-         \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
+         \log({\delta_{S}}_i) &=& \log({\delta_{S}}_{pop})   +\eta^{\delta}_i
     \end{array}\right.
 ```
 
@@ -418,15 +419,15 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.
 
 <strong>Table 4:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
-  <img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="300" />
+  <img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="900" />
   
 <strong>Figure 5:</strong> Individual Fits.  
 
-  <img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="300" /> 
+  <img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="900" /> 
   
 <strong>Figure 6:</strong> Visual Predictive Check. 
 
-  <img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="300" /> 
+  <img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="1000" /> 
   
 <strong>Figure 7:</strong> Convergence Assessment.
 
