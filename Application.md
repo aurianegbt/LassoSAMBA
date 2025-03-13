@@ -40,10 +40,10 @@ with
 \begin{array}{rcl}
          \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
-         \log({\delta_{S}}_i) &=& \log({\delta_{S}}_{pop})   +\eta^\delta}_i
+         \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
     \end{array}\right.
-    ```
-where $\eta^{\varphi_S}_i\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta^{\delta}_i\sim^{iid}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as 
+```
+where $\eta_i^{\varphi_S}\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as 
 ```math
 Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 ```
