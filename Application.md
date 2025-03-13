@@ -24,8 +24,7 @@ gen <- exprs(data)
 genes = rownames(gen)
 ```
 
-We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -Zoster vaccine in young and elderly-, %, and vaccines against Meningococcal virus, under the study accession number SDY1260 -Correlation between human innate and adaptive immune responses to T-cell independent or dependent meningococcal vaccines. 
-with all data are available and dowloaded from the ImmPort platform.  
+We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -Zoster vaccine in young and elderly-, with all data are available and dowloaded from the ImmPort platform.  
 
 We modelise the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -for short-live- and L -for long-live- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. The mechanistic model is then : 
 ```math
