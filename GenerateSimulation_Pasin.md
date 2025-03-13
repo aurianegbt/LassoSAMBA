@@ -16,7 +16,7 @@ with
          \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
     \end{array}\right.
 ```
-where $\eta^{\varphi_S}_i\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta^{Ab}_i\sim^{iid}\mathcal N(0,\omega_{Ab}^2)$. The observation are the defined as 
+where $\eta_i^{\varphi_S}\sim^{iid}\mathcal{N}(0,\omega^2_{\varphi_S})$, $\eta^L_i\sim^{iid}\mathcal{N}(0,\omega_L^2)$, $\eta_i^{Ab}\sim^{iid}\mathcal N(0,\omega^2_{Ab})$. The observation are the defined as 
 ```math
 Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 ```
@@ -50,9 +50,7 @@ nb_cov <- 200
 ```
 
 For this scenario  with random distribution, we implemente a function ``randomcovariate`` providing a random distribution. If  This function outputs a list containing the name of the distribution and the necessary elements for sampling it in R. For example, if the distribution is ''unif'', for a uniform distribution, the elements will be ''min'' and ''max'' for the interval bounds. Table 1 summarizes the process of generating each of the distributions. To generate a distribution for a random variable $X$, the function call allows for a uniform draw from the possible distributions mentioned in the following table, and then it draws the parameters according to the specified distributions, and the correlation matrix provided with the package ``simstudy`` (Goldfeld andWujciak-Jens, 2020). The covariates for each individual are consequently drawn according to this distribution.
-
-<c>
-
+    
 | Distribution | Elements    | Generation                   |
 |--------------|-------------|------------------------------|
 | Gamma        | "shape"     | $\mathcal{P}(10)$            |
@@ -65,7 +63,6 @@ For this scenario  with random distribution, we implemente a function ``randomco
 |              | "max"       | $\max(x)$                    |
 
 **Table 1:** Process of generating various distributions using the implemented `randomCovariate` function.
-</c>
 
 Using this process, we generate the other covariate distribution. 
 
