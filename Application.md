@@ -24,13 +24,12 @@ gen <- exprs(data)
 genes = rownames(gen)
 ```
 
-We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -Zoster vaccine in young and elderly-, %, and vaccines against Meningococcal virus, under the study accession number SDY1260 -Correlation between human innate and adaptive immune responses to T-cell independent or dependent meningococcal vaccines. 
-with all data are available and dowloaded from the ImmPort platform.  
+We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -Zoster vaccine in young and elderly-, with all data are available and dowloaded from the ImmPort platform.  
 
 We modelise the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -for short-live- and L -for long-live- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. The mechanistic model is then : 
 ```math
 \forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
-    \frac{d}{dt} Ab_i(t_{ij}) &=& {\varphi_S}_i e^{-\delta_S t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}}_i Ab_i(t_{ij}) \\
+    \frac{d}{dt} Ab_i(t_{ij}) &=& {\varphi_S}_i e^{-{\delta_S}_i t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}} Ab_i(t_{ij}) \\
     Ab_i(t_{i0}=0) &=& {Ab_0}
 \end{array}\right.
 ```
@@ -40,7 +39,7 @@ with
 \begin{array}{rcl}
          \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
-         \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
+         \log({\delta_{S}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
     \end{array}\right.
 ```
 where $\eta_i^{\varphi_S}\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as 
