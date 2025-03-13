@@ -51,7 +51,7 @@ nb_cov <- 200
 
 For this scenario  with random distribution, we implemente a function ``randomcovariate`` providing a random distribution. If  This function outputs a list containing the name of the distribution and the necessary elements for sampling it in R. For example, if the distribution is ''unif'', for a uniform distribution, the elements will be ''min'' and ''max'' for the interval bounds. Table 1 summarizes the process of generating each of the distributions. To generate a distribution for a random variable $X$, the function call allows for a uniform draw from the possible distributions mentioned in the following table, and then it draws the parameters according to the specified distributions, and the correlation matrix provided with the package ``simstudy`` (Goldfeld andWujciak-Jens, 2020). The covariates for each individual are consequently drawn according to this distribution.
 
-<p>
+<c>
 
 | Distribution | Elements    | Generation                   |
 |--------------|-------------|------------------------------|
@@ -65,7 +65,7 @@ For this scenario  with random distribution, we implemente a function ``randomco
 |              | "max"       | $\max(x)$                    |
 
 **Table 1:** Process of generating various distributions using the implemented `randomCovariate` function.
-</p>
+</c>
 
 Using this process, we generate the other covariate distribution. 
 
