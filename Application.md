@@ -12,7 +12,7 @@ dir <- function(d){if(!dir.exists(d)){dir.create(d)}}
 
 genes_information <- read.table("data/applicationFiles/GenesbyModules_Chaussabel_updateGeneNames.txt",header = TRUE)
 
-genesKeep = unlist(unlist(str_split(genes_information[genes_information$Function %in% c("Interferon","Type 1 Interferon","Neutrophil activation","Inflammation","Cytokines/chemokines","Cell cycle","Erythrocytes"),"Genes"],", ")))
+genesKeep = unlist(unlist(str_split(genes_information[genes_information$Function %in% c("Interferon","Type 1 Interferon","Neutrophil activation","Inflammation","Cytokines/chemokines","Cell cycle"),"Genes"],", ")))
 
 
 data_elisa <- read.csv("data/raw/elisa.csv") # downloaded through ImmPort, not available in this repo 
@@ -126,6 +126,8 @@ ggplot(data = data_VAR[data_VAR$Analyte=="IgG",],
   ylab ("log10(Ab)")+
   xlab("time (in days)")
 
+ggsave(filename="outputs/figures/applicationResults/ObservedData.png")
+
 df <- data_VAR %>%
   filter(Analyte=="IgG") %>%
   dplyr::select(Participant.ID,Study.Time.Collected,Value.Preferred) %>%
@@ -148,6 +150,121 @@ Nb_cov = ncol(df_J_mix)-4
 write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F)
 ```
 
+<p align="center">
+  <img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="300" /> 
+</div>
+**Figure 1:** Observed Data. 
+
+```r
+newProject(modelFile="data/modelFiles/PasinApp.txt",
+           data=list(dataFile="data/applicationFiles/Imm_data.txt",
+                     headerTypes = c("id","time","observation","regressor")))
+                     
+setIndividualParameterVariability(delta_L=FALSE)
+setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
+  
+setIndividualParameterVariability(delta_AB=FALSE)
+setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
+  
+setErrorModel(Value="constant")
+runPopulationParameterEstimation()
+runStandardErrorEstimation()
+runLogLikelihoodEstimation()
+
+getEstimatedPopulationParameters()
+getEstimatedStandardErrors()
+getEstimatedLogLikelihood()
+
+asses = getAssessmentSettings()
+asses$extendedEstimation=TRUE
+runAssessment(settings=asses)
+
+ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits.png",width=2000,height=3000,unit="px")
+
+ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.png",width=1600,height=800,unit="px")
+
+res = getAssessmentResults()
+
+popparams <- getPopulationParameterInformation()
+tabestimates <- NULL
+tabiters <- NULL
+for(i in 1:5){
+  estimates = res[[i]]$populationParameters$convergence[res[[i]]$populationParameters$nbexploratoryiterations+res[[i]]$populationParameters$nbsmoothingiterations+1,-(nrow(popparams)-2+1)]
+  estimates <- data.frame(parameter=names(estimates),estimate=as.numeric(estimates))
+  
+  se = getEstimatedStandardErrors()$stochasticApproximation[,-3]
+  estimates <- merge(estimates,se,by="parameter",sort=FALSE)
+  estimates$run <- i
+  
+  tabestimates <- rbind(tabestimates,estimates)
+  
+  iters <- res[[i]]$populationParameters$convergence
+  iters$iteration <- row.names(iters)
+  iters$run <- i
+  tabiters <- rbind(tabiters,iters)
+}
+
+
+tabestimates$parameter <- factor(tabestimates$parameter,levels=c(estimates$parameter))
+levels(tabestimates$parameter) <- sapply(c(r"($\delta_S$)",
+                                           r"($\varphi_S$)",
+                                           r"($\varphi_L$)",
+                                           r"($\omega_{\delta_S}$)",
+                                           r"($\omega_{\varphi_S}$)",
+                                           r"($\omega_{\varphi_L}$)",
+                                           r"($\sigma_{Ab}$)"),FUN=function(x){latex2exp::TeX(x,output="character")})
+
+ggplot(tabestimates,aes(x=run,y=estimate))+
+  geom_point(aes(color=factor(run))) +
+  facet_wrap(~parameter,nrow=2,scales="free",labeller=label_parsed) +
+  geom_errorbar(aes(ymax=estimate+1.96*se,ymin=estimate-1.96*se,color=factor(run)))+
+  theme(legend.position = "none", plot.title = element_text(hjust = .5)) + 
+  xlab("")+ylab("")
+  
+ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",height=1000,width=2500,unit="px")
+
+```
+
+
+| Parameter             | Value     | Confidence bounds (95%)  |
+|-----------------------|-----------|--------------------------|
+| FIXED EFFECTS                                                |
+| ${\delta_L}_pop$      | $0.00019$ |                          |
+| ${\delta_{Ab}}_{pop}$ | $0.063$   |                          |
+| ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$          | 
+| ${\varphi_S}_pop$     | $907.35$  | $[429.78;1384.93]$       |
+| ${\varphi_L}_pop$     | $1069.24$ | $[819.029;1319.457]$     |
+| RANDOM EFFECTS                                               |
+| $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$          |
+| $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$          |
+| $\omega_{\varphi_L}$  | $0.67$    | $[0.506;0.834]$          |
+| ERROR                                                        |
+| $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$          |
+
+
+**Table 1:** Estimated Values of the empty model (no covariates included).
+
+| OFV     | AIC     | BIC     |  BICc   |
+|---------|---------|---------|---------|
+| -216.08 | -202.08 | -191.19 | -184.06 |
+
+
+**Table 2:** Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
+
+<p align="center">
+  <img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="300" /> 
+</div>
+**Figure 2:** Individual Fits.  
+
+<p align="center">
+  <img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="300" /> 
+</div>
+**Figure 3:** Visual Predictive Check. 
+
+<p align="center">
+  <img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="300" /> 
+</div>
+**Figure 4:** Convergence Assessment plot. 
 
 
 ```r
@@ -167,11 +284,9 @@ newProject(modelFile = "data/modelFiles/PasinApp.txt",
   setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
   
   setErrorModel(Value="constant")
-  
-  saveProject(paste0(temporaryDirectory,"/Build.mlxtran"))
+
   # buildmlx ---------------------------------------------------------
-  res = buildmlx(project = paste0(temporaryDirectory,"/Build.mlxtran"),
-                 buildMethod = "lasso",
+  res = buildmlx(buildMethod = "lasso",
                  model=model,
                  test=FALSE,
                  FDP_thr = 0.2,
@@ -184,6 +299,138 @@ newProject(modelFile = "data/modelFiles/PasinApp.txt",
   
   save(res,Model,covModel,time,iter,file=paste0(pathToResults,"/lasso.RData"))
 ```
+
+Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ and $\varphi_L$ : 
+```math
+\displaystyle\left\{
+\begin{array}{rcl}
+         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) +\beta_{\varphi_S,LEP}LEP_i+ \eta^{\varphi_S}_i \\
+         \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop}) +\beta_{\varphi_L,KIFC1}KIFC1_i + \eta^L_i \\
+         \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
+    \end{array}\right.
+```
+
+```r
+
+new_data = read.csv("data/applicationFiles/data.txt")
+new_data = new_data %>% select(ID,Time,Value,Init,LEP,KIFC1)
+write.csv(new_data,"data/applicationFiles/data_final.txt",quote=FALSE,row.names=FALSE)
+
+newProject(modelFile="data/modelFiles/PasinApp.txt",
+           data=list(dataFile="data/applicationFiles/data_final.txt",
+                     headerTypes = c("id","time","observation","regressor","contcov","contcov")))
+                     
+setIndividualParameterVariability(delta_L=FALSE)
+setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
+  
+setIndividualParameterVariability(delta_AB=FALSE)
+setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
+
+setCovariateModel(list(phi_L=list(KIFC1=TRUE),phi_S=list(LEP=TRUE)))
+setErrorModel(Value="constant")
+
+runPopulationParameterEstimation()
+runStandardErrorEstimation()
+runLogLikelihoodEstimation()
+
+getEstimatedPopulationParameters()
+getEstimatedStandardErrors()
+getEstimatedLogLikelihood()
+
+asses = getAssessmentSettings()
+asses$extendedEstimation=TRUE
+runAssessment(settings=asses)
+
+ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits_final.png",width=2000,height=3000,unit="px")
+
+ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.png",width=1600,height=800,unit="px")
+
+res = getAssessmentResults()
+
+popparams <- getPopulationParameterInformation()
+tabestimates <- NULL
+tabiters <- NULL
+for(i in 1:5){
+  estimates = res[[i]]$populationParameters$convergence[res[[i]]$populationParameters$nbexploratoryiterations+res[[i]]$populationParameters$nbsmoothingiterations+1,-(nrow(popparams)-2+1)]
+  estimates <- data.frame(parameter=names(estimates),estimate=as.numeric(estimates))
+  
+  se = getEstimatedStandardErrors()$stochasticApproximation[,-3]
+  estimates <- merge(estimates,se,by="parameter",sort=FALSE)
+  estimates$run <- i
+  
+  tabestimates <- rbind(tabestimates,estimates)
+  
+  iters <- res[[i]]$populationParameters$convergence
+  iters$iteration <- row.names(iters)
+  iters$run <- i
+  tabiters <- rbind(tabiters,iters)
+}
+
+
+tabestimates$parameter <- factor(tabestimates$parameter,levels=c(estimates$parameter))
+levels(tabestimates$parameter) <- sapply(c(r"($\delta_S$)",
+                                           r"($\varphi_S$)",
+                                           r"($\beta_{varphi_S,LEP}$)",
+                                           r"($\varphi_L$)",
+                                           r"($\beta_{varphi_L,KIFC1}$)",
+                                           r"($\omega_{\delta_S}$)",
+                                           r"($\omega_{\varphi_S}$)",
+                                           r"($\omega_{\varphi_L}$)",
+                                           r"($\sigma_{Ab}$)"),FUN=function(x){latex2exp::TeX(x,output="character")})
+
+ggplot(tabestimates,aes(x=run,y=estimate))+
+  geom_point(aes(color=factor(run))) +
+  facet_wrap(~parameter,nrow=2,scales="free",labeller=label_parsed) +
+  geom_errorbar(aes(ymax=estimate+1.96*se,ymin=estimate-1.96*se,color=factor(run)))+
+  theme(legend.position = "none", plot.title = element_text(hjust = .5)) + 
+  xlab("")+ylab("")
+
+ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.png",height=1000,width=2500,unit="px")
+```
+
+
+| Parameter                 | Value                | Confidence bounds (95%)  |
+|---------------------------|----------------------|--------------------------|
+| FIXED EFFECTS                                                               |
+| ${\delta_L}_pop$          | $0.00019$            |                          |
+| ${\delta_{Ab}}_{pop}$     | $0.063$              |                          |
+| ${\delta_S}_{pop}$        | $0.047$              | $[0.012;0.081]$          | 
+| ${\varphi_S}_pop$         | $5.14\times 10^{8}$  | NA                       |
+| $\beta_{\varphi_S,LEP}$   | $-3.40$              | $[-4.79;-2.003]$         |
+| ${\varphi_L}_pop$         | $1.03\times 10^{7}$  | NA                       |
+| $\beta_{\varphi_L,KIFC1}$ | $-2.05$              | $[-2.89;-1.215]$         |
+| RANDOM EFFECTS                                                              |
+| $\omega_{\delta_S}$       | $0.84$               | $[0.167;1.521]$          |
+| $\omega_{\varphi_S}$      | $0.71$               | $[0.415;1.007]$          |
+| $\omega_{\varphi_L}$      | $0.47$               | $[0.334;0.612]$          |
+| ERROR                                                                       |
+| $\sigma_{Ab}$             | $0.94$               | $[0.083;0.105]$          |
+
+
+**Table 3:** Estimated Values of the final model.
+
+| OFV     | AIC     | BIC     |  BICc   |
+|---------|---------|---------|---------|
+| -254.84 | -236.84 | -222.84 | -215.71 |
+
+
+**Table 4:** Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
+
+<p align="center">
+  <img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="300" /> 
+</div>
+**Figure 5:** Individual Fits.  
+
+<p align="center">
+  <img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="300" /> 
+</div>
+**Figure 6:** Visual Predictive Check. 
+
+<p align="center">
+  <img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="300" /> 
+</div>
+**Figure 7:** Convergence Assessment.
+
 
 We also conduct the selection over 500 bootstrap to test the stability of selected and non selected genes. 
 
