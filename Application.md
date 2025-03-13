@@ -152,8 +152,9 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
 
 <p align="center">
   <img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="300" /> 
+
+<strong>Figure 1:</strong> Observed Data. 
 </div>
-**Figure 1:** Observed Data. 
 
 ```r
 newProject(modelFile="data/modelFiles/PasinApp.txt",
@@ -225,7 +226,7 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 
 ```
 
-
+<p align="center">
 | Parameter             | Value     | Confidence bounds (95%)  |
 |-----------------------|-----------|--------------------------|
 | FIXED EFFECTS                                                |
@@ -242,30 +243,31 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 | $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$          |
 
 
-**Table 1:** Estimated Values of the empty model (no covariates included).
+<strong>Table 1:</strong> Estimated Values of the empty model (no covariates included).
 
 | OFV     | AIC     | BIC     |  BICc   |
 |---------|---------|---------|---------|
 | -216.08 | -202.08 | -191.19 | -184.06 |
 
 
-**Table 2:** Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
+<strong>Table 2:<s/trong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
-<p align="center">
+
   <img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="300" /> 
-</div>
-**Figure 2:** Individual Fits.  
 
-<p align="center">
+<strong>Figure 2:</strong> Individual Fits.  
+
+
   <img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="300" /> 
-</div>
-**Figure 3:** Visual Predictive Check. 
 
-<p align="center">
+
+<strong>Figure 3:</strong> Visual Predictive Check. 
+
   <img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="300" /> 
-</div>
-**Figure 4:** Convergence Assessment plot. 
 
+<strong>Figure 4:</strong> Convergence Assessment plot. 
+
+</div>
 
 ```r
 source("scripts/MBFun.R")
@@ -388,6 +390,7 @@ ggplot(tabestimates,aes(x=run,y=estimate))+
 ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.png",height=1000,width=2500,unit="px")
 ```
 
+<p align="center">
 
 | Parameter                 | Value                | Confidence bounds (95%)  |
 |---------------------------|----------------------|--------------------------|
@@ -407,30 +410,28 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.
 | $\sigma_{Ab}$             | $0.94$               | $[0.083;0.105]$          |
 
 
-**Table 3:** Estimated Values of the final model.
+<strong>Table 3:</strong> Estimated Values of the final model.
 
 | OFV     | AIC     | BIC     |  BICc   |
 |---------|---------|---------|---------|
 | -254.84 | -236.84 | -222.84 | -215.71 |
 
 
-**Table 4:** Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
+<strong>Table 4:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
-<p align="center">
-  <img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="300" /> 
-</div>
-**Figure 5:** Individual Fits.  
+  <img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="300" />
+  
+<strong>Figure 5:</strong> Individual Fits.  
 
-<p align="center">
   <img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="300" /> 
-</div>
-**Figure 6:** Visual Predictive Check. 
+  
+<strong>Figure 6:</strong> Visual Predictive Check. 
 
-<p align="center">
   <img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="300" /> 
-</div>
-**Figure 7:** Convergence Assessment.
+  
+<strong>Figure 7:</strong> Convergence Assessment.
 
+</div>
 
 We also conduct the selection over 500 bootstrap to test the stability of selected and non selected genes. 
 
