@@ -10,11 +10,10 @@ library(Biobase)
 library(biomaRt)
 dir <- function(d){if(!dir.exists(d)){dir.create(d)}}
 
-genes_information <- read.table("data/GenesbyModules_Chaussabel_updateGeneNames.txt",header = TRUE)
+genes_information <- read.table("data/applicationFiles/GenesbyModules_Chaussabel_updateGeneNames.txt",header = TRUE)
 
-T_cell = unlist(str_split(genes_information[genes_information$Function=="T cells","Genes"],", "))
-B_cell = unlist(str_split(genes_information[genes_information$Function=="B cells","Genes"],", "))
-Interferon = unlist(str_split(genes_information[genes_information$Function %in% c("Interferon","Type 1 Interferon"),"Genes"],", "))
+genesKeep = unlist(unlist(str_split(genes_information[genes_information$Function %in% c("Interferon","Type 1 Interferon","Neutrophil activation","Inflammation","Cytokines/chemokines","Cell cycle","Erythrocytes"),"Genes"],", ")))
+
 
 data_elisa <- read.csv("data/raw/elisa.csv") # downloaded through ImmPort, not available in this repo 
 data <- readRDS("data/raw/all_norm_withResponse_eset.rds") # downloaded through ImmPort, not available in this repo 
