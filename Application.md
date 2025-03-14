@@ -257,14 +257,14 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="300"/>
+<img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="800"/>
 </p>
 
 <p align="center"><strong>Figure 2:</strong> Individual Fits.</p>
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="300"/>
+<img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="800"/>
 </p>
 
 
@@ -430,7 +430,7 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="300"/>
+<img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="800"/>
 </p>
 
 
@@ -438,7 +438,7 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="300"/>
+<img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="800"/>
 </p>
 
 
@@ -446,7 +446,7 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="300"/>
+<img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="1000"/>
 </p>
 
 
@@ -518,15 +518,15 @@ save(res,Model,covModel,time,iter,file=pathToResults)
 Results from the bootstrap selection can be visualized by codes bellow, which render the following plots.
 
 <p align="center">
-<img src="outputs/figures/applicationResults/propModel_par.png" alt="Proportion of empty, and final model including LEP and KIFC1 genes, with parameters links, built by the lasso-SAMBA procedure among the 500 bootstraps." width="400"/>
+<img src="outputs/figures/applicationResults/propModel_par.png" alt="Proportion of empty, and final model including LEP and KIFC1 genes, with parameters links, built by the lasso-SAMBA procedure among the 500 bootstraps." width="800"/>
 </p>
 
 <p align="center">
-<img src="outputs/figures/applicationResults/propModel.png" alt="Proportion of empty, and final model including LEP and KIFC1 genes built by the lasso-SAMBA procedure among the 500 bootstraps." width="400"/>
+<img src="outputs/figures/applicationResults/propModel.png" alt="Proportion of empty, and final model including LEP and KIFC1 genes built by the lasso-SAMBA procedure among the 500 bootstraps." width="800"/>
 </p>
 
 <p align="center">
-<img src="outputs/figures/applicationResults/countModel.png" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="400"/>
+<img src="outputs/figures/applicationResults/countModel.png" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
 </p>
 
 ``` r
