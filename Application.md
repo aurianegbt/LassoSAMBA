@@ -1,6 +1,6 @@
 # Application to ZOSTAVAX data from the ImmuneSpace
 
-```r
+``` r
 library(ggplot2)
 library(dplyr)
 library(plyr)
@@ -24,17 +24,20 @@ gen <- exprs(data)
 genes = rownames(gen)
 ```
 
-We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -Zoster vaccine in young and elderly-, with all data are available and dowloaded from the ImmPort platform.  
+We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -Zoster vaccine in young and elderly-, with all data are available and dowloaded from the ImmPort platform.
 
-We modelise the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -for short-live- and L -for long-live- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. The mechanistic model is then : 
-```math
+We modelise the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -for short-live- and L -for long-live- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. The mechanistic model is then :
+
+``` math
 \forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
     \frac{d}{dt} Ab_i(t_{ij}) &=& {\varphi_S}_i e^{-{\delta_S}_i t_{ij}} + {\varphi_L}_i e^{-\delta_L t_{ij}} - {\delta_{Ab}} Ab_i(t_{ij}) \\
     Ab_i(t_{i0}=0) &=& {Ab_0}
 \end{array}\right.
 ```
-with 
-```math
+
+with
+
+``` math
 \displaystyle\left\{
 \begin{array}{rcl}
          \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
@@ -42,17 +45,20 @@ with
          \log({\delta_{S}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
     \end{array}\right.
 ```
-where $\eta_i^{\varphi_S}\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as 
-```math
+
+where $\eta_i^{\varphi_S}\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as
+
+``` math
 Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 ```
+
 where $\varepsilon_i\sim^{iid}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
 
-To conduct the selection, we focus on genes protein coding genes link to B cells, T cells, Interferon or Type 1 Interferon pathway according to Chaussabel classification and the BioBase database. 
+To conduct the selection, we focus on genes protein coding genes link to B cells, T cells, Interferon or Type 1 Interferon pathway according to Chaussabel classification and the BioBase database.
 
-Note that the code here are time consumming, and presented for lasso selection. To conduct the original stepAIC-SAMBA, p.max need to be set to his default value 0.1 and buildMethod to stepAIC. 
+Note that the code here are time consumming, and presented for lasso selection. To conduct the original stepAIC-SAMBA, p.max need to be set to his default value 0.1 and buildMethod to stepAIC.
 
-```r
+``` r
 ensembl <- useEnsembl(biomart = "genes")
 ensembl <- useDataset(dataset = "hsapiens_gene_ensembl", mart = ensembl)
 
@@ -150,12 +156,18 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
 ```
 
 <p align="center">
-  <img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="300" /> 
 
-<strong>Figure 1:</strong> Observed Data. 
-</div>
+<img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="300"/>
 
-```r
+</p>
+
+<p style="text-align:center">
+
+<strong>Figure 1:</strong> Observed Data.
+
+</p>
+
+``` r
 newProject(modelFile="data/modelFiles/PasinApp.txt",
            data=list(dataFile="data/applicationFiles/Imm_data.txt",
                      headerTypes = c("id","time","observation","regressor")))
@@ -222,53 +234,48 @@ ggplot(tabestimates,aes(x=run,y=estimate))+
   xlab("")+ylab("")
   
 ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",height=1000,width=2500,unit="px")
-
 ```
 
 <p align="center">
-| Parameter             | Value     | Confidence bounds (95%)  |
-|-----------------------|-----------|--------------------------|
-| FIXED EFFECTS                                                |
-| ${\delta_L}_pop$      | $0.00019$ |                          |
-| ${\delta_{Ab}}_{pop}$ | $0.063$   |                          |
-| ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$          | 
-| ${\varphi_S}_pop$     | $907.35$  | $[429.78;1384.93]$       |
-| ${\varphi_L}_pop$     | $1069.24$ | $[819.029;1319.457]$     |
-| RANDOM EFFECTS                                               |
-| $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$          |
-| $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$          |
-| $\omega_{\varphi_L}$  | $0.67$    | $[0.506;0.834]$          |
-| ERROR                                                        |
-| $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$          |
 
+| Parameter             | Value     | Confidence bounds (95%) |
+|-----------------------|-----------|-------------------------|
+| FIXED EFFECTS         |           |                         |
+| ${\delta_L}_pop$      | $0.00019$ |                         |
+| ${\delta_{Ab}}_{pop}$ | $0.063$   |                         |
+| ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$         |
+| ${\varphi_S}_pop$     | $907.35$  | $[429.78;1384.93]$      |
+| ${\varphi_L}_pop$     | $1069.24$ | $[819.029;1319.457]$    |
+| RANDOM EFFECTS        |           |                         |
+| $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$         |
+| $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$         |
+| $\omega_{\varphi_L}$  | $0.67$    | $[0.506;0.834]$         |
+| ERROR                 |           |                         |
+| $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$         |
 
 <strong>Table 1:</strong> Estimated Values of the empty model (no covariates included).
 
-| OFV     | AIC     | BIC     |  BICc   |
+| OFV     | AIC     | BIC     | BICc    |
 |---------|---------|---------|---------|
 | -216.08 | -202.08 | -191.19 | -184.06 |
 
-
 <strong>Table 2:<s/trong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
+<img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="300"/>
 
-  <img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="300" /> 
+<strong>Figure 2:</strong> Individual Fits.
 
-<strong>Figure 2:</strong> Individual Fits.  
+<img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="300"/>
 
+<strong>Figure 3:</strong> Visual Predictive Check.
 
-  <img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="300" /> 
+<img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="300"/>
 
-
-<strong>Figure 3:</strong> Visual Predictive Check. 
-
-  <img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="300" /> 
-
-<strong>Figure 4:</strong> Convergence Assessment plot. 
+<strong>Figure 4:</strong> Convergence Assessment plot.
 
 </div>
 
-```r
+``` r
 source("scripts/MBFun.R")
 pathToResults = paste0("outputs/buildingResults/application")
 dir(pathToResults)
@@ -301,8 +308,9 @@ newProject(modelFile = "data/modelFiles/PasinApp.txt",
   save(res,Model,covModel,time,iter,file=paste0(pathToResults,"/lasso.RData"))
 ```
 
-Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ and $\varphi_L$ : 
-```math
+Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ and $\varphi_L$ :
+
+``` math
 \displaystyle\left\{
 \begin{array}{rcl}
          \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) +\beta_{\varphi_S,LEP}LEP_i+ \eta^{\varphi_S}_i \\
@@ -311,7 +319,7 @@ Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ an
     \end{array}\right.
 ```
 
-```r
+``` r
 
 new_data = read.csv("data/applicationFiles/data.txt")
 new_data = new_data %>% select(ID,Time,Value,Init,LEP,KIFC1)
@@ -391,50 +399,48 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.
 
 <p align="center">
 
-| Parameter                 | Value                | Confidence bounds (95%)  |
-|---------------------------|----------------------|--------------------------|
-| FIXED EFFECTS                                                               |
-| ${\delta_L}_pop$          | $0.00019$            |                          |
-| ${\delta_{Ab}}_{pop}$     | $0.063$              |                          |
-| ${\delta_S}_{pop}$        | $0.047$              | $[0.012;0.081]$          | 
-| ${\varphi_S}_pop$         | $5.14\times 10^{8}$  | NA                       |
-| $\beta_{\varphi_S,LEP}$   | $-3.40$              | $[-4.79;-2.003]$         |
-| ${\varphi_L}_pop$         | $1.03\times 10^{7}$  | NA                       |
-| $\beta_{\varphi_L,KIFC1}$ | $-2.05$              | $[-2.89;-1.215]$         |
-| RANDOM EFFECTS                                                              |
-| $\omega_{\delta_S}$       | $0.84$               | $[0.167;1.521]$          |
-| $\omega_{\varphi_S}$      | $0.71$               | $[0.415;1.007]$          |
-| $\omega_{\varphi_L}$      | $0.47$               | $[0.334;0.612]$          |
-| ERROR                                                                       |
-| $\sigma_{Ab}$             | $0.94$               | $[0.083;0.105]$          |
-
+| Parameter                 | Value               | Confidence bounds (95%) |
+|---------------------------|---------------------|-------------------------|
+| FIXED EFFECTS             |                     |                         |
+| ${\delta_L}_pop$          | $0.00019$           |                         |
+| ${\delta_{Ab}}_{pop}$     | $0.063$             |                         |
+| ${\delta_S}_{pop}$        | $0.047$             | $[0.012;0.081]$         |
+| ${\varphi_S}_pop$         | $5.14\times 10^{8}$ | NA                      |
+| $\beta_{\varphi_S,LEP}$   | $-3.40$             | $[-4.79;-2.003]$        |
+| ${\varphi_L}_pop$         | $1.03\times 10^{7}$ | NA                      |
+| $\beta_{\varphi_L,KIFC1}$ | $-2.05$             | $[-2.89;-1.215]$        |
+| RANDOM EFFECTS            |                     |                         |
+| $\omega_{\delta_S}$       | $0.84$              | $[0.167;1.521]$         |
+| $\omega_{\varphi_S}$      | $0.71$              | $[0.415;1.007]$         |
+| $\omega_{\varphi_L}$      | $0.47$              | $[0.334;0.612]$         |
+| ERROR                     |                     |                         |
+| $\sigma_{Ab}$             | $0.94$              | $[0.083;0.105]$         |
 
 <strong>Table 3:</strong> Estimated Values of the final model.
 
-| OFV     | AIC     | BIC     |  BICc   |
+| OFV     | AIC     | BIC     | BICc    |
 |---------|---------|---------|---------|
 | -254.84 | -236.84 | -222.84 | -215.71 |
 
-
 <strong>Table 4:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
-  <img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="300" />
-  
-<strong>Figure 5:</strong> Individual Fits.  
+<img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="300"/>
 
-  <img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="300" /> 
-  
-<strong>Figure 6:</strong> Visual Predictive Check. 
+<strong>Figure 5:</strong> Individual Fits.
 
-  <img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="300" /> 
-  
+<img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="300"/>
+
+<strong>Figure 6:</strong> Visual Predictive Check.
+
+<img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="300"/>
+
 <strong>Figure 7:</strong> Convergence Assessment.
 
 </div>
 
-We also conduct the selection over 500 bootstrap to test the stability of selected and non selected genes. 
+We also conduct the selection over 500 bootstrap to test the stability of selected and non selected genes.
 
-```r
+``` r
 set.seed(1710)
 seed = floor(runif(1000)*100000)
 nb_bootstrap <- 500
@@ -460,7 +466,9 @@ for(i in 1:nb_bootstrap){
 }
 ```
 
-```r
+With the following example code for bootstrap n°1 :
+
+``` r
 arr = 1
 
 pathToResults = paste0("outputs/buildingResults/application/bootstrap")
@@ -492,22 +500,26 @@ iter=res$iter
 save(res,Model,covModel,time,iter,file=pathToResults)
 ```
 
-Results from the bootstraped selection can be visualized by codes bellow, which render the following plots.
+Results from the bootstrap selection can be visualized by codes bellow, which render the following plots.
 
 <p align="center">
-  <img src="outputs/figures/applicationResults/propModel.png" alt="Proportion of empty model built by the lasso-SAMBA procedure among the 500 bootstraps." width="400" />
+
+<img src="outputs/figures/applicationResults/propModel.png" alt="Proportion of empty model built by the lasso-SAMBA procedure among the 500 bootstraps." width="400"/>
+
 </div>
 
 <p align="center">
-  <img src="outputs/figures/applicationResults/countModel.png" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="400" />
+
+<img src="outputs/figures/applicationResults/countModel.png" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="400"/>
+
 </div>
 
-```r
+``` r
 results <- data.frame()
 NB_mod <- 0
 for(i in 1:500){
     tryCatch({
-      load(paste0("outputs/buildingResults/bootstrap/bootstrap_",i,".RData"))
+      load(paste0("outputs/buildingResults/application/bootstrap/bootstrap_",i,".RData"))
       NB_mod[as.character(r)] <-NB_mod[as.character(r)]+1
       
       if(length(unlist(covModel))!=0){
@@ -531,6 +543,8 @@ results[results$parameter=="delta_S","parameter"] <- latex2exp::TeX(r"($\delta_S
 
 value <- data.frame(Type=c("non null model"),
                     Value=length(unique(results[,"model"]))/NB_mod*100)
+                    
+save(value,results,file="outputs/buildingResults/application/bootstrap.RData")
 
 colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(rate)]
 col = c("#a6c46a","#8e6aa0","#ee6c4d","#007194","#9D8F80","#FFD447")[1:length(rate)]
