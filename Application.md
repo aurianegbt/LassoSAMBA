@@ -52,9 +52,9 @@ Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 
 where $\varepsilon_i\sim^{iid}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
 
-To conduct the selection, we focus on genes protein coding genes link to B cells, T cells, Interferon or Type 1 Interferon pathway according to Chaussabel classification and the BioBase database.
+To conduct the selection, we focus on genes protein coding genes link to "Interferon", "Type 1 Interferon", "Neutrophil activation","Inflammation","Cytokines/chemokines" and "Cell cycle"  pathway according to Chaussabel classification and the BioBase database.
 
-Note that the code here are time consumming, and presented for lasso selection. To conduct the original stepAIC-SAMBA, p.max need to be set to his default value 0.1 and buildMethod to stepAIC.
+Note that the code here are time consumming, and presented for lasso selection. However, results are available in outputs folder. To conduct the original stepAIC-SAMBA, p.max need to be set to his default value 0.1 and buildMethod to stepAIC.
 
 ``` r
 ensembl <- useEnsembl(biomart = "genes")
@@ -157,11 +157,7 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
   <img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="600" />
 </p>
 
-<p style="text-align:center">
-
-<strong>Figure 1:</strong> Observed Data.
-
-</p>
+<p style="text-align:center"><strong>Figure 1:</strong> Observed Data.</p>
 
 ``` r
 newProject(modelFile="data/modelFiles/PasinApp.txt",
@@ -512,66 +508,142 @@ Results from the bootstrap selection can be visualized by codes bellow, which re
 </div>
 
 ``` r
-results <- data.frame()
-NB_mod <- 0
-for(i in 1:500){
-    tryCatch({
-      load(paste0("outputs/buildingResults/application/bootstrap/bootstrap_",i,".RData"))
-      NB_mod[as.character(r)] <-NB_mod[as.character(r)]+1
-      
-      if(length(unlist(covModel))!=0){
-        results <- rbind(results,data.frame(model=i,parameter=rep(names(covModel),sapply(covModel,length)),covariates=unname(unlist(covModel))))
-      }},error=function(e){print(i)})
-  }
-
-results[results$parameter=="phi_S","parameter"] <- latex2exp::TeX(r"($\varphi_S$)",output="character")
-results[results$parameter=="phi_L","parameter"] <- latex2exp::TeX(r"($\varphi_L$)",output="character")
-results[results$parameter=="delta_S","parameter"] <- latex2exp::TeX(r"($\delta_S$)",output="character")
-
-
-# sapply(sort(sapply(unique(results$covariates),FUN=function(x){round(length(unique(results[results$covariates==x,"model"]))/NB_mod*100,digits=2)})),FUN=function(x){paste0(x,"%")})
+# results <- data.frame()
+# NB_mod <- 0
+# for(i in 1:500){
+#   tryCatch({
+#     load(paste0("outputs/buildingResults/application/bootstrap/bootstrap_",i,".RData"))
+#     NB_mod <-NB_mod+1
+#     
+#     if(length(unlist(covModel))!=0){
+#       results <- rbind(results,data.frame(model=i,parameter=rep(names(covModel),sapply(covModel,length)),covariates=unname(unlist(covModel))))
+#     }},error=function(e){print(i)})
+# }
 # 
-# lapply(split(results,results$rate),FUN=function(results){
-# lapply(split(results,results$parameter),FUN=function(df){
-#   sapply(sort(sapply(unique(df$covariates),FUN=function(x){round(length(unique(df[df$covariates==x,"model"]))/NB_mod*100,digits=2)})),FUN=function(x){paste0(x,"%")})
-# })
-# })
+# results[results$parameter=="phi_S","parameter"] <- latex2exp::TeX(r"($\varphi_S$)",output="character")
+# results[results$parameter=="phi_L","parameter"] <- latex2exp::TeX(r"($\varphi_L$)",output="character")
+# results[results$parameter=="delta_S","parameter"] <- latex2exp::TeX(r"($\delta_S$)",output="character")
+# 
+# 
+# # sapply(sort(sapply(unique(results$covariates),FUN=function(x){round(length(unique(results[results$covariates==x,"model"]))/NB_mod*100,digits=2)})),FUN=function(x){paste0(x,"%")})
+# #
+# # lapply(split(results,results$rate),FUN=function(results){
+# # lapply(split(results,results$parameter),FUN=function(df){
+# #   sapply(sort(sapply(unique(df$covariates),FUN=function(x){round(length(unique(df[df$covariates==x,"model"]))/NB_mod*100,digits=2)})),FUN=function(x){paste0(x,"%")})
+# # })
+# # })
+# 
+# 
+# value <- data.frame(
+#   method="Lasso",
+#   Type=c("Exact final model",
+#          "With final model",
+#          "Non null model"),
+#   Value=c(sum(sapply(split(results,results$model),FUN=function(x){
+#     (setequal(x$parameter,c("varphi[L]","varphi[S]")) & setequal(x$covariates,c("LEP","KIFC1"))) && x[x$parameter=="varphi[S]","covariates"]=="LEP"
+#   })),
+#   sum(sapply(split(results,results$model),FUN=function(x){
+#     all(c("varphi[S]","varphi[L]") %in% x$parameter) &&
+#       ("LEP" %in% x[x$parameter=="varphi[S]","covariates"] & "KIFC1" %in% x[x$parameter=="varphi[L]","covariates"] )})),
+#   length(unique(results[,"model"])))
+# )
+# 
+# value.par <- data.frame(
+#   method="Lasso",
+#   Parameter = "varphi[S]",
+#   Type = c("Only final gene selected","Final gene selected among others","Non null model"),
+#   Value = c(sum(sapply(split(results[results$parameter=="varphi[S]",],results[results$parameter=="varphi[S]","model"]),FUN=function(x){identical(x$covariates,"LEP")})),
+#             nrow(match_df(results[results$parameter=="varphi[S]",-1],data.frame(parameter="varphi[S]",covariates="LEP"))),
+#             length(unique(results[results$parameter=="varphi[S]","model"])))
+# )
+# value.par <- rbind(value.par,data.frame(
+#   method="Lasso",
+#   Parameter = "varphi[L]",
+#   Type = c("Only final gene selected","Final gene selected among others","Non null model"),
+#   Value = c(sum(sapply(split(results[results$parameter=="varphi[L]",],results[results$parameter=="varphi[L]","model"]),FUN=function(x){identical(x$covariates,"KIFC1")})),
+#             nrow(match_df(results[results$parameter=="varphi[L]",-1],data.frame(parameter="varphi[L]",covariates="KIFC1"))),
+#             length(unique(results[results$parameter=="varphi[L]","model"])))
+# ))
+# value.par <- rbind(value.par,data.frame(
+#   method="Lasso",
+#   Parameter = "delta[S]",
+#   Type = c("Non null model"),
+#   Value = length(unique(results[results$parameter=="delta[S]","model"]))
+# ))
+# 
+# value$Value <- value$Value/NB_mod*100
+# value.par$Value <- value.par$Value/NB_mod*100
+# 
+# save(value,value.par,results,file="outputs/buildingResults/application/bootstrap.RData")
+load(value,results,file="outputs/buildingResults/application/bootstrap.RData")
 
 
-value <- data.frame(Type=c("non null model"),
-                    Value=length(unique(results[,"model"]))/NB_mod*100)
-                    
-save(value,results,file="outputs/buildingResults/application/bootstrap.RData")
+value$Type <- factor(value$Type,levels=c("Non null model","With final model","Exact final model"))
 
-colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(rate)]
-col = c("#a6c46a","#8e6aa0","#ee6c4d","#007194","#9D8F80","#FFD447")[1:length(rate)]
-colpas = c("#e0e6c6","#d0c1d7","#f8c2b4","#99e7ff","#cac2ba","#ffe591")[1:length(rate)]
-
-ggplot(mapping=aes(x=rate,y=Value,pattern=Type)) +
-  geom_col(data=value[value$Type=="non null model",], width = 0.7, position = position_dodge(width = 0.7),color="black",alpha=0.7)  +
-  geom_bar_pattern(data=value[value$Type=="CCDC106 selected among others",], position="dodge",width=0.7,color="black",pattern_fill="black",pattern_density=0.05,pattern_spacing=0.025,stat='identity',pattern="circle",alpha=0.7)+
-  geom_bar_pattern(data=value[value$Type=="Only CCDC106 selected",], position="dodge",width=0.7,color="black",pattern_fill="black",pattern_density=0.05,pattern_spacing=0.025,stat='identity',pattern="stripe",alpha=0.7) +
-  labs( y = "Proportion (in %)") +
+ggplot(mapping=aes(x=method,y=Value,fill=method,color=method,pattern=Type)) +
+  geom_col(data=value[value$Type=="Non null model",],aes(group=method),width = 0.7, position = position_dodge(width = 0.7),color="#024154") +
+  geom_bar_pattern(data=value[value$Type=="With final model",], position="dodge",width=0.7,color="#024154",pattern_color="#024154",pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
+  geom_bar_pattern(data=value[value$Type=="Exact final model",], position="dodge",width=0.7,color="#024154",pattern_color="#024154",pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
+  labs(x="",y="Proportion (in %)") +
   scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+
-  theme(axis.text.x = element_text(size = 10))+
-  theme(axis.text.y = element_text(size = 8))+
-  theme(axis.title = element_text(size=12))+
-  theme(strip.text = element_text(size = 12))+
-  theme(plot.subtitle = element_text(size=12))+
-  theme(plot.title = element_text(size=16,color="#ee6c4d"))+
-  guides(fill = "none") +
-  theme(legend.position = "bottom")
+  scale_pattern_manual(values = c("Exact final model"="stripe","With final model"="circle","Non null model"="none"))+
+  theme_bw() +
+  scale_color_manual(values=setNames("#024154","Lasso"),guide="none")+
+  scale_fill_manual(values=setNames("#99e7ff","Lasso"),guide="none")+
+  theme(axis.text=element_text(size=13), 
+        axis.text.x = element_blank(),
+        axis.title=element_text(size=16,face="bold"),
+        legend.key=element_rect(color="#024154"),
+        legend.position = "bottom")+
+  guides(pattern=guide_legend(override.aes = list(fill="white",color="#024154"))) 
 
-ggsave(filename = "outputs/figures/applicationResults/propModel.png")
 
-ggplot(results,aes(x=covariates))+geom_bar()+facet_grid(parameter~.,labeller=label_parsed)+ylim(c(0,500))+theme(axis.text.x = element_text(angle = 90))+
+ggsave(filename = "outputs/figures/applicationResults/propModel.png",unit="px",height=1200,width=1500)
+
+
+value.par$Type <- factor(value.par$Type,levels=c("Only final gene selected","Final gene selected among others","Non null model"))
+
+ggplot(mapping=aes(x=Parameter,y=Value,fill=Parameter,color=Parameter,pattern=Type)) +
+  geom_col(data=value.par[value.par$Type=="Non null model",],aes(group=Parameter),width = 0.7, position = position_dodge(width = 0.7),color=c("#5c6e39","#563f61","#703527")) +
+  geom_bar_pattern(data=value.par[value.par$Type=="Final gene selected among others",], position="dodge",color=c("#5c6e39","#563f61"),pattern_color=c("#5c6e39","#563f61"),width=0.7,pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
+  geom_bar_pattern(data=value.par[value.par$Type=="Only final gene selected",],color=c("#5c6e39","#563f61"),pattern_color=c("#5c6e39","#563f61"), position="dodge",width=0.7,pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
+  labs(x="",y="Proportion (in %)") +
+  scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+
+  scale_pattern_manual(values = c("Only final gene selected"="stripe","Final gene selected among others"="circle","Non null model"="none"))+
+  theme_bw() +
+  theme(axis.text=element_text(size=13), 
+        axis.title=element_text(size=16,face="bold"),
+        legend.key=element_rect(color="black"),
+        legend.position="bottom")+
+  guides(pattern=guide_legend(override.aes = list(fill="white",color="black"))) +
+  scale_fill_manual(values=setNames(c("#e0e6c6","#d0c1d7","#f8c2b4"),c("varphi[S]","varphi[L]","delta[S]")),guide="none") +
+  scale_color_manual(values=setNames(c("#5c6e39","#563f61","#703527"),c("varphi[S]","varphi[L]","delta[S]")),guide="none")
+
+ggsave(filename = "outputs/figures/applicationResults/propModel_par.png",unit="px",height=1200,width=2000)
+
+
+
+ggplot(results,aes(x=covariates))+geom_bar()+facet_grid(parameter~.,labeller=label_parsed)+theme(axis.text.x = element_text(angle = 90))+
   geom_hline(yintercept = 25, color = "brown", linetype = "dashed") +
-  # geom_segment(data = subset(results, parameter == "varphi[S]"), 
-  #              aes(x = 0, xend = 11.5, 
-  #                  y = 105, yend = 105), 
-  #              color = "red3", linetype = "solid", size = 0.5) + 
-  ylab("Count")
+  geom_segment(data = subset(results, parameter == "varphi[S]"),
+               aes(x = 0, xend = which(sort(unique(results$covariates))=="LEP"),
+                   y = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"])),
+                   yend = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"]))),
+               color = "indianred3", linetype = "solid", size = 0.5) +
+  geom_segment(data = subset(results, parameter == "varphi[L]"),
+               aes(x = 0, xend = which(sort(unique(results$covariates))=="KIFC1"),
+                   y = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])),
+                   yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
+               color = "indianred3", linetype = "solid", size = 0.5) +
+  ylab("Count") +
+  scale_y_continuous(limits = c(0,500),
+                     breaks = seq(0,500,500/4), 
+                     labels = scales::percent(seq(0,1,0.25)))+
+  theme(axis.title=element_text(size=15),
+        axis.text.y = element_text(size=12),
+        strip.text.x = element_text(size = 15))
 
 
-ggsave(filename = "outputs/figures/applicationResults/countModel.png")
+ggsave(filename = "outputs/figures/applicationResults/countModel.png",unit="px",width=4000,height=2500)
+
 ```
