@@ -232,8 +232,6 @@ ggplot(tabestimates,aes(x=run,y=estimate))+
 ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",height=1000,width=2500,unit="px")
 ```
 
-<p align="center">
-
 | Parameter             | Value     | Confidence bounds (95%) |
 |-----------------------|-----------|-------------------------|
 | FIXED EFFECTS         |           |                         |
@@ -249,27 +247,36 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 | ERROR                 |           |                         |
 | $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$         |
 
-<strong>Table 1:</strong> Estimated Values of the empty model (no covariates included).
+<p align="center"><strong>Table 1:</strong> Estimated Values of the empty model (no covariates included).</p>
 
 | OFV     | AIC     | BIC     | BICc    |
 |---------|---------|---------|---------|
 | -216.08 | -202.08 | -191.19 | -184.06 |
 
-<strong>Table 2:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
+<p align="center"><strong>Table 2:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.</p>
 
+
+<p align="center">
 <img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="300"/>
-
-<strong>Figure 2:</strong> Individual Fits.
-
-<img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="300"/>
-
-<strong>Figure 3:</strong> Visual Predictive Check.
-
-<img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="1000"/>
-
-<strong>Figure 4:</strong> Convergence Assessment plot.
-
 </p>
+
+<p align="center"><strong>Figure 2:</strong> Individual Fits.</p>
+
+
+<p align="center">
+<img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="300"/>
+</p>
+
+
+<p align="center"><strong>Figure 3:</strong> Visual Predictive Check.</p>
+
+
+<p align="center">
+<img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="1000"/>
+</p>
+
+<p align="center"><strong>Figure 4:</strong> Convergence Assessment plot.</p>
+
 
 ``` r
 source("scripts/MBFun.R")
@@ -393,7 +400,6 @@ ggplot(tabestimates,aes(x=run,y=estimate))+
 ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.png",height=1000,width=2500,unit="px")
 ```
 
-<p align="center">
 
 | Parameter                 | Value               | Confidence bounds (95%) |
 |---------------------------|---------------------|-------------------------|
@@ -412,27 +418,40 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.
 | ERROR                     |                     |                         |
 | $\sigma_{Ab}$             | $0.94$              | $[0.083;0.105]$         |
 
-<strong>Table 3:</strong> Estimated Values of the final model.
+
+<p align="center"><strong>Table 3:</strong> Estimated Values of the final model.</p>
 
 | OFV     | AIC     | BIC     | BICc    |
 |---------|---------|---------|---------|
 | -254.84 | -236.84 | -222.84 | -215.71 |
 
-<strong>Table 4:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
+<p align="center"><strong>Table 4:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.</p>
+
+
+<p align="center">
 <img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="300"/>
+</p>
 
-<strong>Figure 5:</strong> Individual Fits.
 
+<p align="center"><strong>Figure 5:</strong> Individual Fits.</p>
+
+
+<p align="center">
 <img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="300"/>
+</p>
 
-<strong>Figure 6:</strong> Visual Predictive Check.
 
+<p align="center"><strong>Figure 6:</strong> Visual Predictive Check.</p>
+
+
+<p align="center">
 <img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="300"/>
+</p>
 
-<strong>Figure 7:</strong> Convergence Assessment.
 
-</div>
+<p align="center"><strong>Figure 7:</strong> Convergence Assessment.</p>
+
 
 We also conduct the selection over 500 bootstrap to test the stability of selected and non selected genes.
 
@@ -499,16 +518,16 @@ save(res,Model,covModel,time,iter,file=pathToResults)
 Results from the bootstrap selection can be visualized by codes bellow, which render the following plots.
 
 <p align="center">
-
-<img src="outputs/figures/applicationResults/propModel.png" alt="Proportion of empty model built by the lasso-SAMBA procedure among the 500 bootstraps." width="400"/>
-
-</div>
+<img src="outputs/figures/applicationResults/propModel_par.png" alt="Proportion of empty, and final model including LEP and KIFC1 genes, with parameters links, built by the lasso-SAMBA procedure among the 500 bootstraps." width="400"/>
+</p>
 
 <p align="center">
+<img src="outputs/figures/applicationResults/propModel.png" alt="Proportion of empty, and final model including LEP and KIFC1 genes built by the lasso-SAMBA procedure among the 500 bootstraps." width="400"/>
+</p>
 
+<p align="center">
 <img src="outputs/figures/applicationResults/countModel.png" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="400"/>
-
-</div>
+</p>
 
 ``` r
 # results <- data.frame()
