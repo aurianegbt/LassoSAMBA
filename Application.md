@@ -45,14 +45,16 @@ with
          \log({\delta_{S}}_i) &=& \log({\delta_{S}}_{pop})   +\eta^{\delta}_i
     \end{array}\right.
 ```
-where $\eta_i^S\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_{\varphi_L}^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta_S}^2)$. The observation are the defined as 
-```math
+
+where $\eta_i^S\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_{\varphi_L}^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta_S}^2)$. The observation are the defined as
+
+``` math
 Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 ```
 
 where $\varepsilon_i\sim^{iid}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
 
-To conduct the selection, we focus on genes protein coding genes link to "Interferon", "Type 1 Interferon", "Neutrophil activation","Inflammation","Cytokines/chemokines" and "Cell cycle"  pathway according to Chaussabel classification and the BioBase database.
+To conduct the selection, we focus on genes protein coding genes link to "Interferon", "Type 1 Interferon", "Neutrophil activation","Inflammation","Cytokines/chemokines" and "Cell cycle" pathway according to Chaussabel classification and the BioBase database.
 
 Note that the code here are time consumming, and presented for lasso selection. However, results are available in outputs folder. To conduct the original stepAIC-SAMBA, p.max need to be set to his default value 0.1 and buildMethod to stepAIC.
 
@@ -154,10 +156,12 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
 ```
 
 <p align="center">
-  <img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="600" />
+
+<img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="600"/>
+
 </p>
 
-<p style="text-align:center"><strong>Figure 1:</strong> Observed Data.</p>
+<p align="center"><strong>Figure 1:</strong> Observed Data.</p>
 
 ``` r
 newProject(modelFile="data/modelFiles/PasinApp.txt",
@@ -229,28 +233,27 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 ```
 
 <p align="center">
-    
-| Parameter             | Value     | Confidence bounds (95%)  |
-|-----------------------|-----------|--------------------------|
-| FIXED EFFECTS                                                |
-| ${\delta_L}_pop$      | $0.00019$ |                          |
-| ${\delta_{Ab}}_{pop}$ | $0.063$   |                          |
-| ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$          | 
-| ${\varphi_S}_pop$     | $907.35$  | $[429.78;1384.93]$       |
-| ${\varphi_L}_pop$     | $1069.24$ | $[819.029;1319.457]$     |
-| RANDOM EFFECTS                                               |
-| $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$          |
-| $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$          |
-| $\omega_{\varphi_L}$  | $0.67$    | $[0.506;0.834]$          |
-| ERROR                                                        |
-| $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$          |
+
+| Parameter             | Value     | Confidence bounds (95%) |
+|-----------------------|-----------|-------------------------|
+| FIXED EFFECTS         |           |                         |
+| ${\delta_L}_pop$      | $0.00019$ |                         |
+| ${\delta_{Ab}}_{pop}$ | $0.063$   |                         |
+| ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$         |
+| ${\varphi_S}_pop$     | $907.35$  | $[429.78;1384.93]$      |
+| ${\varphi_L}_pop$     | $1069.24$ | $[819.029;1319.457]$    |
+| RANDOM EFFECTS        |           |                         |
+| $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$         |
+| $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$         |
+| $\omega_{\varphi_L}$  | $0.67$    | $[0.506;0.834]$         |
+| ERROR                 |           |                         |
+| $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$         |
 
 <strong>Table 1:</strong> Estimated Values of the empty model (no covariates included).
 
 | OFV     | AIC     | BIC     | BICc    |
 |---------|---------|---------|---------|
 | -216.08 | -202.08 | -191.19 | -184.06 |
-
 
 <strong>Table 2:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
@@ -262,9 +265,9 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 
 <strong>Figure 3:</strong> Visual Predictive Check.
 
-  <img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="1000" /> 
+<img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="1000"/>
 
-<strong>Figure 4:</strong> Convergence Assessment plot. 
+<strong>Figure 4:</strong> Convergence Assessment plot.
 
 </p>
 
@@ -645,5 +648,4 @@ ggplot(results,aes(x=covariates))+geom_bar()+facet_grid(parameter~.,labeller=lab
 
 
 ggsave(filename = "outputs/figures/applicationResults/countModel.png",unit="px",width=4000,height=2500)
-
 ```
