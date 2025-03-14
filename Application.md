@@ -597,7 +597,7 @@ Results from the bootstrap selection can be visualized by codes bellow, which re
 # value.par$Value <- value.par$Value/NB_mod*100
 # 
 # save(value,value.par,results,file="outputs/buildingResults/application/bootstrap.RData")
-load(value,results,file="outputs/buildingResults/application/bootstrap.RData")
+load(file="outputs/buildingResults/application/bootstrap.RData")
 
 
 value$Type <- factor(value$Type,levels=c("Non null model","With final model","Exact final model"))
