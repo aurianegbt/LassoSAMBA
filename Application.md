@@ -40,15 +40,13 @@ with
 ``` math
 \displaystyle\left\{
 \begin{array}{rcl}
-         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^{\varphi_S}_i \\
+         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) + \eta^S_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop})  + \eta^L_i \\
-         \log({\delta_{S}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
+         \log({\delta_{S}}_i) &=& \log({\delta_{S}}_{pop})   +\eta^{\delta}_i
     \end{array}\right.
 ```
-
-where $\eta_i^{\varphi_S}\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_L^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta}^2)$. The observation are the defined as
-
-``` math
+where $\eta_i^S\sim^{iid}\mathcal N(0,\omega_{\varphi_S}^2)$, $\eta^L_i\sim^{iid}\mathcal N(0,\omega_{\varphi_L}^2)$, $\eta_i^{\delta}\sim^{iid}\mathcal N(0,\omega_{\delta_S}^2)$. The observation are the defined as 
+```math
 Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 ```
 
@@ -156,9 +154,7 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
 ```
 
 <p align="center">
-
-<img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="300"/>
-
+  <img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="600" />
 </p>
 
 <p style="text-align:center">
@@ -237,21 +233,21 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 ```
 
 <p align="center">
-
-| Parameter             | Value     | Confidence bounds (95%) |
-|-----------------------|-----------|-------------------------|
-| FIXED EFFECTS         |           |                         |
-| ${\delta_L}_pop$      | $0.00019$ |                         |
-| ${\delta_{Ab}}_{pop}$ | $0.063$   |                         |
-| ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$         |
-| ${\varphi_S}_pop$     | $907.35$  | $[429.78;1384.93]$      |
-| ${\varphi_L}_pop$     | $1069.24$ | $[819.029;1319.457]$    |
-| RANDOM EFFECTS        |           |                         |
-| $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$         |
-| $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$         |
-| $\omega_{\varphi_L}$  | $0.67$    | $[0.506;0.834]$         |
-| ERROR                 |           |                         |
-| $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$         |
+    
+| Parameter             | Value     | Confidence bounds (95%)  |
+|-----------------------|-----------|--------------------------|
+| FIXED EFFECTS                                                |
+| ${\delta_L}_pop$      | $0.00019$ |                          |
+| ${\delta_{Ab}}_{pop}$ | $0.063$   |                          |
+| ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$          | 
+| ${\varphi_S}_pop$     | $907.35$  | $[429.78;1384.93]$       |
+| ${\varphi_L}_pop$     | $1069.24$ | $[819.029;1319.457]$     |
+| RANDOM EFFECTS                                               |
+| $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$          |
+| $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$          |
+| $\omega_{\varphi_L}$  | $0.67$    | $[0.506;0.834]$          |
+| ERROR                                                        |
+| $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$          |
 
 <strong>Table 1:</strong> Estimated Values of the empty model (no covariates included).
 
@@ -259,7 +255,8 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 |---------|---------|---------|---------|
 | -216.08 | -202.08 | -191.19 | -184.06 |
 
-<strong>Table 2:<s/trong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
+
+<strong>Table 2:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.
 
 <img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="300"/>
 
@@ -269,11 +266,11 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 
 <strong>Figure 3:</strong> Visual Predictive Check.
 
-<img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="300"/>
+  <img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="1000" /> 
 
-<strong>Figure 4:</strong> Convergence Assessment plot.
+<strong>Figure 4:</strong> Convergence Assessment plot. 
 
-</div>
+</p>
 
 ``` r
 source("scripts/MBFun.R")
@@ -313,9 +310,9 @@ Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ an
 ``` math
 \displaystyle\left\{
 \begin{array}{rcl}
-         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) +\beta_{\varphi_S,LEP}LEP_i+ \eta^{\varphi_S}_i \\
+         \log({\varphi_S}_i) &=& \log({\varphi_S}_{pop}) +\beta_{\varphi_S,LEP}LEP_i+ \eta^S_i \\
          \log({\varphi_L}_i) &=& \log({\varphi_L}_{pop}) +\beta_{\varphi_L,KIFC1}KIFC1_i + \eta^L_i \\
-         \log({\delta_{Ab}}_i) &=& \log({\delta_{Ab}}_{pop})   +\eta^{Ab}_i
+         \log({\delta_{S}}_i) &=& \log({\delta_{S}}_{pop})   +\eta^{\delta}_i
     \end{array}\right.
 ```
 
