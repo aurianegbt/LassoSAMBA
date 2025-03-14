@@ -169,10 +169,10 @@ newProject(modelFile="data/modelFiles/PasinApp.txt",
                      headerTypes = c("id","time","observation","regressor")))
                      
 setIndividualParameterVariability(delta_L=FALSE)
-setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
+setPopulationParameterInformation(delta_L_{pop}=list(initialValue=log(2)/(10*365),method="FIXED"))
   
 setIndividualParameterVariability(delta_AB=FALSE)
-setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
+setPopulationParameterInformation(delta_AB_{pop}=list(initialValue=log(2)/11,method="FIXED"))
   
 setErrorModel(Value="constant")
 runPopulationParameterEstimation()
@@ -235,11 +235,11 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",h
 | Parameter             | Value     | Confidence bounds (95%) |
 |-----------------------|-----------|-------------------------|
 | FIXED EFFECTS         |           |                         |
-| ${\delta_L}_pop$      | $0.00019$ |                         |
+| ${\delta_L}_{pop}$      | $0.00019$ |                         |
 | ${\delta_{Ab}}_{pop}$ | $0.063$   |                         |
 | ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$         |
-| ${\varphi_S}_pop$     | $907.35$  | $[429.78;1384.93]$      |
-| ${\varphi_L}_pop$     | $1069.24$ | $[819.029;1319.457]$    |
+| ${\varphi_S}_{pop}$     | $907.35$  | $[429.78;1384.93]$      |
+| ${\varphi_L}_{pop}$     | $1069.24$ | $[819.029;1319.457]$    |
 | RANDOM EFFECTS        |           |                         |
 | $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$         |
 | $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$         |
@@ -289,10 +289,10 @@ newProject(modelFile = "data/modelFiles/PasinApp.txt",
                          headerTypes = c("id","time","observation","regressor",rep("contcov",Nb_cov))))
   
   setIndividualParameterVariability(delta_L=FALSE)
-  setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
+  setPopulationParameterInformation(delta_L_{pop}=list(initialValue=log(2)/(10*365),method="FIXED"))
   
   setIndividualParameterVariability(delta_AB=FALSE)
-  setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
+  setPopulationParameterInformation(delta_AB_{pop}=list(initialValue=log(2)/11,method="FIXED"))
   
   setErrorModel(Value="constant")
 
@@ -333,10 +333,10 @@ newProject(modelFile="data/modelFiles/PasinApp.txt",
                      headerTypes = c("id","time","observation","regressor","contcov","contcov")))
                      
 setIndividualParameterVariability(delta_L=FALSE)
-setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
+setPopulationParameterInformation(delta_L_{pop}=list(initialValue=log(2)/(10*365),method="FIXED"))
   
 setIndividualParameterVariability(delta_AB=FALSE)
-setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
+setPopulationParameterInformation(delta_AB_{pop}=list(initialValue=log(2)/11,method="FIXED"))
 
 setCovariateModel(list(phi_L=list(KIFC1=TRUE),phi_S=list(LEP=TRUE)))
 setErrorModel(Value="constant")
@@ -404,12 +404,12 @@ ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.
 | Parameter                 | Value               | Confidence bounds (95%) |
 |---------------------------|---------------------|-------------------------|
 | FIXED EFFECTS             |                     |                         |
-| ${\delta_L}_pop$          | $0.00019$           |                         |
+| ${\delta_L}_{pop}$          | $0.00019$           |                         |
 | ${\delta_{Ab}}_{pop}$     | $0.063$             |                         |
 | ${\delta_S}_{pop}$        | $0.047$             | $[0.012;0.081]$         |
-| ${\varphi_S}_pop$         | $5.14\times 10^{8}$ | NA                      |
+| ${\varphi_S}_{pop}$         | $5.14\times 10^{8}$ | NA                      |
 | $\beta_{\varphi_S,LEP}$   | $-3.40$             | $[-4.79;-2.003]$        |
-| ${\varphi_L}_pop$         | $1.03\times 10^{7}$ | NA                      |
+| ${\varphi_L}_{pop}$         | $1.03\times 10^{7}$ | NA                      |
 | $\beta_{\varphi_L,KIFC1}$ | $-2.05$             | $[-2.89;-1.215]$        |
 | RANDOM EFFECTS            |                     |                         |
 | $\omega_{\delta_S}$       | $0.84$              | $[0.167;1.521]$         |
@@ -495,9 +495,9 @@ newProject(modelFile = "data/modelFiles/PasinApp.txt",
                        headerTypes = c("id","time","observation","regressor",rep("contcov",nbCov))))
 
 setIndividualParameterVariability(delta_L=FALSE)
-setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
+setPopulationParameterInformation(delta_L_{pop}=list(initialValue=log(2)/(10*365),method="FIXED"))
 setIndividualParameterVariability(delta_AB=FALSE)
-setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
+setPopulationParameterInformation(delta_AB_{pop}=list(initialValue=log(2)/11,method="FIXED"))
 setErrorModel(Value="constant")
 
 # buildmlx ---------------------------------------------------------
