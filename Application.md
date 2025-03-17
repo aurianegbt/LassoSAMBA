@@ -169,10 +169,10 @@ newProject(modelFile="data/modelFiles/PasinApp.txt",
                      headerTypes = c("id","time","observation","regressor")))
                      
 setIndividualParameterVariability(delta_L=FALSE)
-setPopulationParameterInformation(delta_L_{pop}=list(initialValue=log(2)/(10*365),method="FIXED"))
+setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
   
 setIndividualParameterVariability(delta_AB=FALSE)
-setPopulationParameterInformation(delta_AB_{pop}=list(initialValue=log(2)/11,method="FIXED"))
+setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
   
 setErrorModel(Value="constant")
 runPopulationParameterEstimation()
@@ -289,10 +289,10 @@ newProject(modelFile = "data/modelFiles/PasinApp.txt",
                          headerTypes = c("id","time","observation","regressor",rep("contcov",Nb_cov))))
   
   setIndividualParameterVariability(delta_L=FALSE)
-  setPopulationParameterInformation(delta_L_{pop}=list(initialValue=log(2)/(10*365),method="FIXED"))
+  setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
   
   setIndividualParameterVariability(delta_AB=FALSE)
-  setPopulationParameterInformation(delta_AB_{pop}=list(initialValue=log(2)/11,method="FIXED"))
+  setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
   
   setErrorModel(Value="constant")
 
