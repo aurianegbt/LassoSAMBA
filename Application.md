@@ -325,7 +325,11 @@ Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ an
 ``` r
 
 new_data = read.csv("data/applicationFiles/data.txt")
-new_data = new_data %>% select(ID,Time,Value,Init,LEP,KIFC1)
+cov= new_data %>% filter(Time==0) %>% select(ID,LEP,KIFC1)
+new_data = new_data %>% select(ID,Time,Value,Init)
+cov[,-1] <- scale(cov[,-1],center=TRUE,scale=FALSE)
+new_data <- merge(new_data,cov,by="ID")
+
 write.csv(new_data,"data/applicationFiles/data_final.txt",quote=FALSE,row.names=FALSE)
 
 newProject(modelFile="data/modelFiles/PasinApp.txt",
@@ -333,10 +337,10 @@ newProject(modelFile="data/modelFiles/PasinApp.txt",
                      headerTypes = c("id","time","observation","regressor","contcov","contcov")))
                      
 setIndividualParameterVariability(delta_L=FALSE)
-setPopulationParameterInformation(delta_L_{pop}=list(initialValue=log(2)/(10*365),method="FIXED"))
+setPopulationParameterInformation(delta_L_pop=list(initialValue=log(2)/(10*365),method="FIXED"))
   
 setIndividualParameterVariability(delta_AB=FALSE)
-setPopulationParameterInformation(delta_AB_{pop}=list(initialValue=log(2)/11,method="FIXED"))
+setPopulationParameterInformation(delta_AB_pop=list(initialValue=log(2)/11,method="FIXED"))
 
 setCovariateModel(list(phi_L=list(KIFC1=TRUE),phi_S=list(LEP=TRUE)))
 setErrorModel(Value="constant")
@@ -388,7 +392,8 @@ levels(tabestimates$parameter) <- sapply(c(r"($\delta_S$)",
                                            r"($\omega_{\delta_S}$)",
                                            r"($\omega_{\varphi_S}$)",
                                            r"($\omega_{\varphi_L}$)",
-                                           r"($\sigma_{Ab}$)"),FUN=function(x){latex2exp::TeX(x,output="character")})
+                                           r"($\sigma_{Ab}$)")
+                                         ,FUN=function(x){latex2exp::TeX(x,output="character")})
 
 ggplot(tabestimates,aes(x=run,y=estimate))+
   geom_point(aes(color=factor(run))) +
@@ -398,25 +403,38 @@ ggplot(tabestimates,aes(x=run,y=estimate))+
   xlab("")+ylab("")
 
 ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.png",height=1000,width=2500,unit="px")
+
+ggplot(new_data,aes(x=Time,group=ID,color=LEP,y=Value)) + 
+  geom_line(lwd=0.5) +
+  scale_color_gradient2(high="indianred",low="slateblue",mid="grey")
+  
+ggsave(filename="outputs/figures/applicationResults/fitLEP_final.png",height=1000,width=2500,unit="px")
+  
+ggplot(new_data,aes(x=Time,group=ID,color=KIFC1,y=Value)) + 
+  geom_line(lwd=0.5) +
+  scale_color_gradient2(high="indianred",low="slateblue",mid="grey")
+  
+ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.png",height=1000,width=2500,unit="px")
+
 ```
 
 
 | Parameter                 | Value               | Confidence bounds (95%) |
 |---------------------------|---------------------|-------------------------|
 | FIXED EFFECTS             |                     |                         |
-| ${\delta_L}_{pop}$          | $0.00019$           |                         |
+| ${\delta_L}_{pop}$        | $0.00019$           |                         |
 | ${\delta_{Ab}}_{pop}$     | $0.063$             |                         |
 | ${\delta_S}_{pop}$        | $0.047$             | $[0.012;0.081]$         |
-| ${\varphi_S}_{pop}$         | $5.14\times 10^{8}$ | NA                      |
+| ${\varphi_S}_{pop}$       | $945.43$            | $[565.6,1325.2]$        |
 | $\beta_{\varphi_S,LEP}$   | $-3.40$             | $[-4.79;-2.003]$        |
-| ${\varphi_L}_{pop}$         | $1.03\times 10^{7}$ | NA                      |
+| ${\varphi_L}_{pop}$       | $1007.21$           | $[800.2,1214.3]$        |
 | $\beta_{\varphi_L,KIFC1}$ | $-2.05$             | $[-2.89;-1.215]$        |
 | RANDOM EFFECTS            |                     |                         |
 | $\omega_{\delta_S}$       | $0.84$              | $[0.167;1.521]$         |
 | $\omega_{\varphi_S}$      | $0.71$              | $[0.415;1.007]$         |
 | $\omega_{\varphi_L}$      | $0.47$              | $[0.334;0.612]$         |
 | ERROR                     |                     |                         |
-| $\sigma_{Ab}$             | $0.94$              | $[0.083;0.105]$         |
+| $\sigma_{Ab}$             | $0.094$              | $[0.083;0.105]$        |
 
 
 <p align="center"><strong>Table 3:</strong> Estimated Values of the final model.</p>
