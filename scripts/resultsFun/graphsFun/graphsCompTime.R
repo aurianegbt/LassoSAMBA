@@ -37,6 +37,7 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               SAEMVS="SAEMVS"))+
     # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
     scale_fill_manual(values=setNames(colpas,buildMethod))+
+    
     scale_color_manual(values=setNames(colFonce,buildMethod))+
     theme(axis.text.x = element_text(size = 10))+
     theme(axis.text.y = element_text(size = 8))+

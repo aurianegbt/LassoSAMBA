@@ -37,28 +37,29 @@ graphsStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     geom_col(data=value[value$Type=="Overselection",], aes(group = Method), width = 0.7, position = position_dodge(width = 0.7),color="black")  +
     geom_bar_pattern(data=value[value$Type=="Exact",], position="dodge",width=0.7,color="black",pattern_fill="black",pattern_density=0.05,pattern_spacing=0.025,stat='identity') +
     labs(x="Method", y = "Proportion (in %)") +
-    scale_fill_manual(values=setNames(colpas,buildMethod))+ 
+    scale_fill_manual(values=setNames(colpas,buildMethod),guide="none")+ 
     scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+ 
     scale_x_discrete(labels=c(stepAIC="stepAIC\nwith stat. test",
                               setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
                               SAEMVS="SAEMVS"))+
-    theme(axis.text.x = element_text(size = 10))+
-    theme(axis.text.y = element_text(size = 8))+
-    theme(axis.title = element_text(size=12))+
-    theme(strip.text = element_text(size = 12))+
-    theme(plot.subtitle = element_text(size=12))+
-    theme(plot.title = element_text(size=16,color="#ee6c4d"))+
-    guides(fill = "none")+
-    theme(legend.position = "bottom")
+    theme(axis.text.x = element_text(size = 10),
+          axis.text.y = element_text(size = 8),
+          axis.title = element_text(size=12),
+          strip.text = element_text(size = 12),
+          plot.subtitle = element_text(size=12),
+          plot.title = element_text(size=16,color="#ee6c4d"),
+          legend.position="bottom",
+          legend.key=element_rect(color="black",fill="transparent"))+
+    guides(pattern=guide_legend(override.aes = list(fill="transparent",color="black")))
   
   if(PNG){
     ggsave(paste0(Folder,"/ComparisonStats.png"),
-           height = 1200, width =   1000, units = "px", bg='transparent',device=grDevices::png)
+           height = 1200, width =   500*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   }
   
   if(JPEG){
     ggsave(paste0(Folder,"/ComparisonStats.jpeg"),
-           height = 1200, width =   1000, units = "px",device=grDevices::jpeg)
+           height = 1200, width =   500*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
   
 }
