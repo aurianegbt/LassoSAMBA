@@ -10,7 +10,7 @@
 <!--te-->
 
 <details>
-<summary> _Click to expand_ </summary>
+<summary> Click to expand </summary>
     
 ``` r
 library(ggplot2)
@@ -72,12 +72,12 @@ Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 
 where $\varepsilon_i\sim^{iid}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
 
-To conduct the selection, we focus on genes protein coding genes link to "Interferon", "Type 1 Interferon", "Neutrophil activation","Inflammation","Cytokines/chemokines" and "Cell cycle" pathway according to Chaussabel classification [[3]](#3) and the BioBase database [[4]](#4).
+To conduct the selection, we focus on genes protein coding genes link to "Interferon", "Type 1 Interferon", "Neutrophil activation","Inflammation","Cytokines/chemokines" and "Cell cycle" pathway according to Li et al. classification [[3]](#3) and the BioBase database [[4]](#4).
 
 Note that the code here are time consumming, and presented for lasso selection. However, results are available in outputs folder and be directly loaded. To conduct the original stepAIC-SAMBA, `p.max` need to be set to his default value 0.1 and `buildMethod` to stepAIC.
 
 <details>
-<summary> _Click to expand_ </summary>
+<summary> Click to expand </summary>
     
 ``` r
 ensembl <- useEnsembl(biomart = "genes")
@@ -195,7 +195,7 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
 Estimation has been conduct using SAEM algorithm [[5,6,7]](#5,#6,#7) through monolix software [[8]](#8). 
 
 <details>
-<summary> _Click to expand_ </summary>
+<summary> Click to expand </summary>
     
 ``` r
 newProject(modelFile="data/modelFiles/PasinApp.txt",
@@ -335,7 +335,7 @@ Estimated parameters are displayed in the following table.
 ## Selection results
 
 <details>
-<summary> _Click to expand_ </summary>
+<summary> Click to expand </summary>
     
 ``` r
 source("scripts/MBFun.R")
@@ -397,7 +397,7 @@ By stepAIC-SAMBA, the selection results are displayed in the following table :
 <p align="center">**Table:** Results from the stepAIC-SAMBA method for the ZOSTAVAX vaccine. Genes identified uniquely by the lasso-SAMBA method are in bold. The initial model had an empty covariate structure, a constant error model, and no correlation. Both methods started from the same initial conditions, with covariate model selection being the only difference.</p>
 
 <details>
-<summary> _Click to expand_ </summary>
+<summary> Click to expand </summary>
     
 ``` r
 new_data = read.csv("data/applicationFiles/data.txt")
@@ -858,37 +858,41 @@ lapply(split(results,results$method),FUN=function(results){
 
 ## References
 <a id="1">[1]</a>
-Bodinier B (2024).
-sharp: Stability-enHanced Approaches using Resampling Procedures. R package version 1.4.6,
-<https://CRAN.R-project.org/package=sharp>.
+Bhattacharya, S., Dunn, P., Thomas, C., Schaefer, H., Chen, J., Hu, Z., Zalocusky, K., Shankar,R., Shen-Orr, S., Thomson, E., Wiser, J., and Butte, A. (2018).
+Immport, toward repurpos-ing of open access immunological assay data for translational and clinical research.
+ScientificData, 5:180015
 
 <a id="2">[2]</a>
-Mihaljevic F (2023). 
-Rsmlx: R Speaks 'Monolix'. R package version2023.1.5,
-<https://CRAN.R-project.org/package=Rsmlx>.
-
-<a id="3">[3]</a> 
-Prague M, Lavielle M. 
-SAMBA: A novel method for fast automatic model building in nonlinear mixed-effects models. 
-CPT Pharmacometrics Syst Pharmacol. 2022; 11: 161-172. doi:10.1002/psp4.12742
-
-<a id="4">[4]</a> 
-Pasin CBalelli IVan Effelterre T, Bockstal V, Solforosi L, Prague MDouoguih M, Thiébaut R2019.
+Pasin C, Balelli I, Van Effelterre T, Bockstal V, Solforosi L, Prague M, Douoguih M, Thiébaut R, 2019.
 Dynamics of the Humoral Immune Response to a Prime-Boost Ebola Vaccine: Quantification and Sources of Variation. 
 J Virol93:10.1128/jvi.00579-19.https://doi.org/10.1128/jvi.00579-19
 
+
+<a id="3">[3]</a> 
+Li, S., Rouphael, N., Duraisingham, S., Romero-Steiner, S., Presnell, S., Davis, C., Schmidt,D. S., Johnson, S. E., Milton, A., Rajam, G., Kasturi, S., Carlone, G. M., Quinn, C.,Chaussabel, D., Palucka, A. K., Mulligan, M. J., Ahmed, R., Stephens, D. S., Nakaya,H. I., and Pulendran, B. (2014).
+Molecular signatures of antibody responses derived from asystems biology study of five human vaccines.
+Nature immunology, 15(2):195–204
+
+<a id="4">[4]</a> 
+Durinck, S., Moreau, Y., Kasprzyk, A., Davis, S., De Moor, B., Brazma, A., and Huber, W.(2005).
+Biomart and bioconductor: a powerful link between biological databases and mi-croarray data analysis.
+Bioinformatics, 21:3439–3440.
+
 <a id="5">[5]</a>
-Alexandre M, Prague M, McLean C, Bockstal V, Douoguih M, Thiébaut R; EBOVAC 1 and EBOVAC 2 Consortia.
-Prediction of long-term humoral response induced by the two-dose heterologous Ad26.ZEBOV, MVA-BN-Filo vaccine against Ebola.
-NPJ Vaccines. 2023 Nov 8;8(1):174. doi: 10.1038/s41541-023-00767-y. PMID: 37940656; PMCID: PMC10632397.
+Dempster, A. P., Laird, N. M., and Rubin, D. B. (1977). 
+Maximum likelihood from incompletedata via the EM algorithm.
+Journal of the Royal Statistical Society: Series B, 39:1–38.15
+
 
 <a id="6">[6]</a>
-Badio, M., Lhomme, E., Kieh, M. et al.
-Partnership for Research on Ebola VACcination (PREVAC): protocol of a randomized, double-blind, placebo-controlled phase 2 clinical trial evaluating three vaccine strategies against Ebola in healthy volunteers in four West African countries.
-Trials 22, 86 (2021). https://doi.org/10.1186/s13063-021-05035-9
+Delyon, B., Lavielle, M., and Moulines, E. (1999).
+Convergence of a stochastic approximationversion of the em algorithm.
+Annals of statistics, pages 94–128
 
 <a id="7">[7]</a>
-Simulx, Lixoft SAS, a Simulations Plus company, Version 2023R1, https://lixoft.com/products/simulx/
+Kuhn, E. and Lavielle, M. (2005).
+Maximum likelihood estimation in nonlinear mixed effectsmodels.
+Computational statistics & data analysis, 49(4):1020–1038.
 
 <a id="8">[8]</a>
-Monolix, Lixoft SAS, a Simulations Plus company, Version 2023R1, https://lixoft.com/products/monolix/
+Monolix, Lixoft SAS, a Simulations Plus company, Version 2023R1, https://lixoft.com/products/monolix
