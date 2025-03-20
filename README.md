@@ -259,43 +259,43 @@ Function loaded are :
 * `graphsParNB` : for description of a single method, display the proportion of selection of each covariates with each parameters over the replicates.
 
 <p align="center">
-  <img src="outputs/figures/simulationResults/PlotGaussianPasin/SOLO/lassoFDP10/NumberSelectionParameter.png" alt="Proportion selection of each covariates, with each parameters, for lasso method" width="600" />
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/SOLO/lassoFDP10/NumberSelectionParameter.jpeg" alt="Proportion selection of each covariates, with each parameters, for lasso method" width="600" />
 </p>
 
 * `tableStats` : for description of a single method, resume in a table the scores measure (FDR, FNR and F1_score) for the method, with number of exact and overselective model.
 
 <p align="center">
-  <img src="outputs/figures/simulationResults/PlotGaussianPasin/SOLO/lassoFDP10/ErrorTable.png" alt="Scores for lasso method" width="500" />
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/SOLO/lassoFDP10/ErrorTable.jpeg" alt="Scores for lasso method" width="500" />
 </div>
 
 * `graphsCompTime` : display the distribution of the computation time and iteration for several methods.
 
 <p align="center">
-  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ComputationTime.png" alt="Computation time comparison" width="300" /> <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/Iter.png" alt="Iteration number comparison" width="300" />
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ComputationTime.jpeg" alt="Computation time comparison" width="300" /> <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/Iter.jpeg" alt="Iteration number comparison" width="300" />
 </div>
 
 * `graphsLL` : display the distribution of OFV, AIC, BIC and BICc for several methods.
 
 <p align="center">
-  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ICcomparison.png" alt="Information criterion comparison" width="400" />
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ICcomparison.jpeg" alt="Information criterion comparison" width="400" />
 </div>
 
 * `graphsParCompMethod` : display the proportion of selection of each covariates with each parameters over the replicates, for several methods.
 
 <p align="center">
-  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/NumberSelectionParameter.png" alt="Proportion selection of each covariates, with each parameters comparison" width="800" />
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/NumberSelectionParameter.jpeg" alt="Proportion selection of each covariates, with each parameters comparison" width="800" />
 </div>
 
 * `graphsStatsComp` : display the proportion of exact and overselective model over the replicates for several methods.
 
 <p align="center">
-  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ComparisonStats.png" alt="Proportion of exact and overselective model comparison" width="200" />
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ComparisonStats.jpeg" alt="Proportion of exact and overselective model comparison" width="200" />
 </div>
 
 * `tableStatsComp` : resume in a table the scores measure (FDR, FNR and F1_score) for the method, with number of exact and overselective model, for several methods.
 
 <p align="center">
-  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ErrorTable.png" alt="Scores comparison table" width="400" />
+  <img src="outputs/figures/simulationResults/PlotGaussianPasin/COMP/stepAIC_lassoFDP10/ErrorTable.jpeg" alt="Scores comparison table" width="400" />
 </div>
 
 
