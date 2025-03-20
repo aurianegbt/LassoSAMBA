@@ -184,7 +184,7 @@ write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F
 </details>
 
 <p align="center">
-<img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="500"/>
+<img src="outputs/figures/applicationResults/ObservedData.jpeg" alt="Observed Data" width="500"/>
 </p>
 
 <p align="center"><strong>Figure 1:</strong> Observed Data.</p>
