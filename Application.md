@@ -11,6 +11,7 @@
 
 <details>
 <summary> _Click to expand_ </summary>
+    
 ``` r
 library(ggplot2)
 library(dplyr)
@@ -77,6 +78,7 @@ Note that the code here are time consumming, and presented for lasso selection. 
 
 <details>
 <summary> _Click to expand_ </summary>
+    
 ``` r
 ensembl <- useEnsembl(biomart = "genes")
 ensembl <- useDataset(dataset = "hsapiens_gene_ensembl", mart = ensembl)
@@ -194,6 +196,7 @@ Estimation has been conduct using SAEM algorithm [[5,6,7]](#5,#6,#7) through mon
 
 <details>
 <summary> _Click to expand_ </summary>
+    
 ``` r
 newProject(modelFile="data/modelFiles/PasinApp.txt",
            data=list(dataFile="data/applicationFiles/Imm_data.txt",
@@ -333,6 +336,7 @@ Estimated parameters are displayed in the following table.
 
 <details>
 <summary> _Click to expand_ </summary>
+    
 ``` r
 source("scripts/MBFun.R")
 pathToResults = paste0("outputs/buildingResults/application")
@@ -394,6 +398,7 @@ By stepAIC-SAMBA, the selection results are displayed in the following table :
 
 <details>
 <summary> _Click to expand_ </summary>
+    
 ``` r
 new_data = read.csv("data/applicationFiles/data.txt")
 cov= new_data %>% filter(Time==0) %>% select(ID,LEP,KIFC1)
@@ -574,6 +579,7 @@ We also conduct the selection over 500 bootstrap to test the stability of select
 
 <details>
 <summary> Click to expand </summary>
+    
 ``` r
 set.seed(1710)
 seed = floor(runif(1000)*100000)
@@ -645,6 +651,7 @@ Results from the bootstrap selection can be visualized with the following plot. 
 
 <details>
 <summary> Click to expand </summary>
+    
 ``` r
 # buildMethod = c("lasso","stepAIC")
 # results <- data.frame()
