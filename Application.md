@@ -1,5 +1,16 @@
 # Application to ZOSTAVAX data from the ImmuneSpace
 
+<!-- badges: start -->
+<!-- badges: end -->
+<!--ts-->
+1. [Data presentation](#data-presentation)
+2. [Estimation of the initial model](#estimation-of-the-initial-model)
+3. [Selection Results](#selection-results)
+4. [Bootstrap analysis](#bootstrap-analysis)
+<!--te-->
+
+<details>
+<summary> _Click to expand_ </summary>
 ``` r
 library(ggplot2)
 library(dplyr)
@@ -9,6 +20,9 @@ library(stringr)
 library(Biobase)
 library(biomaRt)
 dir <- function(d){if(!dir.exists(d)){dir.create(d)}}
+
+PNG <- F
+JPEG <- T 
 
 genes_information <- read.table("data/applicationFiles/GenesbyModules_Chaussabel_updateGeneNames.txt",header = TRUE)
 
@@ -23,10 +37,13 @@ gen <- exprs(data)
 
 genes = rownames(gen)
 ```
+</details>
 
-We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -Zoster vaccine in young and elderly-, with all data are available and dowloaded from the ImmPort platform.
+## Data presentation 
 
-We modelise the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -for short-live- and L -for long-live- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.). Antibodies are supposed to decay at rate $\delta_{Ab}$. The mechanistic model is then :
+We propose an illustration of the method on publicly available gene expression and immune response data. Our objective is to identify potential biomarkers involved in the immural immune response. Thus, we analyze data from a study on vaccine against Varicella Zoster virus, under the study accession number SDY984 -[Zoster vaccine in young and elderly](https://immport.org/shared/study/SDY984)-, with all data are available and dowloaded from the ImmPort platform [[1]](#1).
+
+We modelise the antibody production by considering two Antibodies secreting cells (ASC), denoted by S -for short-live- and L -for long-live- (at rates $\varphi_S$ and $\varphi_L$ resp.) and characterized by their half-life ($\delta_S$ and $\delta_L$ resp.) [[2]](#2). Antibodies are supposed to decay at rate $\delta_{Ab}$. The mechanistic model is then :
 
 ``` math
 \forall i\leq N,j\leq n_i,   \left\{\begin{array}{rcl}
@@ -54,10 +71,12 @@ Y_{ij} = \log_{10}(Ab_i(t_{ij}))+\varepsilon_{ij}
 
 where $\varepsilon_i\sim^{iid}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})$.
 
-To conduct the selection, we focus on genes protein coding genes link to "Interferon", "Type 1 Interferon", "Neutrophil activation","Inflammation","Cytokines/chemokines" and "Cell cycle" pathway according to Chaussabel classification and the BioBase database.
+To conduct the selection, we focus on genes protein coding genes link to "Interferon", "Type 1 Interferon", "Neutrophil activation","Inflammation","Cytokines/chemokines" and "Cell cycle" pathway according to Chaussabel classification [[3]](#3) and the BioBase database [[4]](#4).
 
-Note that the code here are time consumming, and presented for lasso selection. However, results are available in outputs folder. To conduct the original stepAIC-SAMBA, p.max need to be set to his default value 0.1 and buildMethod to stepAIC.
+Note that the code here are time consumming, and presented for lasso selection. However, results are available in outputs folder and be directly loaded. To conduct the original stepAIC-SAMBA, `p.max` need to be set to his default value 0.1 and `buildMethod` to stepAIC.
 
+<details>
+<summary> _Click to expand_ </summary>
 ``` r
 ensembl <- useEnsembl(biomart = "genes")
 ensembl <- useDataset(dataset = "hsapiens_gene_ensembl", mart = ensembl)
@@ -131,7 +150,13 @@ ggplot(data = data_VAR[data_VAR$Analyte=="IgG",],
   ylab ("log10(Ab)")+
   xlab("time (in days)")
 
-ggsave(filename="outputs/figures/applicationResults/ObservedData.png")
+if(PNG){
+  ggsave(filename="outputs/figures/applicationResults/ObservedData.png",unit="px",height=1800,width=2500,bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(filename="outputs/figures/applicationResults/ObservedData.jpeg",unit="px",height=1800,width=2500,device=grDevices::jpeg)
+}
+
 
 df <- data_VAR %>%
   filter(Analyte=="IgG") %>%
@@ -154,15 +179,21 @@ Nb_cov = ncol(df_J_mix)-4
 
 write.csv(df_J_mix,file="data/applicationFiles/data.txt",quote = F,row.names = F)
 ```
+</details>
 
 <p align="center">
-
-<img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="600"/>
-
+<img src="outputs/figures/applicationResults/ObservedData.png" alt="Observed Data" width="500"/>
 </p>
 
 <p align="center"><strong>Figure 1:</strong> Observed Data.</p>
 
+## Estimation of the initial model
+
+
+Estimation has been conduct using SAEM algorithm [[5,6,7]](#5,#6,#7) through monolix software [[8]](#8). 
+
+<details>
+<summary> _Click to expand_ </summary>
 ``` r
 newProject(modelFile="data/modelFiles/PasinApp.txt",
            data=list(dataFile="data/applicationFiles/Imm_data.txt",
@@ -187,9 +218,20 @@ asses = getAssessmentSettings()
 asses$extendedEstimation=TRUE
 runAssessment(settings=asses)
 
-ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits.png",width=2000,height=3000,unit="px")
+if(PNG){
+  ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits.png",width=2000,height=3000,unit="px",bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits.jpeg",width=2000,height=3000,unit="px",device=grDevices::jpeg)
+}
 
-ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.png",width=1600,height=800,unit="px")
+
+if(PNG){
+  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.png",width=1600,height=800,unit="px",bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.jpeg",width=1600,height=800,unit="px",device=grDevices::jpeg)
+}
 
 res = getAssessmentResults()
 
@@ -229,55 +271,68 @@ ggplot(tabestimates,aes(x=run,y=estimate))+
   theme(legend.position = "none", plot.title = element_text(hjust = .5)) + 
   xlab("")+ylab("")
   
-ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",height=1000,width=2500,unit="px")
+if(PNG){
+  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",height=1000,width=2500,unit="px",bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.jpeg",height=1000,width=2500,unit="px",device=grDevices::jpeg)
+}
+  
+
 ```
+</details>
+
+Estimated parameters are displayed in the following table. 
 
 | Parameter             | Value     | Confidence bounds (95%) |
 |-----------------------|-----------|-------------------------|
-| FIXED EFFECTS         |           |                         |
-| ${\delta_L}_{pop}$      | $0.00019$ |                         |
-| ${\delta_{Ab}}_{pop}$ | $0.063$   |                         |
+| **FIXED EFFECTS**                                             |
+| ${\delta_L}_{pop}$      | _0.00019_ |                         |
+| ${\delta_{Ab}}_{pop}$ | _0.063_   |                         |
 | ${\delta_S}_{pop}$    | $0.058$   | $[0.024;0.091]$         |
 | ${\varphi_S}_{pop}$     | $907.35$  | $[429.78;1384.93]$      |
 | ${\varphi_L}_{pop}$     | $1069.24$ | $[819.029;1319.457]$    |
-| RANDOM EFFECTS        |           |                         |
+| **RANDOM EFFECTS**        |           |                         |
 | $\omega_{\delta_S}$   | $0.50$    | $[0.103;0.895]$         |
 | $\omega_{\varphi_S}$  | $1.16$    | $[0.736;1.586]$         |
 | $\omega_{\varphi_L}$  | $0.67$    | $[0.506;0.834]$         |
-| ERROR                 |           |                         |
+| **ERROR**                 |           |                         |
 | $\sigma_{Ab}$         | $0.95$    | $[0.084;0.106]$         |
 
-<p align="center"><strong>Table 1:</strong> Estimated Values of the empty model (no covariates included).</p>
+<p align="center"><strong>Table 1:</strong> Estimated Values of the initial model : without covariates includes, a constant error model, random effetcs on $\delta_S$, $\varphi_S$ and $\varphi_L$ that are log-normaly distributed.</p>
 
 | OFV     | AIC     | BIC     | BICc    |
 |---------|---------|---------|---------|
 | -216.08 | -202.08 | -191.19 | -184.06 |
 
-<p align="center"><strong>Table 2:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.</p>
+<p align="center"><strong>Table 2:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the fited initial model. Estimation done through Monolix [[8]](#8) by Importance sampling, using a Monte Carlo approach.</p>
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/IndividualFits.png" alt="Individual Fits" width="800"/>
+<img src="outputs/figures/applicationResults/IndividualFits.jpeg" alt="Individual Fits" width="500"/>
 </p>
 
-<p align="center"><strong>Figure 2:</strong> Individual Fits.</p>
+<p align="center"><strong>Figure 2:</strong> Individual fits of the antibodies levels for the fited initial model.</p>
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/Vpc.png" alt="Visual Predictive check" width="800"/>
+<img src="outputs/figures/applicationResults/Vpc.jpeg" alt="Visual predictive check of the initial model." width="600"/>
 </p>
 
 
-<p align="center"><strong>Figure 3:</strong> Visual Predictive Check.</p>
+<p align="center"><strong>Figure 3:</strong> Visual predictive check of the initial model..</p>
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/assessmentConvergence.png" alt="Convergence Assessment" width="1000"/>
+<img src="outputs/figures/applicationResults/assessmentConvergence.jpeg" alt="Convergence Assessment" width="800"/>
 </p>
 
-<p align="center"><strong>Figure 4:</strong> Convergence Assessment plot.</p>
+<p align="center"><strong>Figure 4:</strong> Convergence Assessment plot of the initial model. 5 runs of the SAEM algorithm with different, randomly generated, initial values, and different seeds. Initial values has been uniformly drawn from the intervals defined around the estimated values.</p>
 
+## Selection results
 
+<details>
+<summary> _Click to expand_ </summary>
 ``` r
 source("scripts/MBFun.R")
 pathToResults = paste0("outputs/buildingResults/application")
@@ -310,6 +365,7 @@ newProject(modelFile = "data/modelFiles/PasinApp.txt",
   
   save(res,Model,covModel,time,iter,file=paste0(pathToResults,"/lasso.RData"))
 ```
+</details>
 
 Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ and $\varphi_L$ :
 
@@ -322,8 +378,23 @@ Genes LEP and KIFC1 are respectively found linked with parameters $\varphi_S$ an
     \end{array}\right.
 ```
 
-``` r
+By stepAIC-SAMBA, the selection results are displayed in the following table : 
 
+<p align="center">
+
+| Parameter   | Genes selected |
+|------------|---------------|
+| $\varphi_S$| CDC45, **LEP**, NOTCH1, SP110, TCEAL9 |
+| $\varphi_L$| GDPD5, IKZF2, **KIFC1**, PSORS1C1, SLC16A5, SLC50A1, SRP72 |
+| $\delta_S$ | SLC31A1, TLR7 |
+
+</p>
+
+<p align="center">**Table:** Results from the stepAIC-SAMBA method for the ZOSTAVAX vaccine. Genes identified uniquely by the lasso-SAMBA method are in bold. The initial model had an empty covariate structure, a constant error model, and no correlation. Both methods started from the same initial conditions, with covariate model selection being the only difference.</p>
+
+<details>
+<summary> _Click to expand_ </summary>
+``` r
 new_data = read.csv("data/applicationFiles/data.txt")
 cov= new_data %>% filter(Time==0) %>% select(ID,LEP,KIFC1)
 new_data = new_data %>% select(ID,Time,Value,Init)
@@ -357,9 +428,19 @@ asses = getAssessmentSettings()
 asses$extendedEstimation=TRUE
 runAssessment(settings=asses)
 
-ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits_final.png",width=2000,height=3000,unit="px")
+if(PNG){
+  ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits_final.png",width=2000,height=3000,unit="px",bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits_final.jpeg",width=2000,height=3000,unit="px")
+}
 
-ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.png",width=1600,height=800,unit="px")
+if(PNG){
+   ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.png",width=1600,height=800,unit="px",bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.jpeg",width=1600,height=800,unit="px")
+}
 
 res = getAssessmentResults()
 
@@ -401,39 +482,56 @@ ggplot(tabestimates,aes(x=run,y=estimate))+
   geom_errorbar(aes(ymax=estimate+1.96*se,ymin=estimate-1.96*se,color=factor(run)))+
   theme(legend.position = "none", plot.title = element_text(hjust = .5)) + 
   xlab("")+ylab("")
-
-ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.png",height=1000,width=2500,unit="px")
+  
+if(PNG){
+  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.png",height=1000,width=2500,unit="px",bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.jpeg",width=1600,height=800,unit="px",device=grDevices::jpeg)
+}
 
 ggplot(new_data,aes(x=Time,group=ID,color=LEP,y=Value)) + 
   geom_line(lwd=0.5) +
   scale_color_gradient2(high="indianred",low="slateblue",mid="grey")
   
-ggsave(filename="outputs/figures/applicationResults/fitLEP_final.png",height=1000,width=2500,unit="px")
+if(PNG){
+  ggsave(filename="outputs/figures/applicationResults/fitLEP_final.png",height=1000,width=2500,unit="px",bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(filename="outputs/figures/applicationResults/fitLEP_final.jpeg",height=1000,width=2500,unit="px",device=grDevices::jpeg)
+}
   
 ggplot(new_data,aes(x=Time,group=ID,color=KIFC1,y=Value)) + 
   geom_line(lwd=0.5) +
   scale_color_gradient2(high="indianred",low="slateblue",mid="grey")
   
-ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.png",height=1000,width=2500,unit="px")
+if(PNG){
+  ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.png",height=1000,width=2500,unit="px",bg="transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.jpeg",height=1000,width=2500,unit="px",device=grDevices::jpeg)
+}
 
 ```
+</details>
 
+Again, estimation of the final model has been done using the SAEM algorithm through the monolix software.
 
 | Parameter                 | Value               | Confidence bounds (95%) |
 |---------------------------|---------------------|-------------------------|
-| FIXED EFFECTS             |                     |                         |
-| ${\delta_L}_{pop}$        | $0.00019$           |                         |
-| ${\delta_{Ab}}_{pop}$     | $0.063$             |                         |
+| **FIXED EFFECTS**                                                           |
+| ${\delta_L}_{pop}$        | _0.00019_           |                         |
+| ${\delta_{Ab}}_{pop}$     | _0.063_             |                         |
 | ${\delta_S}_{pop}$        | $0.047$             | $[0.012;0.081]$         |
 | ${\varphi_S}_{pop}$       | $945.43$            | $[565.6,1325.2]$        |
 | $\beta_{\varphi_S,LEP}$   | $-3.40$             | $[-4.79;-2.003]$        |
 | ${\varphi_L}_{pop}$       | $1007.21$           | $[800.2,1214.3]$        |
 | $\beta_{\varphi_L,KIFC1}$ | $-2.05$             | $[-2.89;-1.215]$        |
-| RANDOM EFFECTS            |                     |                         |
+| **RANDOM EFFECTS**                                                         |
 | $\omega_{\delta_S}$       | $0.84$              | $[0.167;1.521]$         |
 | $\omega_{\varphi_S}$      | $0.71$              | $[0.415;1.007]$         |
 | $\omega_{\varphi_L}$      | $0.47$              | $[0.334;0.612]$         |
-| ERROR                     |                     |                         |
+| **ERROR**                                                                 |
 | $\sigma_{Ab}$             | $0.094$              | $[0.083;0.105]$        |
 
 
@@ -448,31 +546,34 @@ ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.png",height=1
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/IndividualFits_final.png" alt="Individual Fits" width="800"/>
+<img src="outputs/figures/applicationResults/IndividualFits_final.jpeg" alt="Individual Fits" width="600"/>
 </p>
 
 
-<p align="center"><strong>Figure 5:</strong> Individual Fits.</p>
+<p align="center"><strong>Figure 5:</strong> Individual fits of the antibodies levels for the fited final model.</p>
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/Vpc_final.png" alt="Visual Predictive check" width="800"/>
+<img src="outputs/figures/applicationResults/Vpc_final.jpeg" alt="Visual Predictive check" width="600"/>
 </p>
 
 
-<p align="center"><strong>Figure 6:</strong> Visual Predictive Check.</p>
+<p align="center"><strong>Figure 6:</strong> Visual predictive check of the final model.</p>
 
 
 <p align="center">
-<img src="outputs/figures/applicationResults/assessmentConvergence_final.png" alt="Convergence assessment" width="1000"/>
+<img src="outputs/figures/applicationResults/assessmentConvergence_final.jpeg" alt="Convergence assessment" width="800"/>
 </p>
 
 
-<p align="center"><strong>Figure 7:</strong> Convergence Assessment.</p>
+<p align="center"><strong>Figure 7:</strong> Convergence Assessment plot of the final model. 5 runs of the SAEM algorithm with different, randomly generated, initial values, and different seeds. Initial values has been uniformly drawn from the intervals defined around the estimated values..</p>
 
+## Bootstrap analysis
 
 We also conduct the selection over 500 bootstrap to test the stability of selected and non selected genes.
 
+<details>
+<summary> Click to expand </summary>
 ``` r
 set.seed(1710)
 seed = floor(runif(1000)*100000)
@@ -532,138 +633,94 @@ iter=res$iter
 
 save(res,Model,covModel,time,iter,file=pathToResults)
 ```
+</details>
 
-Results from the bootstrap selection can be visualized by codes bellow, which render the following plots.
-
-<p align="center">
-<img src="outputs/figures/applicationResults/propModel_par.png" alt="Proportion of empty, and final model including LEP and KIFC1 genes, with parameters links, built by the lasso-SAMBA procedure among the 500 bootstraps." width="800"/>
-</p>
+Results from the bootstrap selection can be visualized with the following plot. [TO FINISH ]
 
 <p align="center">
-<img src="outputs/figures/applicationResults/propModel.png" alt="Proportion of empty, and final model including LEP and KIFC1 genes built by the lasso-SAMBA procedure among the 500 bootstraps." width="800"/>
+<img src="outputs/figures/applicationResults/countModel.jpeg" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
 </p>
 
-<p align="center">
-<img src="outputs/figures/applicationResults/countModel.png" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
-</p>
+<p align="center"> **Figure 8:** Covariates proportion selection with each parameters $\varphi_S$, $\varphi_L$ and $\delta_S$, over the 500 bootstrap, by lasso-SAMBA and stepAIC-SAMBA.</p>
 
+<details>
+<summary> Click to expand </summary>
 ``` r
+# buildMethod = c("lasso","stepAIC")
 # results <- data.frame()
-# NB_mod <- 0
-# for(i in 1:500){
-#   tryCatch({
-#     load(paste0("outputs/buildingResults/application/bootstrap/bootstrap_",i,".RData"))
-#     NB_mod <-NB_mod+1
-#     
-#     if(length(unlist(covModel))!=0){
-#       results <- rbind(results,data.frame(model=i,parameter=rep(names(covModel),sapply(covModel,length)),covariates=unname(unlist(covModel))))
-#     }},error=function(e){print(i)})
+# NB_mod <- setNames(rep(0,2),buildMethod)
+# for(method in buildMethod){
+#   for(i in 1:500){
+#     tryCatch({
+#       load(paste0("outputs/buildingResults/application/bootstrap_",method,"/bootstrap_",i,".RData"))
+#       NB_mod[[method]] <-NB_mod[[method]]+1
+#       
+#       if(length(unlist(covModel))!=0){
+#         results <- rbind(results,data.frame(method=method,
+#                                             model=i,
+#                                             parameter=rep(names(covModel),sapply(covModel,length)),
+#                                             covariates=unname(unlist(covModel))))
+#       }},error=function(e){print(i)})
+#   }
 # }
 # 
 # results[results$parameter=="phi_S","parameter"] <- latex2exp::TeX(r"($\varphi_S$)",output="character")
 # results[results$parameter=="phi_L","parameter"] <- latex2exp::TeX(r"($\varphi_L$)",output="character")
 # results[results$parameter=="delta_S","parameter"] <- latex2exp::TeX(r"($\delta_S$)",output="character")
 # 
+# value <- Reduce(rbind,lapply(split(results,results$method),FUN=function(results){
+#   data.frame(
+#     method=unique(results$method),
+#     Type=c("Exact final model",
+#            "With final model",
+#            "Non null model"),
+#     Value=c(sum(sapply(split(results,results$model),FUN=function(x){
+#       (setequal(x$parameter,c("varphi[L]","varphi[S]")) & setequal(x$covariates,c("LEP","KIFC1"))) && x[x$parameter=="varphi[S]","covariates"]=="LEP"
+#     })),
+#     sum(sapply(split(results,results$model),FUN=function(x){
+#       all(c("varphi[S]","varphi[L]") %in% x$parameter) &&
+#         ("LEP" %in% x[x$parameter=="varphi[S]","covariates"] & "KIFC1" %in% x[x$parameter=="varphi[L]","covariates"] )})),
+#     length(unique(results[,"model"])))/NB_mod[[unique(results$method)]]*100
+#   )
+# }))
 # 
-# # sapply(sort(sapply(unique(results$covariates),FUN=function(x){round(length(unique(results[results$covariates==x,"model"]))/NB_mod*100,digits=2)})),FUN=function(x){paste0(x,"%")})
-# #
-# # lapply(split(results,results$rate),FUN=function(results){
-# # lapply(split(results,results$parameter),FUN=function(df){
-# #   sapply(sort(sapply(unique(df$covariates),FUN=function(x){round(length(unique(df[df$covariates==x,"model"]))/NB_mod*100,digits=2)})),FUN=function(x){paste0(x,"%")})
-# # })
-# # })
-# 
-# 
-# value <- data.frame(
-#   method="Lasso",
-#   Type=c("Exact final model",
-#          "With final model",
-#          "Non null model"),
-#   Value=c(sum(sapply(split(results,results$model),FUN=function(x){
-#     (setequal(x$parameter,c("varphi[L]","varphi[S]")) & setequal(x$covariates,c("LEP","KIFC1"))) && x[x$parameter=="varphi[S]","covariates"]=="LEP"
-#   })),
-#   sum(sapply(split(results,results$model),FUN=function(x){
-#     all(c("varphi[S]","varphi[L]") %in% x$parameter) &&
-#       ("LEP" %in% x[x$parameter=="varphi[S]","covariates"] & "KIFC1" %in% x[x$parameter=="varphi[L]","covariates"] )})),
-#   length(unique(results[,"model"])))
-# )
-# 
-# value.par <- data.frame(
-#   method="Lasso",
-#   Parameter = "varphi[S]",
-#   Type = c("Only final gene selected","Final gene selected among others","Non null model"),
-#   Value = c(sum(sapply(split(results[results$parameter=="varphi[S]",],results[results$parameter=="varphi[S]","model"]),FUN=function(x){identical(x$covariates,"LEP")})),
-#             nrow(match_df(results[results$parameter=="varphi[S]",-1],data.frame(parameter="varphi[S]",covariates="LEP"))),
-#             length(unique(results[results$parameter=="varphi[S]","model"])))
-# )
-# value.par <- rbind(value.par,data.frame(
-#   method="Lasso",
-#   Parameter = "varphi[L]",
-#   Type = c("Only final gene selected","Final gene selected among others","Non null model"),
-#   Value = c(sum(sapply(split(results[results$parameter=="varphi[L]",],results[results$parameter=="varphi[L]","model"]),FUN=function(x){identical(x$covariates,"KIFC1")})),
-#             nrow(match_df(results[results$parameter=="varphi[L]",-1],data.frame(parameter="varphi[L]",covariates="KIFC1"))),
-#             length(unique(results[results$parameter=="varphi[L]","model"])))
-# ))
-# value.par <- rbind(value.par,data.frame(
-#   method="Lasso",
-#   Parameter = "delta[S]",
-#   Type = c("Non null model"),
-#   Value = length(unique(results[results$parameter=="delta[S]","model"]))
-# ))
-# 
-# value$Value <- value$Value/NB_mod*100
-# value.par$Value <- value.par$Value/NB_mod*100
+# value.par <- Reduce(rbind,lapply(split(results,results$method),FUN=function(results){
+#   method = unique(results$method)
+#   value.par <- data.frame(
+#     method=method,
+#     Parameter = "varphi[S]",
+#     Type = c("Only final gene selected","Final gene selected among others","Non null model"),
+#     Value = c(sum(sapply(split(results[results$parameter=="varphi[S]",],results[results$parameter=="varphi[S]","model"]),FUN=function(x){identical(x$covariates,"LEP")})),
+#               nrow(match_df(results[results$parameter=="varphi[S]",-1],data.frame(parameter="varphi[S]",covariates="LEP"))),
+#               length(unique(results[results$parameter=="varphi[S]","model"])))/NB_mod[[method]]*100
+#   )
+#   value.par <- rbind(value.par,data.frame(
+#     method=method,
+#     Parameter = "varphi[L]",
+#     Type = c("Only final gene selected","Final gene selected among others","Non null model"),
+#     Value = c(sum(sapply(split(results[results$parameter=="varphi[L]",],results[results$parameter=="varphi[L]","model"]),FUN=function(x){identical(x$covariates,"KIFC1")})),
+#               nrow(match_df(results[results$parameter=="varphi[L]",-1],data.frame(parameter="varphi[L]",covariates="KIFC1"))),
+#               length(unique(results[results$parameter=="varphi[L]","model"])))/NB_mod[[method]]*100
+#   ))
+#   value.par <- rbind(value.par,data.frame(
+#     method=method,
+#     Parameter = "delta[S]",
+#     Type = c("Non null model"),
+#     Value = length(unique(results[results$parameter=="delta[S]","model"]))/NB_mod[[method]]*100
+#   ))
+#   return(value.par)
+# })) 
 # 
 # save(value,value.par,results,file="outputs/buildingResults/application/bootstrap.RData")
 load(file="outputs/buildingResults/application/bootstrap.RData")
 
-
 value$Type <- factor(value$Type,levels=c("Non null model","With final model","Exact final model"))
-
-ggplot(mapping=aes(x=method,y=Value,fill=method,color=method,pattern=Type)) +
-  geom_col(data=value[value$Type=="Non null model",],aes(group=method),width = 0.7, position = position_dodge(width = 0.7),color="#024154") +
-  geom_bar_pattern(data=value[value$Type=="With final model",], position="dodge",width=0.7,color="#024154",pattern_color="#024154",pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
-  geom_bar_pattern(data=value[value$Type=="Exact final model",], position="dodge",width=0.7,color="#024154",pattern_color="#024154",pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
-  labs(x="",y="Proportion (in %)") +
-  scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+
-  scale_pattern_manual(values = c("Exact final model"="stripe","With final model"="circle","Non null model"="none"))+
-  theme_bw() +
-  scale_color_manual(values=setNames("#024154","Lasso"),guide="none")+
-  scale_fill_manual(values=setNames("#99e7ff","Lasso"),guide="none")+
-  theme(axis.text=element_text(size=13), 
-        axis.text.x = element_blank(),
-        axis.title=element_text(size=16,face="bold"),
-        legend.key=element_rect(color="#024154"),
-        legend.position = "bottom")+
-  guides(pattern=guide_legend(override.aes = list(fill="white",color="#024154"))) 
-
-
-ggsave(filename = "outputs/figures/applicationResults/propModel.png",unit="px",height=1200,width=1500)
-
-
 value.par$Type <- factor(value.par$Type,levels=c("Only final gene selected","Final gene selected among others","Non null model"))
 
-ggplot(mapping=aes(x=Parameter,y=Value,fill=Parameter,color=Parameter,pattern=Type)) +
-  geom_col(data=value.par[value.par$Type=="Non null model",],aes(group=Parameter),width = 0.7, position = position_dodge(width = 0.7),color=c("#5c6e39","#563f61","#703527")) +
-  geom_bar_pattern(data=value.par[value.par$Type=="Final gene selected among others",], position="dodge",color=c("#5c6e39","#563f61"),pattern_color=c("#5c6e39","#563f61"),width=0.7,pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
-  geom_bar_pattern(data=value.par[value.par$Type=="Only final gene selected",],color=c("#5c6e39","#563f61"),pattern_color=c("#5c6e39","#563f61"), position="dodge",width=0.7,pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
-  labs(x="",y="Proportion (in %)") +
-  scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+
-  scale_pattern_manual(values = c("Only final gene selected"="stripe","Final gene selected among others"="circle","Non null model"="none"))+
-  theme_bw() +
-  theme(axis.text=element_text(size=13), 
-        axis.title=element_text(size=16,face="bold"),
-        legend.key=element_rect(color="black"),
-        legend.position="bottom")+
-  guides(pattern=guide_legend(override.aes = list(fill="white",color="black"))) +
-  scale_fill_manual(values=setNames(c("#e0e6c6","#d0c1d7","#f8c2b4"),c("varphi[S]","varphi[L]","delta[S]")),guide="none") +
-  scale_color_manual(values=setNames(c("#5c6e39","#563f61","#703527"),c("varphi[S]","varphi[L]","delta[S]")),guide="none")
-
-ggsave(filename = "outputs/figures/applicationResults/propModel_par.png",unit="px",height=1200,width=2000)
-
-
-
-ggplot(results,aes(x=covariates))+geom_bar()+facet_grid(parameter~.,labeller=label_parsed)+theme(axis.text.x = element_text(angle = 90))+
+ggplot(results,aes(x=covariates))+geom_bar()+
+  facet_nested(factor(method,levels=buildMethod)+parameter~.,labeller=labeller(parameter=label_parsed))+
+  # facet_grid(parameter~.,labeller=label_parsed)+
+  theme(axis.text.x = element_text(angle = 90))+
   geom_hline(yintercept = 25, color = "brown", linetype = "dashed") +
   geom_segment(data = subset(results, parameter == "varphi[S]"),
                aes(x = 0, xend = which(sort(unique(results$covariates))=="LEP"),
@@ -675,14 +732,156 @@ ggplot(results,aes(x=covariates))+geom_bar()+facet_grid(parameter~.,labeller=lab
                    y = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])),
                    yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
                color = "indianred3", linetype = "solid", size = 0.5) +
-  ylab("Count") +
+  ylab("Proportion") +
   scale_y_continuous(limits = c(0,500),
                      breaks = seq(0,500,500/4), 
                      labels = scales::percent(seq(0,1,0.25)))+
   theme(axis.title=element_text(size=15),
         axis.text.y = element_text(size=12),
-        strip.text.x = element_text(size = 15))
+        axis.text.x = element_text(size=4),
+        strip.text = element_text(size = 20),
+        plot.background = element_rect(fill='transparent', color=NA), 
+        legend.key = element_rect(fill = "transparent", color = NA),
+        legend.background = element_rect(fill = "transparent", color = NA))
+
+if(PNG){
+  ggsave(filename = "outputs/figures/applicationResults/countModel.png",unit="px",width=4000,height=2500,bg = "transparent",device=grDevices::png)
+}
+if(JPEG){
+  ggsave(filename = "outputs/figures/applicationResults/countModel.jpeg",unit="px",width=4000,height=2500,device=grDevices::jpeg)
+}
 
 
-ggsave(filename = "outputs/figures/applicationResults/countModel.png",unit="px",width=4000,height=2500)
+lapply(split(value,value$method),FUN=function(value){
+  method=unique(value$method)
+
+  ggplot(mapping=aes(x=method,y=Value,fill=method,color=method,pattern=Type)) +
+    geom_col(data=value[value$Type=="Non null model",],aes(group=method),width = 0.7, position = position_dodge(width = 0.7),color="#024154") +
+    geom_bar_pattern(data=value[value$Type=="With final model",], position="dodge",width=0.7,color="#024154",pattern_color="#024154",pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
+    geom_bar_pattern(data=value[value$Type=="Exact final model",], position="dodge",width=0.7,color="#024154",pattern_color="#024154",pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
+    labs(x="",y="Proportion (in %)") +
+    scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+
+    scale_pattern_manual(values = c("Exact final model"="stripe","With final model"="circle","Non null model"="none"))+
+    theme_bw() +
+    scale_color_manual(values=setNames("#024154",method),guide="none")+
+    scale_fill_manual(values=setNames("#99e7ff",method),guide="none")+
+    theme(axis.text=element_text(size=13),
+          axis.text.x = element_blank(),
+          axis.title=element_text(size=16,face="bold"),
+          legend.key=element_rect(color="#024154",fill="transparent"),
+          legend.position = "bottom",
+          plot.background = element_rect(fill='transparent', color=NA), 
+          legend.background = element_rect(fill = "transparent", color = NA))+
+    guides(pattern=guide_legend(override.aes = list(fill="transparent",color="#024154")))
+  
+  if(PNG){
+    ggsave(filename = paste0("outputs/figures/applicationResults/propModel_",method,".png"),unit="px",height=1200,width=1500, bg='transparent',device=grDevices::png)
+  }
+  if(JPEG){
+    ggsave(filename = paste0("outputs/figures/applicationResults/propModel_",method,".jpeg"),unit="px",height=1200,width=1500,device=grDevices::jpeg)
+  }
+})
+
+lapply(split(value.par,value.par$method),FUN=function(value.par){
+  method=unique(value.par$method)
+  ggplot(mapping=aes(x=Parameter,y=Value,fill=Parameter,color=Parameter,pattern=Type)) +
+    geom_col(data=value.par[value.par$Type=="Non null model",],aes(group=Parameter),width = 0.7, position = position_dodge(width = 0.7),color=c("#5c6e39","#563f61","#703527")) +
+    geom_bar_pattern(data=value.par[value.par$Type=="Final gene selected among others",], position="dodge",color=c("#5c6e39","#563f61"),pattern_color=c("#5c6e39","#563f61"),width=0.7,pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
+    geom_bar_pattern(data=value.par[value.par$Type=="Only final gene selected",],color=c("#5c6e39","#563f61"),pattern_color=c("#5c6e39","#563f61"), position="dodge",width=0.7,pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
+    labs(x="",y="Proportion (in %)") +
+    scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+
+    scale_pattern_manual(values = c("Only final gene selected"="stripe","Final gene selected among others"="circle","Non null model"="none"))+
+    theme_bw() +
+    theme(axis.text=element_text(size=13),
+          axis.title=element_text(size=16,face="bold"),
+          legend.key=element_rect(color="black",fill="transparent"),
+          legend.position="bottom",
+          plot.background = element_rect(fill='transparent', color=NA), 
+          legend.background = element_rect(fill = "transparent", color = NA))+
+    guides(pattern=guide_legend(override.aes = list(fill="transparent",color="black"))) +
+    scale_fill_manual(values=setNames(c("#e0e6c6","#d0c1d7","#f8c2b4"),c("varphi[S]","varphi[L]","delta[S]")),guide="none") +
+    scale_color_manual(values=setNames(c("#5c6e39","#563f61","#703527"),c("varphi[S]","varphi[L]","delta[S]")),guide="none")
+  
+  if(PNG){
+    ggsave(filename = paste0("outputs/figures/applicationResults/propModel_par_",method,".png"),unit="px",height=1200,width=2000, bg='transparent',device=grDevices::png)
+  }
+  if(JPEG){
+    ggsave(filename = paste0("outputs/figures/applicationResults/propModel_par_",method,".jpeg"),unit="px",height=1200,width=2000,device=grDevices::jpeg)
+  }
+})
+
+lapply(split(results,results$method),FUN=function(results){
+  method=unique(results$method)
+  
+  ggplot(results,aes(x=covariates))+geom_bar()+
+    facet_grid(parameter~.,labeller=label_parsed)+
+    theme(axis.text.x = element_text(angle = 90))+
+    geom_hline(yintercept = 0.05*NB_mod[[method]], color = "brown", linetype = "dashed") +
+    geom_segment(data = subset(results, parameter == "varphi[S]"),
+                 aes(x = 0, xend = which(sort(unique(results$covariates))=="LEP"),
+                     y = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"])),
+                     yend = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"]))),
+                 color = "indianred3", linetype = "solid", size = 0.5) +
+    geom_segment(data = subset(results, parameter == "varphi[L]"),
+                 aes(x = 0, xend = which(sort(unique(results$covariates))=="KIFC1"),
+                     y = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])),
+                     yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
+                 color = "indianred3", linetype = "solid", size = 0.5) +
+    ylab("Proportion") +
+    scale_y_continuous(limits = c(0,NB_mod[[method]]),
+                       breaks = seq(0,NB_mod[[method]],NB_mod[[method]]/4), 
+                       labels = scales::percent(seq(0,1,0.25)))+
+    theme(axis.title=element_text(size=15),
+          axis.text.y = element_text(size=12),
+          axis.text.x = element_text(size=if(method=="lasso"){8}else{4}),
+          strip.text = element_text(size = 20),
+          plot.background = element_rect(fill='transparent', color=NA), 
+          legend.key = element_rect(fill = "transparent", color = NA),
+          legend.background = element_rect(fill = "transparent", color = NA))
+  
+  if(PNG){
+    ggsave(filename = paste0("outputs/figures/applicationResults/countModel_",method,".png"),unit="px",width=4000,height=2500, bg='transparent',device=grDevices::png)
+  }
+  if(JPEG){
+    ggsave(filename = paste0("outputs/figures/applicationResults/countModel_",method,".jpeg"),unit="px",width=4000,height=2500,device=grDevices::jpeg)
+  }
+})
 ```
+<details>
+
+## References
+<a id="1">[1]</a>
+Bodinier B (2024).
+sharp: Stability-enHanced Approaches using Resampling Procedures. R package version 1.4.6,
+<https://CRAN.R-project.org/package=sharp>.
+
+<a id="2">[2]</a>
+Mihaljevic F (2023). 
+Rsmlx: R Speaks 'Monolix'. R package version2023.1.5,
+<https://CRAN.R-project.org/package=Rsmlx>.
+
+<a id="3">[3]</a> 
+Prague M, Lavielle M. 
+SAMBA: A novel method for fast automatic model building in nonlinear mixed-effects models. 
+CPT Pharmacometrics Syst Pharmacol. 2022; 11: 161-172. doi:10.1002/psp4.12742
+
+<a id="4">[4]</a> 
+Pasin CBalelli IVan Effelterre T, Bockstal V, Solforosi L, Prague MDouoguih M, Thiébaut R2019.
+Dynamics of the Humoral Immune Response to a Prime-Boost Ebola Vaccine: Quantification and Sources of Variation. 
+J Virol93:10.1128/jvi.00579-19.https://doi.org/10.1128/jvi.00579-19
+
+<a id="5">[5]</a>
+Alexandre M, Prague M, McLean C, Bockstal V, Douoguih M, Thiébaut R; EBOVAC 1 and EBOVAC 2 Consortia.
+Prediction of long-term humoral response induced by the two-dose heterologous Ad26.ZEBOV, MVA-BN-Filo vaccine against Ebola.
+NPJ Vaccines. 2023 Nov 8;8(1):174. doi: 10.1038/s41541-023-00767-y. PMID: 37940656; PMCID: PMC10632397.
+
+<a id="6">[6]</a>
+Badio, M., Lhomme, E., Kieh, M. et al.
+Partnership for Research on Ebola VACcination (PREVAC): protocol of a randomized, double-blind, placebo-controlled phase 2 clinical trial evaluating three vaccine strategies against Ebola in healthy volunteers in four West African countries.
+Trials 22, 86 (2021). https://doi.org/10.1186/s13063-021-05035-9
+
+<a id="7">[7]</a>
+Simulx, Lixoft SAS, a Simulations Plus company, Version 2023R1, https://lixoft.com/products/simulx/
+
+<a id="8">[8]</a>
+Monolix, Lixoft SAS, a Simulations Plus company, Version 2023R1, https://lixoft.com/products/monolix/
