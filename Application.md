@@ -855,7 +855,7 @@ lapply(split(results,results$method),FUN=function(results){
   }
 })
 ```
-<details>
+</details>
 
 ## References
 <a id="1">[1]</a>
