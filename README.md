@@ -1,6 +1,8 @@
 # Supporting information
 
-**Implementation of lasso in SAMBA relies on _sharp_ package [[1]](#1), containing lasso enhanced by stability selection algorithm, and _Rsmlx_ package [[2]](#2), containing SAMBA algorithm [[3]](#3).**
+This repository allows to reproduce simulation and application results from the lasso-SAMBA article. For updated version of the function, the github package LSAMBA is available at link https://github.com/aurianegbt/LSAMBA (dependencies version : Monolix/lixoftConnectors 2024R ; Rsmlx 2024.1.0).
+
+**Implementation of lasso in SAMBA relies on _sharp_ package [[1]](#1), containing lasso enhanced by stability selection algorithm, and _Rsmlx_ package [[2]](#2) (version 2023.1.5), containing SAMBA algorithm [[3]](#3).**
 **For lasso, categorical covariates need to be numerical and no missing values in the covariates table.**
 
 <!-- badges: start -->
@@ -71,7 +73,7 @@ where
 ```math 
 \varepsilon_i\overset{iid}{\sim}\mathcal N(0,\Sigma=\sigma^2_{Ab}I_{n_i})
 ```
-We then add to the dataset noisy genes in order to have finally 200 covariates. These covariates are correlated gaussian covariates. To generate the correlation, we use the estimate of the covariance matrix of genomics measurement from Prevac-UP trial [[6]](#6) at D63 using Spearman method, in order to have realistic correlation between our covariates (including the significant one). This covariance matrix as well as the correlation matrix is saved in the `distribPasin.RData` object. 
+We then add to the dataset noisy genes in order to have finally 200 covariates. These covariates are correlated gaussian covariates. To generate correlation between our covariates, we use the covariance matrix saved in the `distribPasin.RData` object. 
 
 ``` r
 nb_ind <- 100
@@ -81,7 +83,7 @@ load("data/simulationSetup/distribPasin.RData")
 loadProject("data/simulationSetup/Pasin.smlx")
 ```
 
-The project based of this mechanistic model has been created in the Simulx software [[7]](#7), with the values parameter from Alexandre et al.
+The project based of this mechanistic model has been created in the Simulx software [[7]](#7) (version 2023R1), with the values parameter from Alexandre et al.
 
 ``` r
 getPopulationElements()$PopParameters$data
@@ -137,7 +139,7 @@ save(headerTypes,file="data/simulationFiles/FilesGaussianPasin/headerTypes.RData
 
 # lasso-SAMBA algorithm for a replicate
 
-To build the model, we will use Monolix software [[8]](#8) and the Rsmlx package [[2]](#2) (containing implemented SAMBA algorithm [[3]](#3)) from which we had several other function to enable our lasso approach. 
+To build the model, we will use Monolix software [[8]](#8) (version 2023R1) and the Rsmlx package [[2]](#2) (containing implemented SAMBA algorithm [[3]](#3)) from which we had several other function to enable our lasso approach. 
 ``` r
 library(lixoftConnectors)
 library(foreach)
