@@ -645,10 +645,16 @@ save(res,Model,covModel,time,iter,file=pathToResults)
 Results from the bootstrap selection can be visualized with the following plot. [TO FINISH ]
 
 <p align="center">
-<img src="outputs/figures/applicationResults/countModel.jpeg" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
+<img src="outputs/figures/applicationResults/countModel_lasso.jpeg" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
 </p>
 
-<p align="center"> **Figure 8:** Covariates proportion selection with each parameters $\varphi_S$, $\varphi_L$ and $\delta_S$, over the 500 bootstrap, by lasso-SAMBA and stepAIC-SAMBA.</p>
+<p align="center"> <strong>Figure 8:</strong> Covariates proportion selection with each parameters $\varphi_S$, $\varphi_L$ and $\delta_S$, over the 500 bootstrap, by lasso-SAMBA.</p>
+
+<p align="center">
+<img src="outputs/figures/applicationResults/countModel_setpAIC.jpeg" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
+</p>
+
+<p align="center"> <strong>Figure 9:</strong> Covariates proportion selection with each parameters $\varphi_S$, $\varphi_L$ and $\delta_S$, over the 500 bootstrap, by stepAIC-SAMBA.</p>
 
 <details>
 <summary> Click to expand </summary>
@@ -724,40 +730,6 @@ load(file="outputs/buildingResults/application/bootstrap.RData")
 
 value$Type <- factor(value$Type,levels=c("Non null model","With final model","Exact final model"))
 value.par$Type <- factor(value.par$Type,levels=c("Only final gene selected","Final gene selected among others","Non null model"))
-
-ggplot(results,aes(x=covariates))+geom_bar()+
-  facet_nested(factor(method,levels=buildMethod)+parameter~.,labeller=labeller(parameter=label_parsed))+
-  # facet_grid(parameter~.,labeller=label_parsed)+
-  theme(axis.text.x = element_text(angle = 90))+
-  geom_hline(yintercept = 25, color = "brown", linetype = "dashed") +
-  geom_segment(data = subset(results, parameter == "varphi[S]"),
-               aes(x = 0, xend = which(sort(unique(results$covariates))=="LEP"),
-                   y = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"])),
-                   yend = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"]))),
-               color = "indianred3", linetype = "solid", size = 0.5) +
-  geom_segment(data = subset(results, parameter == "varphi[L]"),
-               aes(x = 0, xend = which(sort(unique(results$covariates))=="KIFC1"),
-                   y = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])),
-                   yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
-               color = "indianred3", linetype = "solid", size = 0.5) +
-  ylab("Proportion") +
-  scale_y_continuous(limits = c(0,500),
-                     breaks = seq(0,500,500/4), 
-                     labels = scales::percent(seq(0,1,0.25)))+
-  theme(axis.title=element_text(size=15),
-        axis.text.y = element_text(size=12),
-        axis.text.x = element_text(size=4),
-        strip.text = element_text(size = 20),
-        plot.background = element_rect(fill='transparent', color=NA), 
-        legend.key = element_rect(fill = "transparent", color = NA),
-        legend.background = element_rect(fill = "transparent", color = NA))
-
-if(PNG){
-  ggsave(filename = "outputs/figures/applicationResults/countModel.png",unit="px",width=4000,height=2500,bg = "transparent",device=grDevices::png)
-}
-if(JPEG){
-  ggsave(filename = "outputs/figures/applicationResults/countModel.jpeg",unit="px",width=4000,height=2500,device=grDevices::jpeg)
-}
 
 
 lapply(split(value,value$method),FUN=function(value){
