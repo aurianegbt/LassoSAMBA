@@ -174,9 +174,8 @@ df <- merge(df,init,by="ID")
 
 write.csv(df,file="data/applicationFiles/Imm_data.txt",quote = F,row.names = F)
 
-gen_J = gen_VAR[gen_VAR$date==1,-c(2,3,4)]
+gen_J = scale(gen_VAR[gen_VAR$date==1,-c(2,3,4)],center=TRUE,scale=FALSE)
 df_J = merge(df,dplyr::select(gen_J,id,any_of(T_cell),any_of(B_cell),any_of(Interferon)),by.x="ID",by.y="id")
-
 
 Nb_cov = ncol(df_J_mix)-4
 
@@ -389,9 +388,9 @@ By stepAIC-SAMBA, the selection results are displayed in the following table :
 
 | Parameter   | Genes selected |
 |------------|---------------|
-| $\varphi_S$| CDC45, **LEP**, NOTCH1, SP110, TCEAL9 |
+| $\varphi_S$| ASPM, CDC45, **LEP**, NOTCH1, SP110 |
 | $\varphi_L$| GDPD5, IKZF2, **KIFC1**, PSORS1C1, SLC16A5, SLC50A1, SRP72 |
-| $\delta_S$ | SLC31A1, TLR7 |
+| $\delta_S$ | ISTNA1, RAB2A, SLC31A1 |
 
 </p>
 
@@ -724,8 +723,8 @@ Results from the bootstrap selection can be visualized with the following plot. 
 #   ))
 #   return(value.par)
 # })) 
-# 
-# save(value,value.par,results,file="outputs/buildingResults/application/bootstrap.RData")
+# load("~/Travail/LassoSAMBA_clean/outputs/buildingResults/application/stepAIC.RData")
+# save(value,value.par,NB_mod,results,file="outputs/buildingResults/application/bootstrap.RData")
 load(file="outputs/buildingResults/application/bootstrap.RData")
 
 value$Type <- factor(value$Type,levels=c("Non null model","With final model","Exact final model"))
