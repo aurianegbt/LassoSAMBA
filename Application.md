@@ -394,7 +394,7 @@ By stepAIC-SAMBA, the selection results are displayed in the following table :
 
 </p>
 
-<p align="center">**Table:** Results from the stepAIC-SAMBA method for the ZOSTAVAX vaccine. Genes identified uniquely by the lasso-SAMBA method are in bold. The initial model had an empty covariate structure, a constant error model, and no correlation. Both methods started from the same initial conditions, with covariate model selection being the only difference.</p>
+<p align="center"><strong>Table 3:</strong> Results from the stepAIC-SAMBA method for the ZOSTAVAX vaccine. Genes identified uniquely by the lasso-SAMBA method are in bold. The initial model had an empty covariate structure, a constant error model, and no correlation. Both methods started from the same initial conditions, with covariate model selection being the only difference.</p>
 
 <details>
 <summary> Click to expand </summary>
@@ -540,14 +540,14 @@ Again, estimation of the final model has been done using the SAEM algorithm thro
 | $\sigma_{Ab}$             | $0.094$              | $[0.083;0.105]$        |
 
 
-<p align="center"><strong>Table 3:</strong> Estimated Values of the final model.</p>
+<p align="center"><strong>Table 4:</strong> Estimated Values of the final model.</p>
 
 | OFV     | AIC     | BIC     | BICc    |
 |---------|---------|---------|---------|
 | -254.84 | -236.84 | -222.84 | -215.71 |
 
 
-<p align="center"><strong>Table 4:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.</p>
+<p align="center"><strong>Table 5:</strong> Estimated Log-Likelihood and Information Criterion by importance sampling of the empty model.</p>
 
 
 <p align="center">
@@ -789,30 +789,77 @@ lapply(split(value.par,value.par$method),FUN=function(value.par){
   }
 })
 
+
 lapply(split(results,results$method),FUN=function(results){
   method=unique(results$method)
   
-  ggplot(results,aes(x=covariates))+geom_bar()+
+  write_lasso = data.frame(parameter = c("delta[S]","varphi[S]","varphi[L]"),
+                     text = c("",paste0(c("LEP : ","KIFC1 :"),round(c(length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"])),
+                                          length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])))/NB_mod[[method]]*100,digits=1),"%")),
+                     coory=c(10,c(length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"])),
+                                        length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])))),
+                     coorx=c(0,0,0))
+  
+  covariates = results %>% select(parameter,covariates) %>% unique() %>% arrange(parameter,covariates)
+  fill <- rep("grey61",nrow(covariates))
+  
+  fill[which(covariates$parameter=="delta[S]" & covariates$covariates %in% covModel$delta_S)] <- "tomato"
+  fill[which(covariates$parameter=="varphi[S]" & covariates$covariates %in% covModel$phi_S)] <- "tomato"
+  fill[which(covariates$parameter=="varphi[L]" & covariates$covariates %in% covModel$phi_L)] <- "tomato"
+  fill[which(covariates$parameter=="varphi[S]" & covariates$covariates=="LEP")] <- "darkred"
+  fill[which(covariates$parameter=="varphi[L]" & covariates$covariates=="KIFC1")] <- "darkred"
+  
+  write <- data.frame(
+                   parameter = rep("delta[S]",sum(covariates$parameter=="delta[S]" & covariates$covariates %in% covModel$delta_S)),
+                   covariates = covariates$covariates[(covariates$parameter=="delta[S]" & covariates$covariates %in% covModel$delta_S)],
+                   text=paste0(covariates$covariates[(covariates$parameter=="delta[S]" & covariates$covariates %in% covModel$delta_S)]," : ",sapply(covariates$covariates[(covariates$parameter=="delta[S]" & covariates$covariates %in% covModel$delta_S)],FUN=function(g){round(length(unique(results[results$parameter=="delta[S]" & results$covariates==g,"model"]))/NB_mod[[method]]*100,digits=1)}),"%"),
+                   coorx = which(covariates[covariates$parameter=="delta[S]","covariates"] %in% covariates$covariates[(covariates$parameter=="delta[S]" & covariates$covariates %in% covModel$delta_S)]),
+                   coory = sapply(covariates$covariates[(covariates$parameter=="delta[S]" & covariates$covariates %in% covModel$delta_S)],FUN=function(g){length(unique(results[results$parameter=="delta[S]" & results$covariates==g,"model"]))})
+                 )
+  write <- rbind(write,
+                 data.frame(
+                   parameter = rep("varphi[S]",sum(covariates$parameter=="varphi[S]" & covariates$covariates %in% covModel$phi_S)),
+                   covariates = covariates$covariates[(covariates$parameter=="varphi[S]" & covariates$covariates %in% covModel$phi_S)],
+                   text=paste0(covariates$covariates[(covariates$parameter=="varphi[S]" & covariates$covariates %in% covModel$phi_S)]," : ",sapply(covariates$covariates[(covariates$parameter=="varphi[S]" & covariates$covariates %in% covModel$phi_S)],FUN=function(g){round(length(unique(results[results$parameter=="varphi[S]" & results$covariates==g,"model"]))/NB_mod[[method]]*100,digits=1)}),"%"),
+                   coorx = which(covariates[covariates$parameter=="varphi[S]","covariates"] %in% covariates$covariates[(covariates$parameter=="varphi[S]" & covariates$covariates %in% covModel$phi_S)]),
+                   coory = sapply(covariates$covariates[(covariates$parameter=="varphi[S]" & covariates$covariates %in% covModel$phi_S)],FUN=function(g){length(unique(results[results$parameter=="varphi[S]" & results$covariates==g,"model"]))})
+                 ))
+  write <- write[-which(write$parameter=="varphi[S]" & stringr::str_detect(write$text,"LEP")),]
+  write <- rbind(write,
+                 data.frame(
+                   parameter = rep("varphi[L]",sum(covariates$parameter=="varphi[L]" & covariates$covariates %in% covModel$phi_L)),
+                   covariates = covariates$covariates[(covariates$parameter=="varphi[L]" & covariates$covariates %in% covModel$phi_L)],
+                   text=paste0(covariates$covariates[(covariates$parameter=="varphi[L]" & covariates$covariates %in% covModel$phi_L)]," : ",sapply(covariates$covariates[(covariates$parameter=="varphi[L]" & covariates$covariates %in% covModel$phi_L)],FUN=function(g){round(length(unique(results[results$parameter=="varphi[L]" & results$covariates==g,"model"]))/NB_mod[[method]]*100,digits=1)}),"%"),
+                   coorx = which(covariates[covariates$parameter=="varphi[L]","covariates"] %in% covariates$covariates[(covariates$parameter=="varphi[L]" & covariates$covariates %in% covModel$phi_L)]),
+                   coory = sapply(covariates$covariates[(covariates$parameter=="varphi[L]" & covariates$covariates %in% covModel$phi_L)],FUN=function(g){length(unique(results[results$parameter=="varphi[L]" & results$covariates==g,"model"]))})
+                 ))
+  write <- write[-which(write$parameter=="varphi[L]" & stringr::str_detect(write$text,"KIFC1")),]
+  
+  write <- write[write$coory>=25,]
+  
+  ggplot(results,aes(x=covariates))+geom_bar(fill=fill,color=fill)+
     facet_grid(parameter~.,labeller=label_parsed)+
     theme(axis.text.x = element_text(angle = 90))+
-    geom_hline(yintercept = 0.05*NB_mod[[method]], color = "brown", linetype = "dashed") +
+    geom_hline(yintercept = 0.05*NB_mod[[method]], color = "tomato", linetype = "dashed") +
     geom_segment(data = subset(results, parameter == "varphi[S]"),
                  aes(x = 0, xend = which(sort(unique(results$covariates))=="LEP"),
                      y = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"])),
                      yend = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"]))),
-                 color = "indianred3", linetype = "solid", size = 0.5) +
+                 color = "darkred", linetype = "solid", size = 0.5) +
     geom_segment(data = subset(results, parameter == "varphi[L]"),
                  aes(x = 0, xend = which(sort(unique(results$covariates))=="KIFC1"),
                      y = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])),
                      yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
-                 color = "indianred3", linetype = "solid", size = 0.5) +
+                 color = "darkred", linetype = "solid", size = 0.5) +
+    geom_text(data=write_lasso,aes(label=text,y=coory,x=coorx),hjust=-0.5,vjust = -0.5,color="darkred",size=6)+
+    geom_text(data=write,aes(label=text,y=coory,x=covariates),hjust=0.8,vjust = -0.8,color="tomato",size=6)+
     ylab("Proportion") +
     scale_y_continuous(limits = c(0,NB_mod[[method]]),
                        breaks = seq(0,NB_mod[[method]],NB_mod[[method]]/4), 
                        labels = scales::percent(seq(0,1,0.25)))+
     theme(axis.title=element_text(size=15),
           axis.text.y = element_text(size=12),
-          axis.text.x = element_text(size=if(method=="lasso"){8}else{4}),
+          axis.text.x = element_blank(),
           strip.text = element_text(size = 20),
           plot.background = element_rect(fill='transparent', color=NA), 
           legend.key = element_rect(fill = "transparent", color = NA),
