@@ -132,14 +132,15 @@ gen_VAR <- data_gen[data_gen$id %in% id_VAR,]
 # 35 35 35 35 
 
 # Plot imm
+plot <-
 ggplot(data = data_VAR[data_VAR$Analyte=="IgG",],
        mapping = aes(x = Study.Time.Collected, y = log10(Value.Preferred),group=Participant.ID,color=vaccine))  +
-  geom_line(alpha=0.7) +
+  geom_line(alpha=1) +
   stat_summary(fun = mean, geom = "point", aes(group = vaccine), size = 1,color="brown") +  # Moyenne par temps
   stat_summary(fun = mean, geom = "line", aes(group = vaccine), linewidth = 0.7,color="brown") +
   stat_summary(fun.data = function(y) { 
     data.frame(ymin = mean(y) - sd(y), ymax = mean(y) + sd(y), y = mean(y)) 
-  }, geom = "errorbar", aes(group = vaccine), color="brown",size=0.7) +
+  }, geom = "errorbar", aes(group = vaccine), color="brown",linewidth=0.7) +
   theme (text = element_text(size=28),
          axis.text.y = element_text(hjust = 1, size=20), 
          axis.title= element_text (size=20),
@@ -154,11 +155,12 @@ ggplot(data = data_VAR[data_VAR$Analyte=="IgG",],
   xlab("time (in days)")
 
 if(PNG){
-  ggsave(filename="outputs/figures/applicationResults/ObservedData.png",unit="px",height=1800,width=2500,bg="transparent",device=grDevices::png)
+  ggsave(plot,filename="outputs/figures/applicationResults/ObservedData.png",unit="px",height=3000,width=4500,dpi=600,bg="transparent",device=grDevices::png)
 }
 if(JPEG){
-  ggsave(filename="outputs/figures/applicationResults/ObservedData.jpeg",unit="px",height=1800,width=2500,device=grDevices::jpeg)
+  ggsave(plot,filename="outputs/figures/applicationResults/ObservedData.jpeg",unit="px",height=3000,width=4500,dpi=600,device=grDevices::jpeg)
 }
+ggsave(plot,filename ="outputs/figures/applicationResults/ObservedData.eps",device="eps",width=10,height=7)
 
 
 df <- data_VAR %>%
@@ -227,14 +229,16 @@ if(PNG){
 if(JPEG){
   ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits.jpeg",width=2000,height=3000,unit="px",device=grDevices::jpeg)
 }
+ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits.eps",device="eps",height=8.5,width=7)
 
 
 if(PNG){
-  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.png",width=1600,height=800,unit="px",bg="transparent",device=grDevices::png)
+  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.png",width=3000,height=1600,unit="px",dpi=600,bg="transparent",device=grDevices::png)
 }
 if(JPEG){
-  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.jpeg",width=1600,height=800,unit="px",device=grDevices::jpeg)
+  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.jpeg",width=3000,height=1600,unit="px",device=grDevices::jpeg)
 }
+ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc.eps",device=cairo_ps,height=3,width=5)
 
 res = getAssessmentResults()
 
@@ -257,7 +261,6 @@ for(i in 1:5){
   tabiters <- rbind(tabiters,iters)
 }
 
-
 tabestimates$parameter <- factor(tabestimates$parameter,levels=c(estimates$parameter))
 levels(tabestimates$parameter) <- sapply(c(r"($\delta_S$)",
                                            r"($\varphi_S$)",
@@ -267,20 +270,24 @@ levels(tabestimates$parameter) <- sapply(c(r"($\delta_S$)",
                                            r"($\omega_{\varphi_L}$)",
                                            r"($\sigma_{Ab}$)"),FUN=function(x){latex2exp::TeX(x,output="character")})
 
-ggplot(tabestimates,aes(x=run,y=estimate))+
+plot <- ggplot(tabestimates,aes(x=run,y=estimate))+
   geom_point(aes(color=factor(run))) +
   facet_wrap(~parameter,nrow=2,scales="free",labeller=label_parsed) +
   geom_errorbar(aes(ymax=estimate+1.96*se,ymin=estimate-1.96*se,color=factor(run)))+
-  theme(legend.position = "none", plot.title = element_text(hjust = .5)) + 
+  theme(legend.position = "none", plot.title = element_text(hjust = .5),
+  
+         plot.background = element_rect(fill='transparent', color=NA),
+         legend.background = element_rect(fill='transparent'),
+         legend.box.background = element_rect(fill='transparent')) + 
   xlab("")+ylab("")
   
 if(PNG){
-  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",height=1000,width=2500,unit="px",bg="transparent",device=grDevices::png)
+  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.png",height=2000,width=3000,unit="px",dpi=600,bg="transparent",device=grDevices::png)
 }
 if(JPEG){
-  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.jpeg",height=1000,width=2500,unit="px",device=grDevices::jpeg)
+  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence.jpeg",height=2000,width=3000,unit="px",dpi=600,device=grDevices::jpeg)
 }
-  
+ggsave(plot,filename="outputs/figures/applicationResults/assessmentConvergence.eps",device=cairo_ps,height=3,width=5)
 
 ```
 </details>
@@ -403,7 +410,6 @@ By stepAIC-SAMBA, the selection results are displayed in the following table :
 new_data = read.csv("data/applicationFiles/data.txt")
 cov= new_data %>% filter(Time==0) %>% select(ID,LEP,KIFC1)
 new_data = new_data %>% select(ID,Time,Value,Init)
-cov[,-1] <- scale(cov[,-1],center=TRUE,scale=FALSE)
 new_data <- merge(new_data,cov,by="ID")
 
 write.csv(new_data,"data/applicationFiles/data_final.txt",quote=FALSE,row.names=FALSE)
@@ -433,19 +439,23 @@ asses = getAssessmentSettings()
 asses$extendedEstimation=TRUE
 runAssessment(settings=asses)
 
+
 if(PNG){
   ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits_final.png",width=2000,height=3000,unit="px",bg="transparent",device=grDevices::png)
 }
 if(JPEG){
-  ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits_final.jpeg",width=2000,height=3000,unit="px")
+  ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits_final.jpeg",width=2000,height=3000,unit="px",device=grDevices::jpeg)
 }
+ggsave(plotIndividualFits(),filename="outputs/figures/applicationResults/IndividualFits_final.eps",device="eps",height=8.5,width=7)
+
 
 if(PNG){
-   ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.png",width=1600,height=800,unit="px",bg="transparent",device=grDevices::png)
+  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.png",width=3000,height=1600,unit="px",dpi=600,bg="transparent",device=grDevices::png)
 }
 if(JPEG){
-  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.jpeg",width=1600,height=800,unit="px")
+  ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.jpeg",width=3000,height=1600,unit="px",device=grDevices::jpeg)
 }
+ggsave(plotVpc(),filename="outputs/figures/applicationResults/Vpc_final.eps",device=cairo_ps,height=3,width=5)
 
 res = getAssessmentResults()
 
@@ -481,41 +491,49 @@ levels(tabestimates$parameter) <- sapply(c(r"($\delta_S$)",
                                            r"($\sigma_{Ab}$)")
                                          ,FUN=function(x){latex2exp::TeX(x,output="character")})
 
-ggplot(tabestimates,aes(x=run,y=estimate))+
+plot <- ggplot(tabestimates,aes(x=run,y=estimate))+
   geom_point(aes(color=factor(run))) +
   facet_wrap(~parameter,nrow=2,scales="free",labeller=label_parsed) +
   geom_errorbar(aes(ymax=estimate+1.96*se,ymin=estimate-1.96*se,color=factor(run)))+
-  theme(legend.position = "none", plot.title = element_text(hjust = .5)) + 
+  theme(legend.position = "none", plot.title = element_text(hjust = .5),
+  
+         plot.background = element_rect(fill='transparent', color=NA),
+         legend.background = element_rect(fill='transparent'),
+         legend.box.background = element_rect(fill='transparent')) + 
   xlab("")+ylab("")
   
 if(PNG){
-  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.png",height=1000,width=2500,unit="px",bg="transparent",device=grDevices::png)
+  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.png",height=2000,width=4000,unit="px",dpi=600,bg="transparent",device=grDevices::png)
 }
 if(JPEG){
-  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.jpeg",width=1600,height=800,unit="px",device=grDevices::jpeg)
+  ggsave(filename="outputs/figures/applicationResults/assessmentConvergence_final.jpeg",height=2000,width=4000,unit="px",dpi=600,device=grDevices::jpeg)
 }
+ggsave(plot,filename="outputs/figures/applicationResults/assessmentConvergence_final.eps",device=cairo_ps,height=3,width=5)
 
 ggplot(new_data,aes(x=Time,group=ID,color=LEP,y=Value)) + 
-  geom_line(lwd=0.5) +
+  geom_line(lwd=0.2) +
   scale_color_gradient2(high="indianred",low="slateblue",mid="grey")
   
 if(PNG){
-  ggsave(filename="outputs/figures/applicationResults/fitLEP_final.png",height=1000,width=2500,unit="px",bg="transparent",device=grDevices::png)
+  ggsave(filename="outputs/figures/applicationResults/fitLEP_final.png",height=1500,width=2500,unit="px",dpi=600,bg="transparent",device=grDevices::png)
 }
 if(JPEG){
-  ggsave(filename="outputs/figures/applicationResults/fitLEP_final.jpeg",height=1000,width=2500,unit="px",device=grDevices::jpeg)
+  ggsave(filename="outputs/figures/applicationResults/fitLEP_final.jpeg",height=1500,width=2500,unit="px",dpi=600,device=grDevices::jpeg)
 }
+ggsave(filename="outputs/figures/applicationResults/fitLEP_final.eps",device=cairo_ps,height=3,width=5)
+
   
 ggplot(new_data,aes(x=Time,group=ID,color=KIFC1,y=Value)) + 
-  geom_line(lwd=0.5) +
+  geom_line(lwd=0.2) +
   scale_color_gradient2(high="indianred",low="slateblue",mid="grey")
   
 if(PNG){
-  ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.png",height=1000,width=2500,unit="px",bg="transparent",device=grDevices::png)
+  ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.png",height=1500,width=2500,unit="px",dpi=600,bg="transparent",device=grDevices::png)
 }
 if(JPEG){
-  ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.jpeg",height=1000,width=2500,unit="px",device=grDevices::jpeg)
+  ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.jpeg",height=1500,width=2500,dpi=600,unit="px",device=grDevices::jpeg)
 }
+ggsave(filename="outputs/figures/applicationResults/fitKIFC1_final.eps",device=cairo_ps,height=3,width=5)
 
 ```
 </details>
@@ -641,19 +659,13 @@ save(res,Model,covModel,time,iter,file=pathToResults)
 ```
 </details>
 
-Results from the bootstrap selection can be visualized with the following plot. [TO FINISH ]
+Results from the bootstrap selection can be visualized with the following plot.
 
 <p align="center">
-<img src="outputs/figures/applicationResults/countModel_lasso.jpeg" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
+<img src="outputs/figures/finalFigures/countModel.jpeg" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
 </p>
 
-<p align="center"> <strong>Figure 8:</strong> Covariates proportion selection with each parameters $\varphi_S$, $\varphi_L$ and $\delta_S$, over the 500 bootstrap, by lasso-SAMBA.</p>
-
-<p align="center">
-<img src="outputs/figures/applicationResults/countModel_setpAIC.jpeg" alt="Number of of selection of selected covariates with each parameters over the 500 bootstraps." width="1000"/>
-</p>
-
-<p align="center"> <strong>Figure 9:</strong> Covariates proportion selection with each parameters $\varphi_S$, $\varphi_L$ and $\delta_S$, over the 500 bootstrap, by stepAIC-SAMBA.</p>
+<p align="center"> <strong>Figure 8:</strong> Bootstrap selection frequencies for covariates across all parameter models. The top panel shows results for the stepAIC-SAMBA procedure (493 successful runs), and the bottom panel for the lasso-SAMBA procedure (500 runs). Selection frequencies above 5\% of selected genes by any of the procedure are indicated.</p>
 
 <details>
 <summary> Click to expand </summary>
@@ -851,8 +863,8 @@ lapply(split(results,results$method),FUN=function(results){
                      y = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])),
                      yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
                  color = "darkred", linetype = "solid", size = 0.5) +
-    geom_text(data=write_lasso,aes(label=text,y=coory,x=coorx),hjust=-0.5,vjust = -0.5,color="darkred",size=6)+
-    geom_text(data=write,aes(label=text,y=coory,x=covariates),hjust=0.8,vjust = -0.8,color="tomato",size=6)+
+    geom_text(data=write_lasso,aes(label=text,y=coory,x=coorx),hjust=-0.5,vjust = -0.5,color="darkred",size=5)+
+    geom_text(data=write,aes(label=text,y=coory,x=covariates),hjust=0.8,vjust = -0.8,color="tomato",size=5)+
     ylab("Proportion") +
     scale_y_continuous(limits = c(0,NB_mod[[method]]),
                        breaks = seq(0,NB_mod[[method]],NB_mod[[method]]/4), 
@@ -866,12 +878,34 @@ lapply(split(results,results$method),FUN=function(results){
           legend.background = element_rect(fill = "transparent", color = NA))
   
   if(PNG){
-    ggsave(filename = paste0("outputs/figures/applicationResults/countModel_",method,".png"),unit="px",width=4000,height=2500, bg='transparent',device=grDevices::png)
+    ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".png"),unit="px",width=7000,height=2800,dpi=600, bg='transparent',device=grDevices::png)
   }
   if(JPEG){
-    ggsave(filename = paste0("outputs/figures/applicationResults/countModel_",method,".jpeg"),unit="px",width=4000,height=2500,device=grDevices::jpeg)
+    ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".jpeg"),unit="px",width=7000,height=2800,dpi=600,device=grDevices::jpeg)
   }
+  ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".eps"),device="eps",width=12,height=4)
+  
+  return(plot)
 })
+
+library(ggpubr)
+
+plot <-
+  ggarrange(plots$stepAIC +theme(
+    plot.background = element_rect(color = "black", size = 0.7, fill = "white")
+  ), plots$lasso+ theme(
+    plot.background = element_rect(color = "black", size = 0.7, fill = "white")
+  ), ncol = 1, nrow = 2,labels = c("A","B"))
+
+
+if(PNG){
+  ggsave(plot,filename = paste0("outputs/figures/finalFigures/countModel.png"),unit="px",width=7000,height=5600,dpi=600, bg='transparent',device=grDevices::png)
+}
+if(JPEG){
+  ggsave(plot,filename = paste0("outputs/figures/finalFigures/countModel.jpeg"),unit="px",width=7000,height=5600,dpi=600,device=grDevices::jpeg)
+}
+ggsave(plot,filename = paste0("outputs/figures/finalFigures/countModel.eps"),device="eps",width=12,height=8)
+
 ```
 </details>
 
