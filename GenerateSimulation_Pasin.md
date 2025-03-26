@@ -33,6 +33,9 @@ dir <- function(path){if(!dir.exists(path)){dir.create(path)}}
 ## Load the library required 
 suppressMessages({
   library(dplyr)
+  library(ggcorrplot)
+  library(ggpubr)
+  library(ggplot2)
   library(lixoftConnectors)
   initializeLixoftConnectors("simulx")
   loadProject("data/simulationSetup/Pasin.smlx") # Simulx project with mechanistic model and parameters value 
@@ -46,6 +49,17 @@ suppressMessages({
 nb_ind <- 100
 nb_replicates <- 10
 nb_cov <- 200
+
+corrplot =  ggcorrplot(genCorMat, colors= c("#446494","#eeeeee","#882255"))  +  theme(legend.position="none",axis.text=element_text(size=1))
+corrplot2 =  ggcorrplot(genCorMat[1:50,1:50], colors= c("#446494","#eeeeee","#882255"),legend.title="Correlation")  + theme(legend.key.height = unit(5, 'mm'),legend.key.width=unit(5,"mm"),legend.text = element_text(size=7),legend.title=element_text(size=10),axis.text=element_text(size=1))+labs(fill="Correlation")
+
+ggarrange(corrplot,corrplot2,nrow=1)
+ggsave("outputs/figures/finalFigures/corr.png",
+       height = 2000, width = 4000,dpi=600, units = "px", bg='transparent')
+ggsave("outputs/figures/finalFigures/corr.jpeg",
+       height = 2000, width = 4000,dpi=600, units = "px")
+ggsave("outputs/figures/finalFigures/corr.eps",height=4,width=8,device=cairo_ps)
+
 
 ```
 
