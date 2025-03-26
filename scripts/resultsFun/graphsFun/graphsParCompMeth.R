@@ -187,4 +187,5 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     ggsave(paste0(Folder,"/NumberSelectionParameter.jpeg"),
             height = length(buildMethod)*500, width = 2000, units="px",limitsize =   FALSE,device=grDevices::jpeg)
   }
+  return(plot)
 }

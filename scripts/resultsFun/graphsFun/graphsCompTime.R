@@ -20,7 +20,7 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     valueDisplayTime = rbind(valueDisplayTime,data.frame(Method=meth,
                                                          Median = median(aux$time), 
                                                          Q76 = quantile(aux$time,0.76),
-                                                         textMean = round(median(aux$time)),
+                                                         textMean = paste0(round(median(aux$time))," s"),
                                                          textStandardDeviation = paste0("sd = ", round(sd(aux$time),digits=2)),
                                                          StandardDeviation = sd(aux$time)))
   }
@@ -62,6 +62,7 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
            height = 800, width =   500+300*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
   
+  piter <- 
   ggplot(computationStatsCov,aes(color=Method,fill=Method,x=factor(Method,levels=buildMethod),y=iteration))+
     geom_boxplot(lwd=0.5,alpha=0.6)+
     xlab("Method used")+
@@ -72,8 +73,8 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                               setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
                               SAEMVS="SAEMVS"))+
     # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
-    scale_fill_manual(values=colpas)+
-    scale_color_manual(values=colFonce)+
+    scale_fill_manual(values=setNames(colpas,buildMethod))+
+    scale_color_manual(values=setNames(colFonce,buildMethod))+
     theme(axis.text.x = element_text(size = 10))+
     theme(axis.text.y = element_text(size = 8))+
     theme(axis.title = element_text(size=12))+
@@ -83,12 +84,15 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     theme(legend.position = "none")
   
   if(PNG){
-    ggsave(paste0(Folder,"/Iter.png"),
+    ggsave(piter,filename = paste0(Folder,"/Iter.png"),
            height = 800, width =   500+300*length(buildMethod), units = "px", bg='transparent',device=grDevices::png)
   }
   
   if(JPEG){
-    ggsave(paste0(Folder,"/Iter.jpeg"),
+    ggsave(piter,filename = paste0(Folder,"/Iter.jpeg"),
            height = 800, width =   500+300*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
+  
+  return(list(time=plot,
+              iter=piter))
 }

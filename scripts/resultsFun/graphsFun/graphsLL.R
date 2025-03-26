@@ -12,7 +12,8 @@ graphsLL <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   # Data to use
   likelihoodStatsCov <- likelihoodStats[likelihoodStats$Method %in% buildMethod,]
 
-  ggplot(likelihoodStatsCov,aes(x=Criterion,y=Value,fill=Method))+geom_boxplot()+
+  plot <- 
+    ggplot(likelihoodStatsCov,aes(x=Criterion,y=Value,fill=Method))+geom_boxplot()+
     scale_fill_manual(values=setNames(colpas,buildMethod),
                       labels=c(stepAIC="stepAIC\nwith stat. test",
                               setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
@@ -37,5 +38,5 @@ graphsLL <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     ggsave(paste0(Folder,"/ICcomparison.jpeg"),
            height = 800, width =   500*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
-  
+  return(plot)
 }

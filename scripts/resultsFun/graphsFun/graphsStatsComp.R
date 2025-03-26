@@ -61,5 +61,5 @@ graphsStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     ggsave(paste0(Folder,"/ComparisonStats.jpeg"),
            height = 1200, width =   500*length(buildMethod), units = "px",device=grDevices::jpeg)
   }
-  
+  return(plot)
 }

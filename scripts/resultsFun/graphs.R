@@ -46,14 +46,19 @@ graphsGenerate <- function(project="Pasin",
     Folder=paste0(initFolder,"/COMP/",paste0(buildMethod,collapse="_"))
     if(!dir.exists(Folder)){dir.create(Folder)}
     subtitle = generalsubtitle
-    graphsParCompMethod(Folder,subtitle,project,buildMethod,JPEG,PNG)
+    p1 = graphsParCompMethod(Folder,subtitle,project,buildMethod,JPEG,PNG)
     # graphsCompFR(Folder,subtitle,project,buildMethod,JPEG,PNG)
     tableStatsComp(Folder,subtitle,project,buildMethod,JPEG,PNG)
-    graphsStatsComp(Folder,subtitle,project,buildMethod,JPEG,PNG)
+    p2 = graphsStatsComp(Folder,subtitle,project,buildMethod,JPEG,PNG)
     if(length(setdiff(buildMethod,"SAEMVS"))>1){
-      graphsCompTime(Folder,subtitle,project,setdiff(buildMethod,"SAEMVS"),JPEG,PNG)
-      graphsLL(Folder,subtitle,project,setdiff(buildMethod,"SAEMVS"),JPEG,PNG)
+      p3 = graphsCompTime(Folder,subtitle,project,setdiff(buildMethod,"SAEMVS"),JPEG,PNG)
+      p4 = graphsLL(Folder,subtitle,project,setdiff(buildMethod,"SAEMVS"),JPEG,PNG)
     }
   }
+  
+  return(list(ParComp = p1,
+              StatsComp = p2,
+              TimeComp = p3,
+              LLComp = p4))
 }
 
