@@ -1,4 +1,4 @@
-
+# Article figures 
 
 ```r
 library(ggplot2)
@@ -27,6 +27,8 @@ pG_all = graphsGenerate(project="GaussianPasin",buildMethod = c("stepAIC","lasso
 ```
 
 
+
+
 ```r
 ggarrange(pN$StatsComp+theme(axis.title.x = element_blank(),
                              plot.background = element_rect(linewidth=0.7,color="black")),
@@ -41,6 +43,12 @@ ggsave("outputs/figures/finalFigures/Figure1.eps",
 
 ```
 
+<p align="center">
+<img src="outputs/figures/finalFigures/ComparisonStats.jpeg" alt="Observed Data" width="800"/>
+</p>
+
+<p align="center"><strong>Figure 1:</strong> Proportion of exact models (no false positives or false negatives) and models that strictly including the exact model (no false negatives but with false positives). (A) Pharmacokinetics model with categorical covariates; (B) Vaccinology framework with Gaussian-correlated covariates; (C) Vaccinology framework with randomly drawn covariates.</p>
+
 ```r
 ggarrange(pN0$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
           pG$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
@@ -51,6 +59,12 @@ ggsave("outputs/figures/finalFigures/Figure2.eps",
        width = 8.33, height = 8.75,units="in",device=cairo_ps)
 
 ```
+
+<p align="center">
+<img src="outputs/figures/finalFigures/NumberSelectionParameter.jpeg" alt="Observed Data" width="800"/>
+</p>
+
+<p align="center"><strong>Figure 2:</strong> Covariate selection frequency across simulation frameworks for the original method (stepAIC with statistical tests at each iteration) and the lasso approach, with an error control threshold of 10%. The mean selection frequency of false discoveries is displayed on the right of each histogram. (A) Pharmacokinetics model with categorical covariates; (B) Vaccinology framework with Gaussian-correlated covariates; (C) Vaccinology framework with randomly drawn covariates.</p>
 
 ```r
 
@@ -150,3 +164,12 @@ plot <-
 ggsave(plot,filename = paste0("outputs/figures/finalFigures/Figure3.eps"),device="eps",width=12,height=8)
 
 ```
+
+<p align="center">
+<img src="outputs/figures/finalFigures/CountModel.jpeg" alt="Observed Data" width="800"/>
+</p>
+
+<p align="center"><strong>Figure 3:</strong> Bootstrap selection frequencies for covariates across all parameter models. The top
+panel shows results for the stepAIC-SAMBA procedure (493 successful runs), and the bottom
+panel for the lasso-SAMBA procedure (500 runs). Selection frequencies above 5% of selected
+genes by any of the procedure are indicated.</p>
