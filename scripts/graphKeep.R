@@ -51,21 +51,21 @@ ggsave("outputs/figures/finalFigures/ComparisonStats.eps",
        height=3,width=9,device=cairo_ps)
 
 # 
-ggarrange(pN$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
+ggarrange(pN0$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
           pG$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
           pP$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
-          ncol=1,labels=c("A","B","C"),heights = c(1.4,1,1))
+          ncol=1,labels=c("A","B","C"),heights = c(1,1,1))
 
 if(PNG){
   ggsave("outputs/figures/finalFigures/NumberSelectionParameter.png",
-         height = 6000, width =   3500,dpi=600, units = "px", bg='transparent',device=grDevices::png)
+         height = 5250, width =   5000,dpi=600, units = "px", bg='transparent',device=grDevices::png)
 }
 if(JPEG){
   ggsave("outputs/figures/finalFigures/NumberSelectionParameter.jpeg",
-         height = 6000, width =   3500,dpi=600, units = "px",device=grDevices::jpeg)
+         height = 5250, width =   5000,dpi=600, units = "px",device=grDevices::jpeg)
 }
 ggsave("outputs/figures/finalFigures/NumberSelectionParameter.eps",
-       height=11,width=6,device=cairo_ps)
+       width = 8.33, height = 8.75,units="in",device=cairo_ps)
 
 # 
 ggarrange(pN_all$StatsComp+theme(axis.title.x = element_blank(),
