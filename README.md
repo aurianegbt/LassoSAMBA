@@ -15,16 +15,26 @@ This repository allows to reproduce simulation and application results from the 
 
 This repository contains :
 * the [data folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/data) contains
+  - the application files extract from the ImmPort platform and used to realise the real data study (raw data aren't available on this repository and needs to be [dowloaded from the ImmPort platform](https://immport.org/shared/study/SDY984));
   - the model files used to create the monolix project of both simulation framework ;
   - an extract of the simulation files, with the first replicates of each simulation framework with additional information files used for the plots ;
   - the code to simulate all the datasets for each simulation framework, with the simulX project used.
 * the [outputs folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/outputs) contains :
-  - all the final figures generated resuming all the results ;
-  - each individual figures used for the previously mentionned final results and additional one for each simulation framework ;
+  - real data application results ; 
+  - all the final figures generated resuming all the results (in .eps and .jpeg) ;
+  - simulation results.
 * the [scripts folder](https://github.com/aurianegbt/LassoSAMBA/tree/master/scripts) contains:
   - the model building function, with modified function from _Rsmlx_ package [[2]](#2), and added function for the lasso selection ([detailed bellow](#lasso-SAMBA-algorithm-for-a-replicate)) ;
   - the function to generate the graphs and results table ([detailed bellow](#results-for-every-replicates)) ;
   - the function used to generate the simulation ([detailed bellow](#generation-of-an-example))
+
+Additional markdown file are available to better undertand simulation frameworks, application study and to reproduce manuscript figures : 
+* [Application](https://github.com/aurianegbt/LassoSAMBA/blob/master/Application.md) markdown details every step of the application ;
+* [Figure](https://github.com/aurianegbt/LassoSAMBA/blob/master/Figure.md) allows to reproduce the article figures ;
+* [Generate Simulation Gaussian Pasin](https://github.com/aurianegbt/LassoSAMBA/blob/master/GenerateSimulation_GaussianPasin.md) gives an example of simulation for the vaccinology framework with gaussian covariates (for all replicates [raw code](https://github.com/aurianegbt/LassoSAMBA/blob/master/data/simulationSetup/GenSimuGaussianPasin.R)) ;
+* [Generate Simulation Pasin](https://github.com/aurianegbt/LassoSAMBA/blob/master/GenerateSimulation_Pasin.md) gives an example of simulation for the vaccinology framework with non gaussian covariates (for all replicates [raw code](https://github.com/aurianegbt/LassoSAMBA/blob/master/data/simulationSetup/GenSimuPasin.R)) ;
+* [Generate Simulation Naveau](https://github.com/aurianegbt/LassoSAMBA/blob/master/GenerateSimulation_Naveau.md) gives an example of simulation for the vaccinology framework with gaussian covariates (for all replicates [raw code](https://github.com/aurianegbt/LassoSAMBA/blob/master/data/simulationSetup/GenSimuNAVEAU.R)) ;
+
 
 ``` r
 rm(list = ls())
