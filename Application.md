@@ -742,67 +742,7 @@ load(file="outputs/buildingResults/application/bootstrap.RData")
 value$Type <- factor(value$Type,levels=c("Non null model","With final model","Exact final model"))
 value.par$Type <- factor(value.par$Type,levels=c("Only final gene selected","Final gene selected among others","Non null model"))
 
-
-lapply(split(value,value$method),FUN=function(value){
-  method=unique(value$method)
-
-  ggplot(mapping=aes(x=method,y=Value,fill=method,color=method,pattern=Type)) +
-    geom_col(data=value[value$Type=="Non null model",],aes(group=method),width = 0.7, position = position_dodge(width = 0.7),color="#024154") +
-    geom_bar_pattern(data=value[value$Type=="With final model",], position="dodge",width=0.7,color="#024154",pattern_color="#024154",pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
-    geom_bar_pattern(data=value[value$Type=="Exact final model",], position="dodge",width=0.7,color="#024154",pattern_color="#024154",pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
-    labs(x="",y="Proportion (in %)") +
-    scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+
-    scale_pattern_manual(values = c("Exact final model"="stripe","With final model"="circle","Non null model"="none"))+
-    theme_bw() +
-    scale_color_manual(values=setNames("#024154",method),guide="none")+
-    scale_fill_manual(values=setNames("#99e7ff",method),guide="none")+
-    theme(axis.text=element_text(size=13),
-          axis.text.x = element_blank(),
-          axis.title=element_text(size=16,face="bold"),
-          legend.key=element_rect(color="#024154",fill="transparent"),
-          legend.position = "bottom",
-          plot.background = element_rect(fill='transparent', color=NA), 
-          legend.background = element_rect(fill = "transparent", color = NA))+
-    guides(pattern=guide_legend(override.aes = list(fill="transparent",color="#024154")))
-  
-  if(PNG){
-    ggsave(filename = paste0("outputs/figures/applicationResults/propModel_",method,".png"),unit="px",height=1200,width=1500, bg='transparent',device=grDevices::png)
-  }
-  if(JPEG){
-    ggsave(filename = paste0("outputs/figures/applicationResults/propModel_",method,".jpeg"),unit="px",height=1200,width=1500,device=grDevices::jpeg)
-  }
-})
-
-lapply(split(value.par,value.par$method),FUN=function(value.par){
-  method=unique(value.par$method)
-  ggplot(mapping=aes(x=Parameter,y=Value,fill=Parameter,color=Parameter,pattern=Type)) +
-    geom_col(data=value.par[value.par$Type=="Non null model",],aes(group=Parameter),width = 0.7, position = position_dodge(width = 0.7),color=c("#5c6e39","#563f61","#703527")) +
-    geom_bar_pattern(data=value.par[value.par$Type=="Final gene selected among others",], position="dodge",color=c("#5c6e39","#563f61"),pattern_color=c("#5c6e39","#563f61"),width=0.7,pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
-    geom_bar_pattern(data=value.par[value.par$Type=="Only final gene selected",],color=c("#5c6e39","#563f61"),pattern_color=c("#5c6e39","#563f61"), position="dodge",width=0.7,pattern_density=0.05,pattern_spacing=0.025,stat='identity')+
-    labs(x="",y="Proportion (in %)") +
-    scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+
-    scale_pattern_manual(values = c("Only final gene selected"="stripe","Final gene selected among others"="circle","Non null model"="none"))+
-    theme_bw() +
-    theme(axis.text=element_text(size=13),
-          axis.title=element_text(size=16,face="bold"),
-          legend.key=element_rect(color="black",fill="transparent"),
-          legend.position="bottom",
-          plot.background = element_rect(fill='transparent', color=NA), 
-          legend.background = element_rect(fill = "transparent", color = NA))+
-    guides(pattern=guide_legend(override.aes = list(fill="transparent",color="black"))) +
-    scale_fill_manual(values=setNames(c("#e0e6c6","#d0c1d7","#f8c2b4"),c("varphi[S]","varphi[L]","delta[S]")),guide="none") +
-    scale_color_manual(values=setNames(c("#5c6e39","#563f61","#703527"),c("varphi[S]","varphi[L]","delta[S]")),guide="none")
-  
-  if(PNG){
-    ggsave(filename = paste0("outputs/figures/applicationResults/propModel_par_",method,".png"),unit="px",height=1200,width=2000, bg='transparent',device=grDevices::png)
-  }
-  if(JPEG){
-    ggsave(filename = paste0("outputs/figures/applicationResults/propModel_par_",method,".jpeg"),unit="px",height=1200,width=2000,device=grDevices::jpeg)
-  }
-})
-
-
-lapply(split(results,results$method),FUN=function(results){
+plots <- lapply(split(results,results$method),FUN=function(results){
   method=unique(results$method)
   
   write_lasso = data.frame(parameter = c("delta[S]","varphi[S]","varphi[L]"),
@@ -849,33 +789,40 @@ lapply(split(results,results$method),FUN=function(results){
   
   write <- write[write$coory>=25,]
   
-  ggplot(results,aes(x=covariates))+geom_bar(fill=fill,color=fill)+
-    facet_grid(parameter~.,labeller=label_parsed)+
-    theme(axis.text.x = element_text(angle = 90))+
-    geom_hline(yintercept = 0.05*NB_mod[[method]], color = "tomato", linetype = "dashed") +
-    geom_segment(data = subset(results, parameter == "varphi[S]"),
-                 aes(x = 0, xend = which(sort(unique(results$covariates))=="LEP"),
-                     y = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"])),
-                     yend = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"]))),
-                 color = "darkred", linetype = "solid", size = 0.5) +
-    geom_segment(data = subset(results, parameter == "varphi[L]"),
-                 aes(x = 0, xend = which(sort(unique(results$covariates))=="KIFC1"),
-                     y = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])),
-                     yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
-                 color = "darkred", linetype = "solid", size = 0.5) +
-    geom_text(data=write_lasso,aes(label=text,y=coory,x=coorx),hjust=-0.5,vjust = -0.5,color="darkred",size=5)+
-    geom_text(data=write,aes(label=text,y=coory,x=covariates),hjust=0.8,vjust = -0.8,color="tomato",size=5)+
-    ylab("Proportion") +
-    scale_y_continuous(limits = c(0,NB_mod[[method]]),
-                       breaks = seq(0,NB_mod[[method]],NB_mod[[method]]/4), 
-                       labels = scales::percent(seq(0,1,0.25)))+
-    theme(axis.title=element_text(size=15),
-          axis.text.y = element_text(size=12),
-          axis.text.x = element_blank(),
-          strip.text = element_text(size = 20),
-          plot.background = element_rect(fill='transparent', color=NA), 
-          legend.key = element_rect(fill = "transparent", color = NA),
-          legend.background = element_rect(fill = "transparent", color = NA))
+  plot <- ggplot(results,aes(x=covariates))+geom_bar(fill=fill,color=fill)+
+      facet_grid(parameter~.,labeller=label_parsed)+
+      theme(axis.text.x = element_text(angle = 90))+
+      geom_hline(yintercept = 0.05*NB_mod[[method]], color = "tomato", linetype = "dashed") +
+      geom_segment(data = subset(results, parameter == "varphi[S]"),
+                   aes(x = 0, xend = which(sort(unique(results$covariates))=="LEP"),
+                       y = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"])),
+                       yend = length(unique(results[results$parameter=="varphi[S]" & results$covariates=="LEP","model"]))),
+                   color = "darkred", linetype = "solid", size = 0.5) +
+      geom_segment(data = subset(results, parameter == "varphi[L]"),
+                   aes(x = 0, xend = which(sort(unique(results$covariates))=="KIFC1"),
+                       y = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"])),
+                       yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
+                   color = "darkred", linetype = "solid", size = 0.5) +
+      geom_text(data=write_lasso,aes(label=text,y=coory,x=coorx,color="LS"),hjust=-0.5,vjust = -0.5,size=5)+
+      geom_text(data=ifelse(nrow(write)==0,data.frame(parameter="delta[S]",text="",coory=10,coorx=0),write),aes(label=text,x=covariates,color="S"),y=30,hjust=0.8,vjust = -0.8,size=5)+
+      ylab("Proportion") +
+      scale_y_continuous(limits = c(0,NB_mod[[method]]),
+                         breaks = seq(0,NB_mod[[method]],NB_mod[[method]]/4), 
+                         labels = scales::percent(seq(0,1,0.25)))+
+      theme(axis.title=element_text(size=15),
+            axis.text.y = element_text(size=12),
+            axis.text.x = element_blank(),
+            strip.text = element_text(size = 20),
+            plot.background = element_rect(fill='transparent', color=NA), 
+            legend.key = element_rect(fill = "transparent", color = NA),
+            legend.background = element_rect(fill = "transparent", color = NA),
+            legend.position="bottom",
+            # legend.direction = "vertical",
+            legend.box="vertical",
+            panel.grid.major.x = element_blank(),
+            panel.grid.minor.x = element_blank()) +
+      scale_color_manual(name="",values=c("LS"="darkred","S"="tomato"),labels=c("LS"="selected by lasso- and stepAIC-SAMBA;","S"="selected by stepAIC-SAMBA only.")) +
+      guides(color = guide_legend(override.aes = list(label = "Genes", size = 4,vjust=0.5),label.theme=element_text(margin=margin(l=0.5),size=14)))
   
   if(PNG){
     ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".png"),unit="px",width=7000,height=2800,dpi=600, bg='transparent',device=grDevices::png)
@@ -883,7 +830,7 @@ lapply(split(results,results$method),FUN=function(results){
   if(JPEG){
     ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".jpeg"),unit="px",width=7000,height=2800,dpi=600,device=grDevices::jpeg)
   }
-  ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".eps"),device="eps",width=12,height=4)
+  ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".eps"),device="eps",width=12,height=4.5)
   
   return(plot)
 })
@@ -895,7 +842,7 @@ plot <-
     plot.background = element_rect(color = "black", size = 0.7, fill = "white")
   ), plots$lasso+ theme(
     plot.background = element_rect(color = "black", size = 0.7, fill = "white")
-  ), ncol = 1, nrow = 2,labels = c("A","B"))
+  ), ncol = 1, nrow = 2,labels = c("A","B"),common.legend=TRUE,legend="bottom")
 
 
 if(PNG){
