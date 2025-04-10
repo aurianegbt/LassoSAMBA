@@ -4,7 +4,6 @@ tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   load(paste0("outputs/finalResults/BuildResults_",project,".RData"))
   source(paste0("data/simulationFiles/Files",project,"/H1.all.R"))
   
-
   # Data.frame to use
   resultModelParCov <- resultModelPar[resultModelPar$Method %in% buildMethod, ]
   errorStatsParCov <- errorStatsPar[errorStatsPar$Method %in% buildMethod,]
@@ -19,9 +18,12 @@ tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     as.data.frame()
 
   errorStatsParCov <- errorStatsParCov  %>% 
+    mutate(FPR = (FP/sapply(FP+TN,FUN=function(x){max(x,1)})),.after = "TP") %>%
     mutate(FDR = (FP/sapply(FP+TP,FUN=function(x){max(x,1)})),.after = "TP") %>%
-    mutate(FNR = (FN/sapply(FN+TN,FUN=function(x){max(x,1)})),.after="TN") %>%
+    mutate(FNR = (FN/sapply(FN+TP,FUN=function(x){max(x,1)})),.after="TN") %>%
+    mutate(FOR = (FN/sapply(FN+TN,FUN=function(x){max(x,1)})),.after="TN") %>%
     mutate(F1_score = TP/(TP+1/2*(FN+FP)),.after="FNR")
+  
 
   df = data.frame(Method = buildMethod,
                   FDR_mean = sapply(split(errorStatsParCov$FDR,
@@ -88,8 +90,8 @@ tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
 
   # Data Processing
   df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"),F1_score_CB=CB(df,"F1_score"))
-  methname=c(stepAIC="stepAIC with stat. test",
-             setNames(paste0("Lasso E[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
+  methname=c(stepAIC="step-SAMBA",
+             setNames(paste0("lasso-SAMBA E[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
              SAEMVS="SAEMVS")
 
   table = data.frame(Rate = c(paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),

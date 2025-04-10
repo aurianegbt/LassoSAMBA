@@ -19,8 +19,10 @@ tableStats <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     as.data.frame()
   
   errorStatsParCov <- errorStatsParCov  %>% 
+    mutate(FPR = (FP/sapply(FP+TN,FUN=function(x){max(x,1)})),.after = "TP") %>%
     mutate(FDR = (FP/sapply(FP+TP,FUN=function(x){max(x,1)})),.after = "TP") %>%
-    mutate(FNR = (FN/sapply(FN+TN,FUN=function(x){max(x,1)})),.after="TN") %>%
+    mutate(FNR = (FN/sapply(FN+TP,FUN=function(x){max(x,1)})),.after="TN") %>%
+    mutate(FOR = (FN/sapply(FN+TN,FUN=function(x){max(x,1)})),.after="TN") %>%
     mutate(F1_score = TP/(TP+1/2*(FN+FP)),.after="FNR")
   
 
@@ -35,6 +37,21 @@ tableStats <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
          FNR_sd = sd(errorStatsParCov[,"FNR"]),
          FNR_q975 = quantile(errorStatsParCov[,"FNR"],0.975),
          FNR_q25 = quantile(errorStatsParCov[,"FNR"],0.025),
+         
+         
+         FOR_mean = mean(errorStatsParCov[,"FOR"]),
+         FOR_median = median(errorStatsParCov[,"FOR"]),
+         FOR_sd = sd(errorStatsParCov[,"FOR"]),
+         FOR_q975 = quantile(errorStatsParCov[,"FOR"],0.975),
+         FOR_q25 = quantile(errorStatsParCov[,"FOR"],0.025),
+         
+         
+         FPR_mean = mean(errorStatsParCov[,"FPR"]),
+         FPR_median = median(errorStatsParCov[,"FPR"]),
+         FPR_sd = sd(errorStatsParCov[,"FPR"]),
+         FPR_q975 = quantile(errorStatsParCov[,"FPR"],0.975),
+         FPR_q25 = quantile(errorStatsParCov[,"FPR"],0.025),
+         
          FN_mean = mean(errorStatsParCov[,"FN"]),
          FN_median = median(errorStatsParCov[,"FN"]),
          FN_sd = sd(errorStatsParCov[,"FN"]),

@@ -15,8 +15,8 @@ graphsGenerate <- function(project="Pasin",
   
   # Load data
   generalsubtitle = paste0("Among ",length(unique(errorStatsPar$Model))," simulated datasets of ",dataType," for ",nInd," individuals, with ",nbCov," correlated covariates.\n")
-  Titlelist = list(stepAIC = "Model built with SAMBA, with statistic test to exclude covariates at each iteration.",
-                   lasso = "Model built with a lasso approach within SAMBA.")[Reduce(union,c("stepAIC",if(any(stringr::str_detect(buildMethod,"lasso"))){"lasso"}))] 
+  Titlelist = list(stepAIC = "Model built with step-SAMBA.",
+                   lasso = "Model built with lasso-SAMBA method.")[Reduce(union,c("stepAIC",if(any(stringr::str_detect(buildMethod,"lasso"))){"lasso"}))] 
   
   for(k in 1:length(buildMethod)){
     if(stringr::str_detect(buildMethod[k],"lassoFDP")){

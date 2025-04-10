@@ -32,8 +32,8 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     geom_text(data=valueDisplayTime, mapping=aes(label=textMean,y=Median,x=coor-0.25),vjust=-0.2,hjust=1,fontface="bold",size=4)+
     xlab("Method used")+
     ylab("Computation time (s)")+
-    scale_x_discrete(labels=c(setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
-                              stepAIC="stepAIC\nwith stat. test",
+    scale_x_discrete(labels=c(setNames(paste0("lasso-SAMBA\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
+                              stepAIC="step-SAMBA",
                               SAEMVS="SAEMVS"))+
     # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
     scale_fill_manual(values=setNames(colpas,buildMethod))+
@@ -69,8 +69,8 @@ graphsCompTime <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     ylab("Iteration")+
     # ggtitle("Computation Time Comparison",
             # subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(stepAIC="stepAIC\nwith stat. test",
-                              setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
+    scale_x_discrete(labels=c(stepAIC="step-SAMBA",
+                              setNames(paste0("lasso-SAMBA\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
                               SAEMVS="SAEMVS"))+
     # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x)) +
     scale_fill_manual(values=setNames(colpas,buildMethod))+

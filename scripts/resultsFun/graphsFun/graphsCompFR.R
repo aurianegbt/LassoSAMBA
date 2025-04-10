@@ -49,8 +49,8 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     xlab("Method used")+
     ggtitle("False Discovery Rate Distribution",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(stepAIC="stepAIC\nwith stat. test",
-                              setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+    scale_x_discrete(labels=c(stepAIC="step-SAMBA",
+                              setNames(paste0("lasso-SAMBA\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
                               SAEMVS="SAEMVS"))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
@@ -95,8 +95,8 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     xlab("Method used")+
     ggtitle("False Negative Rate Distribution",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(stepAIC="stepAIC\nwith stat. test",
-                              setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+    scale_x_discrete(labels=c(stepAIC="step-SAMBA",
+                              setNames(paste0("lasso-SAMBA\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
                               SAEMVS="SAEMVS"))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+
@@ -141,8 +141,8 @@ graphsCompFR <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     xlab("Method used")+
     ggtitle("F1-score Distribution",
             subtitle=stringr::str_wrap(subtitle,60))+
-    scale_x_discrete(labels=c(stepAIC="stepAIC\nwith stat. test",
-                              setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
+    scale_x_discrete(labels=c(stepAIC="step-SAMBA",
+                              setNames(paste0("lasso-SAMBA\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))],"sharpnoCov0FDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"sharpnoCov0FDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"sharpnoCov0FDP"))]),
                               SAEMVS="SAEMVS"))+
     scale_fill_manual(values=colpas)+
     scale_color_manual(values=colFonce)+

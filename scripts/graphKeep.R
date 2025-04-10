@@ -87,6 +87,9 @@ if(JPEG){
 ggsave("outputs/figures/finalFigures/ComparisonStats_all.eps",
        height=9,width=4.5,device=cairo_ps)
 
+ggsave("outputs/figures/finalFigures/SuppFigure13.eps",
+       height=9,width=4.5,device=cairo_ps)
+
 # 
 ggarrange(pN0$LLComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
           pG$LLComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
@@ -102,6 +105,9 @@ if(JPEG){
          height = 2400, width =   6000,dpi=600, units = "px",device=grDevices::jpeg)
 }
 ggsave("outputs/figures/finalFigures/LL.eps",
+       height=3,width=9,device=cairo_ps)
+
+ggsave("outputs/figures/finalFigures/SuppFigure14.eps",
        height=3,width=9,device=cairo_ps)
 
 ggarrange(
@@ -120,3 +126,6 @@ if(JPEG){
 }
 ggsave("outputs/figures/finalFigures/Time.eps",
        height=4.5,width=14,device=cairo_ps)
+
+ggsave("outputs/figures/finalFigures/SuppFigure15.eps",
+       height=3,width=9,device=cairo_ps)

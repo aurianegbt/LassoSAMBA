@@ -14,9 +14,9 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   newbuildMethod <- c()
   for(k in 1:length(buildMethod)){
     if(buildMethod[k]=="stepAIC"){
-      newbuildMethod[k] <- "StepAIC"
+      newbuildMethod[k] <- "step-SAMBA"
     }else if(stringr::str_detect(buildMethod[k],"lassoFDP")){
-      newbuildMethod[k] <- paste0("Lasso\nE[FDP]<",stringr::str_remove(buildMethod[k],"lassoFDP"),"%")
+      newbuildMethod[k] <- paste0("lasso-SAMBA\nE[FDP]<",stringr::str_remove(buildMethod[k],"lassoFDP"),"%")
     }else if(buildMethod[k]=="SAEMVS"){
       newbuildMethod[k] <- "SAEMVS"
     }

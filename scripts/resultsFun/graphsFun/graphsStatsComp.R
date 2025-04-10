@@ -39,8 +39,8 @@ graphsStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     labs(x="Method", y = "Proportion (in %)") +
     scale_fill_manual(values=setNames(colpas,buildMethod),guide="none")+ 
     scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+ 
-    scale_x_discrete(labels=c(stepAIC="stepAIC\nwith stat. test",
-                              setNames(paste0("Lasso\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
+    scale_x_discrete(labels=c(stepAIC="step-SAMBA",
+                              setNames(paste0("lasso-SAMBA\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
                               SAEMVS="SAEMVS"))+
     theme(axis.text.x = element_text(size = 10),
           axis.text.y = element_text(size = 8),

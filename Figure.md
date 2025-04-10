@@ -50,7 +50,7 @@ ggarrange(pN$StatsComp+theme(axis.title.x = element_blank(),
                              scale_fill_manual(values=c("stepAIC"="grey","lassoFDP10"="grey"),guide="none"),
           nrow=1,common.legend=TRUE,legend="bottom",labels=c("A","B","C"),widths=c(1.3,1,1))
 
-ggsave("outputs/figures/finalFigures/Figure1.eps",
+ggsave("outputs/figures/finalFigures/Figure2.eps",
        height=3,width=9,device=cairo_ps)
 
 ```
@@ -68,7 +68,7 @@ ggarrange(pN0$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="
           pP$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="black")),
           ncol=1,labels=c("A","B","C"),heights = c(1,1,1))
           
-ggsave("outputs/figures/finalFigures/Figure2_colored.eps",
+ggsave("outputs/figures/finalFigures/Figure3_colored.eps",
        width = 8.33, height = 8.75,units="in",device=cairo_ps)
 
 ```
@@ -79,7 +79,7 @@ ggarrange(bw(pN0$ParComp+theme(plot.background = element_rect(linewidth=0.7,colo
           bw(pP$ParComp+theme(plot.background = element_rect(linewidth=0.7,color="black"))),
           ncol=1,labels=c("A","B","C"),heights = c(1,1,1))
           
-ggsave("outputs/figures/finalFigures/Figure2.eps",
+ggsave("outputs/figures/finalFigures/Figure3.eps",
        width = 8.33, height = 8.75,units="in",device=cairo_ps)
 
 ```
@@ -91,8 +91,8 @@ ggsave("outputs/figures/finalFigures/Figure2.eps",
 <p align="center"><strong>Figure 2:</strong> Covariate selection frequency across simulation frameworks for the original method (stepAIC with statistical tests at each iteration) and the lasso approach, with an error control threshold of 10%. The mean selection frequency of false discoveries is displayed on the right of each histogram. (A) Pharmacokinetics model with categorical covariates; (B) Vaccinology framework with Gaussian-correlated covariates; (C) Vaccinology framework with randomly drawn covariates.</p>
 
 ```r
-
 load(file="outputs/buildingResults/application/bootstrap.RData")
+PNG <- JPEG <- TRUE
 
 value$Type <- factor(value$Type,levels=c("Non null model","With final model","Exact final model"))
 value.par$Type <- factor(value.par$Type,levels=c("Only final gene selected","Final gene selected among others","Non null model"))
@@ -144,6 +144,9 @@ plots <- lapply(split(results,results$method),FUN=function(results){
   write <- write[-which(write$parameter=="varphi[L]" & stringr::str_detect(write$text,"KIFC1")),]
   
   write <- write[write$coory>=25,]
+  if(nrow(write)==0){
+    write <- data.frame(parameter="delta[S]",text="",coory=10,coorx=0,covariates="LEP")
+  }
   
   plot <- ggplot(results,aes(x=covariates))+geom_bar(fill=fill,color=fill)+
       facet_grid(parameter~.,labeller=label_parsed)+
@@ -160,7 +163,7 @@ plots <- lapply(split(results,results$method),FUN=function(results){
                        yend = length(unique(results[results$parameter=="varphi[L]" & results$covariates=="KIFC1","model"]))),
                    color = "darkred", linetype = "solid", size = 0.5) +
       geom_text(data=write_lasso,aes(label=text,y=coory,x=coorx,color="LS"),hjust=-0.5,vjust = -0.5,size=5)+
-      geom_text(data=ifelse(nrow(write)==0,data.frame(parameter="delta[S]",text="",coory=10,coorx=0),write),aes(label=text,x=covariates,color="S"),y=30,hjust=0.8,vjust = -0.8,size=5)+
+      geom_text(data=write,aes(label=text,x=covariates,color="S"),y=30,hjust=0.8,vjust = -0.8,size=5)+
       ylab("Proportion") +
       scale_y_continuous(limits = c(0,NB_mod[[method]]),
                          breaks = seq(0,NB_mod[[method]],NB_mod[[method]]/4), 
@@ -199,7 +202,7 @@ plot <-
   ), ncol = 1, nrow = 2,labels = c("A","B"),common.legend=TRUE,legend="bottom")
 
 
-ggsave(plot,filename = paste0("outputs/figures/finalFigures/Figure3.eps"),device="eps",width=12,height=8)
+ggsave(plot,filename = paste0("outputs/figures/finalFigures/Figure4.eps"),device="eps",width=12,height=8)
 
 ```
 
