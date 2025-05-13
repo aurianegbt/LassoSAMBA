@@ -180,7 +180,7 @@ plots <- lapply(split(results,results$method),FUN=function(results){
             legend.box="vertical",
             panel.grid.major.x = element_blank(),
             panel.grid.minor.x = element_blank()) +
-      scale_color_manual(name="",values=c("LS"="darkred","S"="tomato"),labels=c("LS"="selected by lasso- and stepAIC-SAMBA;","S"="selected by stepAIC-SAMBA only.")) +
+      scale_color_manual(name="",values=c("LS"="darkred","S"="tomato"),labels=c("LS"="selected by lasso- and step-SAMBA;","S"="selected by step-SAMBA only.")) +
       guides(color = guide_legend(override.aes = list(label = "Genes", size = 4,vjust=0.5),label.theme=element_text(margin=margin(l=0.5),size=14)))
   
   if(PNG){
@@ -189,7 +189,7 @@ plots <- lapply(split(results,results$method),FUN=function(results){
   if(JPEG){
     ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".jpeg"),unit="px",width=7000,height=2800,dpi=600,device=grDevices::jpeg)
   }
-  ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".eps"),device="eps",width=12,height=4.5)
+  ggsave(plot,filename = paste0("outputs/figures/applicationResults/countModel_",method,".eps"),device=cairo_ps,width=12,height=4.5)
   
   return(plot)
 })
@@ -202,7 +202,7 @@ plot <-
   ), ncol = 1, nrow = 2,labels = c("A","B"),common.legend=TRUE,legend="bottom")
 
 
-ggsave(plot,filename = paste0("outputs/figures/finalFigures/Figure4.eps"),device="eps",width=12,height=8)
+ggsave(plot,filename = paste0("outputs/figures/finalFigures/Figure4.eps"),device=cairo_ps,width=12,height=8)
 
 ```
 
