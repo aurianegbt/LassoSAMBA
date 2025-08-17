@@ -21,7 +21,7 @@ buildmlx <- function(project=NULL,
                      seq.cov=FALSE,
                      seq.cov.iter=0,
                      seq.corr=TRUE,
-                     p.max=if(buildMethod=="lasso"){1}else{0.1},
+                     p.max=if(buildMethod=="stepAIC"){0.1}else{1},
                      p.min=c(0.075, 0.05, 0.1),
                      print=TRUE,
                      nb.model=1,
@@ -56,6 +56,19 @@ buildmlx <- function(project=NULL,
   } else {
     project <- Rsmlx:::mlx.getProjectSettings()$project
   }
+  
+  
+  
+  if(buildMethod=="lassoSSrep"){
+    oldsettings = Rsmlx:::mlx.getConditionalDistributionSamplingSettings()
+    if(oldsettings$enablemaxiterations || oldsettings$nbminiterations!=nSS+100 || oldsettings$nbsimulatedparameters!= nSS){
+      setConditionalDistributionSamplingSettings(enablemaxiterations = FALSE)
+      setConditionalDistributionSamplingSettings(nbminiterations = nSS+100)
+      setConditionalDistributionSamplingSettings(nbsimulatedparameters = nSS)
+    }
+  }
+  
+  
   method.ll <- iop.ll <- pen.coef <- NULL
   r <- Rsmlx:::buildmlx.check(project, final.project, model, paramToUse,
                               covToTest, covToTransform, center.covariate, criterion,
