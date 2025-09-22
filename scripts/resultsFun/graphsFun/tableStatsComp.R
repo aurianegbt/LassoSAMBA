@@ -92,7 +92,9 @@ tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   df <- cbind(df, FDR_CB = CB(df,"FDR"),FNR_CB = CB(df,"FNR"),F1_score_CB=CB(df,"F1_score"))
   methname=c(stepAIC="step-SAMBA",
              setNames(paste0("lasso-SAMBA E[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
-             SAEMVS="SAEMVS")
+             setNames(paste0("Elastic Net alpha=",ifelse(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")==10,"1",ifelse(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")==0,"0",paste0("0.",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet"))))),buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))]),
+             SAEMVS="SAEMVS",
+             lassoBIC="lassoBIC-SAMBA")
 
   table = data.frame(Rate = c(paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
                                  paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),

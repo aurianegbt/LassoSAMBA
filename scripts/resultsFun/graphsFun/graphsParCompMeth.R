@@ -1,9 +1,8 @@
 graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
-
   # Load data
   load(paste0("outputs/finalResults/BuildResults_",project,".RData"))
   source(paste0("data/simulationFiles/Files",project,"/H1.all.R"))
-
+  
   # Color & covariates
   gr = "#888888"
   fill.vec = c(c("#468b97", "#ef6262", "#74C385", "#8e6aa0", "#ee6c4d",                   "#1e90ff", "#ffa500", "#ff69b4", "#32cd32", "#4169e1",                  "#ff6347", "#6a5acd", "#20b2aa", "#f08080", "#6495ed",                  "#9acd32", "#9370db", "#00ced1", "#ff4500", "#7b68ee",                  "#2e8b57", "#ba55d3", "#00bfff", "#d2691e", "#4682b4")[1:length(unlist(H1.all,use.names = F))],rep(gr,200))
@@ -19,6 +18,12 @@ graphsParCompMethod <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
       newbuildMethod[k] <- paste0("lasso-SAMBA\nE[FDP]<",stringr::str_remove(buildMethod[k],"lassoFDP"),"%")
     }else if(buildMethod[k]=="SAEMVS"){
       newbuildMethod[k] <- "SAEMVS"
+    }else if(buildMethod[k]=="lassoBIC"){
+      newbuildMethod[k] <- "lassoBIC-SAMBA"
+    }else if(buildMethod[k]=="lassoSSrepFDP10"){
+      newbuildMethod[k] <- "lassorep-SAMBA\nE[FDP]<10%"
+    }else if(stringr::str_detect(buildMethod[k],"elasticnet")){
+      newbuildMethod[k] <- paste0("Elastic Net\nalpha=",ifelse(stringr::str_remove(buildMethod[k],"elasticnet")==10,"1",ifelse(stringr::str_remove(buildMethod[k],"elasticnet")==0,"0",paste0("0.",stringr::str_remove(buildMethod[k],"elasticnet")))),"")
     }
   }
   

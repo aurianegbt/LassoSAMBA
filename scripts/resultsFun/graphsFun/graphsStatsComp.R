@@ -4,9 +4,10 @@ graphsStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
   source(paste0("data/simulationFiles/Files",project,"/H1.all.R"))
   
   # Color
-  colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43")[1:length(buildMethod)]
-  col = c("#a6c46a","#8e6aa0","#ee6c4d","#007194","#9D8F80","#FFD447")[1:length(buildMethod)]
-  colpas = c("#e0e6c6","#d0c1d7","#f8c2b4","#99e7ff","#cac2ba","#ffe591")[1:length(buildMethod)]## FDR
+  colFonce = c("#5c6e39","#563f61","#703527","#024154","#524b43","#9C4400","#005E57","#7A003C")[1:length(buildMethod)]
+  col = c("#a6c46a","#8e6aa0","#ee6c4d","#007194","#9D8F80","#FF7F11","#00B8A9","#D81159")[1:length(buildMethod)]
+  colpas = c("#e0e6c6","#d0c1d7","#f8c2b4","#99e7ff","#cac2ba","#FFD2A6","#BFF0E6","#F7B8D2")[1:length(buildMethod)]
+  
   
   # Data.frame to use
   resultModelParCov <- resultModelPar[resultModelPar$Method %in% buildMethod, ]
@@ -41,7 +42,8 @@ graphsStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
     scale_y_continuous(breaks=seq(0,100,10),limits = c(0,100))+ 
     scale_x_discrete(labels=c(stepAIC="step-SAMBA",
                               setNames(paste0("lasso-SAMBA\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
-                              SAEMVS="SAEMVS"))+
+                              setNames(paste0("Elastic Net\nalpha=",ifelse(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")==10,"1",ifelse(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")==0,"0",paste0("0.",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")))),"%"),buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))]),
+                              SAEMVS="SAEMVS",lassBIC="lassoBIC-SAMBA",lassoSSrepFDP10="lassorep-SAMBA\nE[FDR]<10%"))+
     theme(axis.text.x = element_text(size = 10),
           axis.text.y = element_text(size = 8),
           axis.title = element_text(size=12),

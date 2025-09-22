@@ -22,6 +22,9 @@ graphsGenerate <- function(project="Pasin",
     if(stringr::str_detect(buildMethod[k],"lassoFDP")){
       Titlelist <- append(Titlelist, paste0(stringr::str_remove(Titlelist["lasso"],"\\.")," with constrained E[FDR] under ",stringr::str_remove(buildMethod[k],"lassoFDP"),"%."))
       names(Titlelist)[length(Titlelist)] <- buildMethod[k]
+    }else if(buildMethod[k] == "lassoBIC"){
+      Titlelist <- append(Titlelist, paste0(stringr::str_remove(Titlelist["lasso"],"\\.")," with penalty parameter calibrated using BIC."))
+      names(Titlelist)[length(Titlelist)] <- buildMethod[k]
     }
   }
   Titlelist <- Titlelist[buildMethod]
@@ -56,9 +59,17 @@ graphsGenerate <- function(project="Pasin",
     }
   }
   
-  return(list(ParComp = p1,
-              StatsComp = p2,
-              TimeComp = p3,
-              LLComp = p4))
+  if(length(buildMethod)>1){
+    res = list(ParComp = p1,
+         StatsComp = p2,
+         TimeComp = p3,
+         LLComp = p4)
+  }else{
+    res = NULL
+  }
+  
+  
+  
+  return(invisible(res))
 }
 
