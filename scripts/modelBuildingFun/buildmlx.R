@@ -29,7 +29,7 @@ buildmlx <- function(project=NULL,
                      alpha=1,
                      nSS=1000, 
                      buildMethod="lasso",
-                     FDR_thr=0.1
+                     FDP_thr=0.1
                      )
 {
   
@@ -298,7 +298,7 @@ buildmlx <- function(project=NULL,
                                                correlation.model=correlation.model,
                                                covariate.model=covariate.model,
                                                criterion = criterion,
-                                               FDR_thr=FDR_thr)
+                                               FDP_thr=FDP_thr)
       
       ##################################
       res.covariate$res <- Rsmlx:::sortCov(res.covariate$res, cov.ini)

@@ -110,7 +110,7 @@ covariateModelSelection.lasso <- function(nfolds = 5,
                      covariate.model = covariate.model[[p]],
                      n_cores = max(floor(parallel::detectCores()/length(names(indvar)[which(indvar)])),1),
                      iter=iter,
-                     FDR_thr=FDR_thr)
+                     FDP_thr=FDR_thr)
     
     pathToSavePlot.p <- paste0(pathToSavePlot,"/calibrationPlot_",p)
     if(!dir.exists(pathToSavePlot.p)){dir.create(pathToSavePlot.p)}

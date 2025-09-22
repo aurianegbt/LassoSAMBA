@@ -107,7 +107,7 @@ covariateModelSelection.lassoSSrep <- function(nfolds = 5,
                          covariate.model = covariate.model[[p]],
                          n_cores = max(floor(parallel::detectCores()/length(names(indvar)[which(indvar)])),1),
                          iter=iter,
-                         FDR_thr=FDR_thr)
+                         FDP_thr=FDR_thr)
     
     return(aux)
   }

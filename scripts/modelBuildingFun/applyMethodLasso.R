@@ -7,7 +7,7 @@ applyMethodLasso <- function(Y,X,omega,cov0,
                              p.name=NULL,
                              n_cores = 1,
                              iter=1,
-                             FDR_thr=0.10){
+                             FDP_thr=0.10){
   to.cat = c()
   
   if(criterion %in% c("BIC","BICc")){
@@ -76,7 +76,8 @@ applyMethodLasso <- function(Y,X,omega,cov0,
     
     to.cat.here = ""
   }else{
-    VariableSelection.outputs = sharp::VariableSelection(Xwh,Ywh,exclude=exclude,nfolds=nfolds,pi_list=seq(0.50,0.99,0.01),alpha=alpha,K=nSS,n_cores=n_cores,FDP_thr = FDR_thr)
+    
+    VariableSelection.outputs = sharp::VariableSelection(Xwh,Ywh,exclude=exclude,nfolds=nfolds,pi_list=seq(0.50,0.99,0.01),alpha=alpha,K=nSS,n_cores=n_cores,FDP_thr = FDP_thr)
     
     pi_list = VariableSelection.outputs$params$pi_list
     lambda_list = VariableSelection.outputs$Lambda

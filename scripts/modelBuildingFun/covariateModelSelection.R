@@ -17,13 +17,13 @@ covariateModelSelection <- function(buildMethod,
                                     correlation.model=NULL,
                                     covariate.model=NULL,
                                     criterion = "BIC",
-                                    FDR_thr=0.10){
+                                    FDP_thr=0.10){
   if(buildMethod %in% c("stepAIC")){
     covariateModelSelection.reg(covFix,pen.coef,weight,n.full,nb.model,direction,paramToUse,eta,p.max,steps,sp0,iter,correlation.model)
   }else if(buildMethod=="lasso"){
-    covariateModelSelection.lasso(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,nSS,covariate.model,criterion,iter,FDR_thr)
+    covariateModelSelection.lasso(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,nSS,covariate.model,criterion,iter,FDP_thr)
   }else if(buildMethod=="lassoSSrep"){
-    covariateModelSelection.lassoSSrep(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,iter,FDR_thr)
+    covariateModelSelection.lassoSSrep(nfolds,alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,iter,FDP_thr)
   }else if(buildMethod=="lassoBIC"){
     covariateModelSelection.lassoBIC(alpha,covFix,pen.coef,weight,paramToUse,eta,p.max,sp0,covariate.model,criterion,iter)
     

@@ -45,8 +45,9 @@ buildFS <- function(pathToSim,
   res = buildmlx(project = paste0(temporaryDirectory,"/Build.mlxtran"),
                  buildMethod = if(buildMethod=="reg"){"stepAIC"}else{buildMethod},
                  model=model,
+                 alpha=alpha,
                  test=FALSE,
-                 FDR_thr=FDP_thr)
+                 FDP_thr=FDP_thr)
   
   Model <- Rsmlx:::mlx.getIndividualParameterModel()
   LL <- Rsmlx:::mlx.getEstimatedLogLikelihood()
