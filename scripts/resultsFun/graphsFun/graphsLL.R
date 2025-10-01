@@ -19,7 +19,7 @@ graphsLL <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
                       labels=c(stepAIC="step-SAMBA",
                                setNames(paste0("lasso-SAMBA\nE[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
                                setNames(paste0("Elastic Net\nalpha=",ifelse(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")==10,"1",ifelse(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")==0,"0",paste0("0.",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet"))))),buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))]),
-                               SAEMVS="SAEMVS",lassBIC="lassoBIC-SAMBA",lassoSSrepFDP10="lassorep-SAMBA\nE[FDR]<10%"))+
+                               SAEMVS="SAEMVS",lassoBIC="lassoBIC-SAMBA",lassoSSrepFDP10="lassorep-SAMBA\nE[FDR]<10%"))+
     theme(axis.text.x = element_text(size = 10),
           axis.text.y = element_text(size = 8),
           axis.title = element_text(size=12),

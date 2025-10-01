@@ -94,7 +94,8 @@ tableStatsComp <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
              setNames(paste0("lasso-SAMBA E[FDR]<",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))],"lassoFDP"),"%"),buildMethod[stringr::str_detect(buildMethod,"lassoFDP") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"lassoFDP"))]),
              setNames(paste0("Elastic Net alpha=",ifelse(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")==10,"1",ifelse(stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet")==0,"0",paste0("0.",stringr::str_remove_all(buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))],"elasticnet"))))),buildMethod[stringr::str_detect(buildMethod,"elasticnet") & grepl("^[0-9]+$", stringr::str_remove(buildMethod,"elasticnet"))]),
              SAEMVS="SAEMVS",
-             lassoBIC="lassoBIC-SAMBA")
+             lassoBIC="lassoBIC-SAMBA",
+             lassoSSrepFDP10="lassorep-SAMBA E[FDR]<10%")
 
   table = data.frame(Rate = c(paste0("False Discovery Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),
                                  paste0("False Negative Rate :\n",paste0(paste0("\t\t - ",methname[buildMethod]),collapse="\n")),

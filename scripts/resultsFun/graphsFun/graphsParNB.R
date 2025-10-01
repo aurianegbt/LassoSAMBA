@@ -163,4 +163,6 @@ graphsParNB <- function(Folder,subtitle,project,buildMethod,JPEG,PNG){
              height = 1500,width = 2500, units = "px",device=grDevices::jpeg)
     }
   }
+  
+  return(invisible(gp))
 }

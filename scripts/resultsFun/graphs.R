@@ -41,6 +41,8 @@ graphsGenerate <- function(project="Pasin",
     if(!dir.exists(Folder)){dir.create(Folder)}
     subtitle = paste0(generalsubtitle,Titlelist[[meth]])
     graphsParNB(Folder,subtitle,project,meth,JPEG,PNG)
+    p1 = graphsParCompMethod(Folder,subtitle,project,meth,FALSE,FALSE)
+    p2 = graphsStats(Folder,subtitle,project,meth,FALSE,FALSE)
     tableStats(Folder,subtitle,project,meth,JPEG,PNG)
   }
   
@@ -65,7 +67,8 @@ graphsGenerate <- function(project="Pasin",
          TimeComp = p3,
          LLComp = p4)
   }else{
-    res = NULL
+    res = list(ParComp = p1,
+               StatsComp = p2)
   }
   
   
