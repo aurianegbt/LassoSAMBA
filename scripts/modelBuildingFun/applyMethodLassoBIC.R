@@ -73,19 +73,30 @@ applyMethodLassoBIC <- function(Y,X,omega,cov0,
     
     to.cat.here = ""
   }else{
+    
+    
+    
     fit <- glmnet::glmnet(Xwh,Ywh,alpha=alpha,exclude = exclude)
     
-    tLL <- fit$nulldev - deviance(fit)
+    tLL <- fit$nulldev - deviance(fit) 
+    # 2*(loglike_sat -loglike(Null) - 2*(loglike_sat - loglike) =  2loglik - 2loglike(Null) = 2LL - cst 
     k <- fit$df
     n <- fit$nobs
     
-    fit.BIC <-log(n)*k - tLL
+    fit.BIC <- log(n)*k - tLL
     argmax_id = which.min(fit.BIC)
     
     coef.final = coef(fit,s=fit$lambda[which.min(fit.BIC)])
     
-    newcriterion = min(fit.BIC)
     selection = setNames(as.numeric(coef.final[-1,1]!=0),names(coef.final[-1,1]))
+    if(all(!as.logical(selection))){
+      newcriterion = critFUN(lm(Ywh ~ NULL))
+    }else{
+      Xkeep = Xwh[,names(selection)[which(as.logical(selection))]]
+      newcriterion = critFUN(lm(Ywh~Xkeep))
+    }
+    
+    
     
     to.cat.here =  paste0("\n              > parameter values : ",
                           paste0("lambda=",round(fit$lambda[which.min(fit.BIC)],digits=3)))
