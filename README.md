@@ -1,6 +1,6 @@
 # Supporting information
 
-This repository allows to reproduce simulation and application results from the lasso-SAMBA article. For updated version of the function, the github package LSAMBA is available at link https://github.com/aurianegbt/LSAMBA (dependencies version : Monolix/lixoftConnectors 2024R ; Rsmlx 2024.1.0).
+This repository allows to reproduce simulation and application results from the [lasso-SAMBA article](https://onlinelibrary.wiley.com/doi/10.1002/sim.70407). For updated version of the function, the github package LSAMBA is available at link https://github.com/aurianegbt/LSAMBA (dependencies version : Monolix/lixoftConnectors 2024R ; Rsmlx 2024.1.0).
 
 **Implementation of lasso in SAMBA relies on _sharp_ package [[1]](#1), containing lasso enhanced by stability selection algorithm, and _Rsmlx_ package [[2]](#2) (version 2023.1.5), containing SAMBA algorithm [[3]](#3).**
 **For lasso, categorical covariates need to be numerical and no missing values in the covariates table.**
